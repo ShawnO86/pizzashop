@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Login Page</title>
+</head>
+<style>
+    #error {
+        color: red;
+    }
+    #logout {
+        color: green;
+    }
+    h2 {
+        text-align: center;
+        background-color: #c6d3e6;
+        color: #4d70ae;
+    }
+    .form-container {
+        border: 1px solid #c6d3e6;
+        color: #333333;
+        width: fit-content;
+        margin: 15vh auto;
+    }
+    .form-info {
+        width: 100%;
+        text-align: center;
+        background-color: #fcfcfc;
+        border-top: 1px solid #343434;
+        border-bottom: 1px solid #343434;
+        padding: 0.25rem 0;
+    }
+    form {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 0.5rem 0;
+        padding: 0 1rem 1rem 1rem;
+    }
+    input[type=submit] {
+        padding: 0 1rem;
+        cursor: pointer;
+    }
+</style>
+<body>
+
+<div class="form-container">
+    <h2>Custom Login Page</h2>
+    <form action="#" th:action="@{/authenticateUser}" method="POST">
+
+        <!-- params are gathered on load from uri -->
+        <p th:if="${param.error}" class="form-info">
+            <i id="error">Invalid username or password.</i>
+        </p>
+
+        <p th:if="${param.logout}" class="form-info">
+            <i id="logout">You have been logged out.</i>
+        </p>
+
+        <label>
+            Username:
+            <input type="text" name="username" />
+        </label>
+
+        <label>
+            Password:
+            <input type="password" name="password" />
+        </label>
+
+        <br>
+        <input type="submit" value="Login" />
+
+    </form>
+</div>
+
+</body>
+</html>
