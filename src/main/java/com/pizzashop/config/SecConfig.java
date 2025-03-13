@@ -1,51 +1,47 @@
 package com.pizzashop.config;
 
+import com.pizzashop.services.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.JdbcUserDetailsManager;
-import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 import javax.sql.DataSource;
 
 @Configuration
-@EnableWebSecurity
 public class SecConfig {
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
+    public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public UserDetailsManager userDetailsManager(DataSource dataSource) {
-        JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
-
-        jdbcUserDetailsManager.setUsersByUsernameQuery(
-                "select username, password, active from user where username=?");
-        jdbcUserDetailsManager.setAuthoritiesByUsernameQuery(
-                "select username, role from role where username=?");
-
-        return jdbcUserDetailsManager;
+    public DaoAuthenticationProvider authenticationProvider(UserService userService) {
+        DaoAuthenticationProvider auth = new DaoAuthenticationProvider();
+        auth.setUserDetailsService(userService); //set the custom user details service
+        auth.setPasswordEncoder(passwordEncoder()); //set the password encoder - bcrypt
+        return auth;
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationSuccessHandler customAuthenticationSuccessHandler) throws Exception {
 
         http.authorizeHttpRequests(configurer ->
                         configurer
                                 .requestMatchers("/").permitAll()
+                                .requestMatchers("/register").permitAll()
                                 .requestMatchers("/order/**").hasRole("CUSTOMER")
                                 .requestMatchers("/employees/**").hasRole("EMPLOYEE")
                                 .requestMatchers("/system/**").hasRole("MANAGER")
                                 .anyRequest().authenticated()
                 )
                 .formLogin(form ->
-                        form.loginPage("/loginPage").loginProcessingUrl("/authenticateUser").permitAll()
+                        form.loginPage("/loginPage").loginProcessingUrl("/authenticateUser")
+                                .successHandler(customAuthenticationSuccessHandler).permitAll()
                 )
                 .logout(logout -> logout.permitAll()
                 )

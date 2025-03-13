@@ -22,24 +22,24 @@ public class User {
     @Column(name = "active")
     private boolean isActive;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "userDetailId")
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_detail_id")
     private UserDetail userDetail;
 
     //ToDo: test what cascade remove does to join table and role table
     @ManyToMany(fetch = FetchType.EAGER,
             cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(name = "userroles",
-            joinColumns = @JoinColumn(name = "userid"),
-            inverseJoinColumns = @JoinColumn(name = "roleid"))
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
     private List<Role> roles;
 
     public User() {}
 
-    public User(String username, String password) {
+    public User(String username, String password, boolean isActive) {
         this.username = username;
         this.password = password;
-        this.isActive = true;
+        this.isActive = isActive;
     }
 
     public int getId() {

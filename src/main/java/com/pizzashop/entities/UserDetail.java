@@ -25,17 +25,22 @@ public class UserDetail {
     @Column(name = "address")
     private String address;
 
-    @OneToOne(mappedBy = "userDetail",
-            cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-    private User user;
+    @Column(name = "city")
+    private String city;
+
+    @Column(name = "state")
+    private String state;
 
     public UserDetail() {}
 
-    public UserDetail(String firstName, String lastName, String email, String phone) {
+    public UserDetail(String firstName, String lastName, String email, String phone, String address, String city, String state) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.phone = phone;
+        this.address = address;
+        this.city = city;
+        this.state = state;
     }
 
     public String getFirstName() {
@@ -78,11 +83,11 @@ public class UserDetail {
         this.address = address;
     }
 
-    public User getUser() {
-        return user;
+    public int getId() {
+        return id;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setId(int id) {
+        this.id = id;
     }
 }

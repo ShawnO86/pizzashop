@@ -10,6 +10,11 @@ public class ViewController {
         return "index";
     }
 
+    @GetMapping("/order")
+    public String order() {
+        return "order";
+    }
+
     @GetMapping("/system")
     public String system() {
         return "system";

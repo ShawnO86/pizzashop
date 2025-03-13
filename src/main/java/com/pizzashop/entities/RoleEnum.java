@@ -1,7 +1,7 @@
 package com.pizzashop.entities;
 
 public enum RoleEnum {
-    CUSTOMER,
-    EMPLOYEE,
-    MANAGER,
+    ROLE_CUSTOMER,
+    ROLE_EMPLOYEE,
+    ROLE_MANAGER,
 }
