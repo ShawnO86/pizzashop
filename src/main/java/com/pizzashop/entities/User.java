@@ -2,6 +2,7 @@ package com.pizzashop.entities;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -88,5 +89,22 @@ public class User {
 
     public void setRoles(List<Role> roles) {
         this.roles = roles;
+    }
+
+    public void addRole(Role role) {
+        if (this.roles == null) {
+            this.roles = new ArrayList<>();
+        }
+        this.roles.add(role);
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "isActive=" + isActive +
+                ", userDetail=" + userDetail +
+                ", roles=" + roles +
+                ", username='" + username + '\'' +
+                '}';
     }
 }

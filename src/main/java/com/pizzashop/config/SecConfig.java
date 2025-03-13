@@ -9,8 +9,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
-import javax.sql.DataSource;
-
 @Configuration
 public class SecConfig {
 
@@ -33,7 +31,7 @@ public class SecConfig {
         http.authorizeHttpRequests(configurer ->
                         configurer
                                 .requestMatchers("/").permitAll()
-                                .requestMatchers("/register").permitAll()
+                                .requestMatchers("/register/**").permitAll()
                                 .requestMatchers("/order/**").hasRole("CUSTOMER")
                                 .requestMatchers("/employees/**").hasRole("EMPLOYEE")
                                 .requestMatchers("/system/**").hasRole("MANAGER")

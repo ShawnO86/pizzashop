@@ -5,8 +5,10 @@
   <title>Test Registration Page</title>
 </head>
 <style>
-  #error {
+  .error {
     color: red;
+    text-align: right;
+    width: 100%;
   }
   #logout {
     color: green;
@@ -46,26 +48,60 @@
 
 <div class="form-container">
   <h2>Custom Registration Page</h2>
-  <form action="#" th:action="@{/authenticateUser}" method="POST">
+  <form action="#" th:action="@{/register/processRegistrationForm}" th:object="${webUser}" method="POST">
 
-    <!-- params are gathered on load from uri -->
     <p th:if="${registrationError}" class="form-info">
-      <i id="error" th:text="${registrationError}"></i>
+      <i class="error" th:text="${registrationError}"></i>
     </p>
 
     <label>
       Username:
-      <input type="text" name="username" />
+      <input type="text" name="username" th:field="*{username}" required/>
     </label>
-
+    <sub th:if="${#fields.hasErrors('username')}" th:errors="*{username}" class="error"></sub>
     <label>
       Password:
-      <input type="password" name="password" />
+      <input type="password" name="password" th:field="*{password}" required/>
     </label>
+    <sub th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="error"></sub>
+    <label>
+      First Name:
+      <input type="text" name="firstname" th:field="*{firstName}" required/>
+    </label>
+    <sub th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}" class="error"></sub>
+    <label>
+      Last Name:
+      <input type="text" name="lastName" th:field="*{lastName}" required/>
+    </label>
+    <sub th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}" class="error"></sub>
+    <label>
+      Email:
+      <input type="text" name="email" th:field="*{email}" required/>
+    </label>
+    <sub th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error"></sub>
+    <label>
+      Phone Number:
+      <input type="text" name="phone" th:field="*{phone}" required/>
+    </label>
+    <sub th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}" class="error"></sub>
+    <label>
+      Street Address:
+      <input type="text" name="address" th:field="*{address}" required/>
+    </label>
+    <sub th:if="${#fields.hasErrors('address')}" th:errors="*{address}" class="error"></sub>
+    <label>
+      City:
+      <input type="text" name="city" th:field="*{city}" required/>
+    </label>
+    <sub th:if="${#fields.hasErrors('city')}" th:errors="*{city}" class="error"></sub>
+    <label>
+      State:
+      <input type="text" name="state" th:field="*{state}" required/>
+    </label>
+    <sub th:if="${#fields.hasErrors('state')}" th:errors="*{state}" class="error"></sub>
 
     <br>
-    <input type="submit" value="Login" />
-
+    <input type="submit" />
   </form>
 </div>
 

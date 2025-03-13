@@ -5,7 +5,6 @@ import com.pizzashop.entities.Role;
 import com.pizzashop.entities.RoleEnum;
 import com.pizzashop.entities.User;
 import com.pizzashop.dao.RoleDAO;
-import com.pizzashop.dao.UserDetailDAO;
 import com.pizzashop.dao.UserDAO;
 import com.pizzashop.entities.UserDetail;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -24,14 +22,12 @@ public class UserServiceImpl implements UserService {
 
     private final UserDAO userDAO;
     private final RoleDAO roleDAO;
-    private final UserDetailDAO userDetailDAO;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public UserServiceImpl(
-            UserDAO userDAO, RoleDAO roleDAO, UserDetailDAO userDetailDAO, BCryptPasswordEncoder bCryptPasswordEncoder) {
+            UserDAO userDAO, RoleDAO roleDAO, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userDAO = userDAO;
         this.roleDAO = roleDAO;
-        this.userDetailDAO = userDetailDAO;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
@@ -42,9 +38,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void save(UserRegisterDTO userRegisterDTO) {
+        System.out.println("Saving user: " + userRegisterDTO);
         User user;
         UserDetail userDetails;
-        Role role;
 
         user = new User();
         user.setUsername(userRegisterDTO.getUsername());
@@ -60,12 +56,14 @@ public class UserServiceImpl implements UserService {
                 userRegisterDTO.getCity(),
                 userRegisterDTO.getState()
         );
-
-        role = new Role(RoleEnum.ROLE_CUSTOMER);
         user.setUserDetail(userDetails);
-        user.setRoles(List.of(role));
-        userDAO.save(user);
 
+        //default role of customer
+        // ToDo: allow adding other roles in management view
+        Role role = roleDAO.findByRole(RoleEnum.ROLE_CUSTOMER);
+        user.addRole(role);
+
+        userDAO.save(user);
     }
 
     @Override

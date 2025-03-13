@@ -50,6 +50,7 @@ public class RegistrationController {
             HttpSession session, Model theModel) {
 
         String userName = theWebUser.getUsername();
+        System.out.println("Processing user: " + theWebUser);
 
         // form validation
         if (theBindingResult.hasErrors()){
@@ -65,6 +66,7 @@ public class RegistrationController {
             theWebUser.setPassword("");
             theModel.addAttribute("webUser", theWebUser);
             //theModel.addAttribute("webUser", new WebUser());
+
             theModel.addAttribute("registrationError", "Username already exists.");
 
             return "auth/register";

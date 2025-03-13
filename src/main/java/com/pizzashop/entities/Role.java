@@ -14,8 +14,6 @@ public class Role {
     @Column(name = "role")
     private RoleEnum role;
 
-    //Todo: setup many-to-many relation to User class
-
     public Role() {}
 
     public Role(RoleEnum role) {
