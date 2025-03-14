@@ -18,13 +18,13 @@ import java.util.Collection;
 import java.util.Optional;
 
 @Service
-public class UserServiceImpl implements UserService {
+public class UserRegistrationServiceImpl implements UserRegistrationService {
 
     private final UserDAO userDAO;
     private final RoleDAO roleDAO;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public UserServiceImpl(
+    public UserRegistrationServiceImpl(
             UserDAO userDAO, RoleDAO roleDAO, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userDAO = userDAO;
         this.roleDAO = roleDAO;
@@ -39,15 +39,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public void save(UserRegisterDTO userRegisterDTO) {
         System.out.println("Saving user: " + userRegisterDTO);
-        User user;
-        UserDetail userDetails;
 
-        user = new User();
+        User user = new User();
         user.setUsername(userRegisterDTO.getUsername());
         user.setPassword(bCryptPasswordEncoder.encode(userRegisterDTO.getPassword()));
         user.setActive(true);
 
-        userDetails = new UserDetail(
+        UserDetail userDetails = new UserDetail(
                 userRegisterDTO.getFirstName(),
                 userRegisterDTO.getLastName(),
                 userRegisterDTO.getEmail(),
@@ -56,9 +54,10 @@ public class UserServiceImpl implements UserService {
                 userRegisterDTO.getCity(),
                 userRegisterDTO.getState()
         );
+
         user.setUserDetail(userDetails);
 
-        //default role of customer
+        // set default role of customer
         // ToDo: allow adding other roles in management view
         Role role = roleDAO.findByRole(RoleEnum.ROLE_CUSTOMER);
         user.addRole(role);

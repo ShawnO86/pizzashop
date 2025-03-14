@@ -1,7 +1,7 @@
 package com.pizzashop.controllers;
 
 import com.pizzashop.entities.User;
-import com.pizzashop.services.UserService;
+import com.pizzashop.services.UserRegistrationService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -15,9 +15,9 @@ import java.util.Optional;
 
 @Controller
 public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
-    private final UserService userService;
+    private final UserRegistrationService userService;
 
-    public CustomAuthenticationSuccessHandler(UserService userService) {
+    public CustomAuthenticationSuccessHandler(UserRegistrationService userService) {
         this.userService = userService;
     }
 

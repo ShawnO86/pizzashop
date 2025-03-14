@@ -2,7 +2,7 @@ package com.pizzashop.controllers;
 
 import com.pizzashop.dto.UserRegisterDTO;
 import com.pizzashop.entities.User;
-import com.pizzashop.services.UserService;
+import com.pizzashop.services.UserRegistrationService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +19,10 @@ import java.util.Optional;
 @RequestMapping("/register")
 public class RegistrationController {
 
-    private final UserService userService;
+    private final UserRegistrationService userService;
 
     @Autowired
-    public RegistrationController(UserService userService) {
+    public RegistrationController(UserRegistrationService userService) {
         this.userService = userService;
     }
 

@@ -1,6 +1,6 @@
 package com.pizzashop.config;
 
-import com.pizzashop.services.UserService;
+import com.pizzashop.services.UserRegistrationService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -18,9 +18,9 @@ public class SecConfig {
     }
 
     @Bean
-    public DaoAuthenticationProvider authenticationProvider(UserService userService) {
+    public DaoAuthenticationProvider authenticationProvider(UserRegistrationService userRegistrationService) {
         DaoAuthenticationProvider auth = new DaoAuthenticationProvider();
-        auth.setUserDetailsService(userService); //set the custom user details service
+        auth.setUserDetailsService(userRegistrationService); //set the custom user details service
         auth.setPasswordEncoder(passwordEncoder()); //set the password encoder - bcrypt
         return auth;
     }
