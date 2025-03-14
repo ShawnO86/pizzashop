@@ -7,7 +7,6 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 @Configuration
 public class SecConfig {
@@ -26,10 +25,11 @@ public class SecConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationSuccessHandler customAuthenticationSuccessHandler) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http.authorizeHttpRequests(configurer ->
                         configurer
+                                .requestMatchers("/styles/**", "/js/**", "/images/**").permitAll()
                                 .requestMatchers("/").permitAll()
                                 .requestMatchers("/register/**").permitAll()
                                 .requestMatchers("/order/**").hasRole("CUSTOMER")
@@ -38,8 +38,7 @@ public class SecConfig {
                                 .anyRequest().authenticated()
                 )
                 .formLogin(form ->
-                        form.loginPage("/loginPage").loginProcessingUrl("/authenticateUser")
-                                .successHandler(customAuthenticationSuccessHandler).permitAll()
+                        form.loginPage("/loginPage").loginProcessingUrl("/authenticateUser").permitAll()
                 )
                 .logout(logout -> logout.permitAll()
                 )
