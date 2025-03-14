@@ -7,6 +7,7 @@ import com.pizzashop.entities.User;
 import com.pizzashop.dao.RoleDAO;
 import com.pizzashop.dao.UserDAO;
 import com.pizzashop.entities.UserDetail;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -33,7 +34,14 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
 
     @Override
     public Optional<User> findByUserName(String userName) {
-        return Optional.ofNullable(userDAO.findByUsername(userName));
+        User user;
+        try {
+           user = userDAO.findByUsername(userName);
+           return Optional.of(user);
+        } catch (EmptyResultDataAccessException e_2) {
+            System.out.println("User not found" + e_2.getMessage());
+            return Optional.empty();
+        }
     }
 
     @Override

@@ -3,7 +3,6 @@ package com.pizzashop.controllers;
 import com.pizzashop.dto.UserRegisterDTO;
 import com.pizzashop.entities.User;
 import com.pizzashop.services.UserRegistrationService;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
@@ -46,8 +45,7 @@ public class RegistrationController {
     @PostMapping("/processRegistrationForm")
     public String processRegistrationForm(
             @Valid @ModelAttribute("webUser") UserRegisterDTO theWebUser,
-            BindingResult theBindingResult,
-            HttpSession session, Model theModel) {
+            BindingResult theBindingResult, Model theModel) {
 
         String userName = theWebUser.getUsername();
         System.out.println("Processing user: " + theWebUser);
@@ -61,12 +59,11 @@ public class RegistrationController {
         Optional<User> existing = userService.findByUserName(userName);
 
         if (existing.isPresent()){
-            // instead of creating a new blank 'WebUser DTO' can just null out the userName and provide already populated
-            theWebUser.setUsername("");
-            theWebUser.setPassword("");
+            // instead of creating a new blank 'WebUser DTO', just null out the username and password and
+            // provide already populated details
+            theWebUser.setUsername(null);
+            theWebUser.setPassword(null);
             theModel.addAttribute("webUser", theWebUser);
-            //theModel.addAttribute("webUser", new WebUser());
-
             theModel.addAttribute("registrationError", "Username already exists.");
 
             return "auth/register";
@@ -76,10 +73,6 @@ public class RegistrationController {
         // I will have to populate userDetails
         userService.save(theWebUser);
 
-        // place user in the web http session for later use
-        session.setAttribute("user", theWebUser);
-
         return "auth/registration-confirmation";
     }
-
 }

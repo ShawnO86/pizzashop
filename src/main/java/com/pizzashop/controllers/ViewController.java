@@ -12,11 +12,11 @@ public class ViewController {
 
     @GetMapping("/order")
     public String order() {
-        return "order";
+        return "ordering/order";
     }
 
     @GetMapping("/system")
     public String system() {
-        return "system";
+        return "management/system";
     }
 }

@@ -7,7 +7,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import java.util.Optional;
 
 public interface UserRegistrationService extends UserDetailsService {
-    public Optional<User> findByUserName(String userName);
+    Optional<User> findByUserName(String userName);
 
-    public void save(UserRegisterDTO userRegisterDTO);
+    void save(UserRegisterDTO userRegisterDTO);
 }
