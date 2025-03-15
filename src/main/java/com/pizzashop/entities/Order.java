@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-//@Table(name = "order")
-//for H2 testing
 @Table(name = "orders")
 public class Order {
 
@@ -36,16 +34,14 @@ public class Order {
 
     public Order() {}
 
-    public Order(User user, LocalDateTime order_date, int final_price_cents) {
+    public Order(User user, LocalDateTime order_date) {
         this.user = user;
         this.order_date = order_date;
-        this.final_price_cents = final_price_cents;
     }
 
-    public Order(User user, LocalDateTime order_date, int final_price_cents, List<MenuItem> menuItems) {
+    public Order(User user, LocalDateTime order_date, List<MenuItem> menuItems) {
         this.user = user;
         this.order_date = order_date;
-        this.final_price_cents = final_price_cents;
         this.menuItems = menuItems;
     }
 
@@ -77,8 +73,14 @@ public class Order {
         return final_price_cents;
     }
 
-    public void setFinal_price_cents(int final_price_cents) {
-        this.final_price_cents = final_price_cents;
+    public void setFinal_price_cents() {
+        int price = 0;
+        if (this.menuItems != null) {
+            for (MenuItem menuItem : this.menuItems) {
+                price += menuItem.getPriceCents();
+            }
+        }
+        this.final_price_cents = price;
     }
 
     public List<MenuItem> getMenuItems() {
@@ -89,7 +91,7 @@ public class Order {
         this.menuItems = menuItems;
     }
 
-    private void addMenuItem(MenuItem menuItem) {
+    public void addMenuItem(MenuItem menuItem) {
         if (menuItems == null) {
             menuItems = new ArrayList<>();
         }

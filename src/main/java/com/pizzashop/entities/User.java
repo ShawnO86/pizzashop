@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-//@Table(name = "user")
-//for H2 testing
 @Table(name = "users")
 public class User {
 
@@ -38,7 +36,7 @@ public class User {
     private List<Role> roles;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user",
-            cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+            cascade = CascadeType.ALL)
     private List<Order> orders;
 
     public User() {}
@@ -127,6 +125,7 @@ public class User {
                 ", userDetail=" + userDetail +
                 ", roles=" + roles +
                 ", username='" + username + '\'' +
+                ", orders=" + orders +
                 '}';
     }
 }
