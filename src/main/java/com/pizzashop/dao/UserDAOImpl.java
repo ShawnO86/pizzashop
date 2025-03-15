@@ -23,8 +23,23 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
+    public User findByUsernameJoinFetchDetailsOrders(String username) {
+        TypedQuery<User> query = em.createQuery("SELECT u FROM User u " +
+                "JOIN FETCH u.userDetail JOIN FETCH u.orders " +
+                "WHERE u.username = :username", User.class);
+        query.setParameter("username", username);
+        return query.getSingleResult();
+    }
+
+    @Override
     @Transactional
     public void save(User user) {
         em.persist(user);
+    }
+
+    @Override
+    @Transactional
+    public void update(User user) {
+        em.merge(user);
     }
 }
