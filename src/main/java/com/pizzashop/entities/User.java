@@ -6,7 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "user")
+//@Table(name = "user")
+//for H2 testing
+@Table(name = "users")
 public class User {
 
     @Id
@@ -30,10 +32,14 @@ public class User {
     //ToDo: test what cascade remove does to join table and role table
     @ManyToMany(fetch = FetchType.EAGER,
             cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-    @JoinTable(name = "userroles",
+    @JoinTable(name = "users_roles",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private List<Role> roles;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user",
+            cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    private List<Order> orders;
 
     public User() {}
 
@@ -91,11 +97,27 @@ public class User {
         this.roles = roles;
     }
 
+    public List<Order> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(List<Order> orders) {
+        this.orders = orders;
+    }
+
     public void addRole(Role role) {
         if (this.roles == null) {
             this.roles = new ArrayList<>();
         }
         this.roles.add(role);
+    }
+
+    public void addOrder(Order order) {
+        if (this.orders == null) {
+            this.orders = new ArrayList<>();
+        }
+        this.orders.add(order);
+        order.setUser(this);
     }
 
     @Override

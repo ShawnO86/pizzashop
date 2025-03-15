@@ -1,0 +1,108 @@
+package com.pizzashop.entities;
+
+import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+//@Table(name = "order")
+//for H2 testing
+@Table(name = "orders")
+public class Order {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private int id;
+
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @Column(name = "order_date")
+    private LocalDateTime order_date;
+
+    @Column(name = "final_price_cents")
+    private int final_price_cents;
+
+    @ManyToMany(fetch = FetchType.EAGER,
+            cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @JoinTable(name = "orders_menuItems",
+            joinColumns = @JoinColumn(name = "order_id"),
+            inverseJoinColumns = @JoinColumn(name = "menu_item_id"))
+    private List<MenuItem> menuItems;
+
+    public Order() {}
+
+    public Order(User user, LocalDateTime order_date, int final_price_cents) {
+        this.user = user;
+        this.order_date = order_date;
+        this.final_price_cents = final_price_cents;
+    }
+
+    public Order(User user, LocalDateTime order_date, int final_price_cents, List<MenuItem> menuItems) {
+        this.user = user;
+        this.order_date = order_date;
+        this.final_price_cents = final_price_cents;
+        this.menuItems = menuItems;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public LocalDateTime getOrder_date() {
+        return order_date;
+    }
+
+    public void setOrder_date(LocalDateTime order_date) {
+        this.order_date = order_date;
+    }
+
+    public int getFinal_price_cents() {
+        return final_price_cents;
+    }
+
+    public void setFinal_price_cents(int final_price_cents) {
+        this.final_price_cents = final_price_cents;
+    }
+
+    public List<MenuItem> getMenuItems() {
+        return menuItems;
+    }
+
+    public void setMenuItems(List<MenuItem> menuItems) {
+        this.menuItems = menuItems;
+    }
+
+    private void addMenuItem(MenuItem menuItem) {
+        if (menuItems == null) {
+            menuItems = new ArrayList<>();
+        }
+        this.menuItems.add(menuItem);
+    }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "user=" + user.getUsername() +
+                ", order_date=" + order_date +
+                ", final_price_cents=" + final_price_cents +
+                ", menuItems=" + menuItems +
+                '}';
+    }
+}
