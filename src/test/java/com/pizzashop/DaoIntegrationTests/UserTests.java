@@ -2,21 +2,19 @@ package com.pizzashop.DaoIntegrationTests;
 
 import com.pizzashop.dao.UserDAO;
 import com.pizzashop.entities.*;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY) // uses H2
+@DataJpaTest // uses H2 in memory db instead of main db IF on classpath
 @ComponentScan("com.pizzashop.dao") // needed because not within main com.pizzashop package
 public class UserTests {
     @Autowired
@@ -62,31 +60,34 @@ public class UserTests {
     }
 
     @Test
-    public void testAddOrder() {
-        List<Order> orders = new ArrayList<>();
-        MenuItem menuItem1 = new MenuItem("Bread sticks", "sticks of bread", 350);
-        MenuItem menuItem2 = new MenuItem("Spaghetti Bolognese", "Pasta with a meat and tomato sauce", 900);
-        MenuItem menuItem3 = new MenuItem("Lg Soda", "Large Soda", 150);
+    public void notFoundUser() {
+        User fetchedUser = userDAO.findByUsername(user.getUsername());
+        List<User> fetchedUsers = userDAO.findAll();
 
-        Order order1 = new Order(user, LocalDateTime.now());
-        order1.addMenuItem(menuItem1);
-        order1.addMenuItem(menuItem2);
-        order1.addMenuItem(menuItem3);
-        order1.setFinal_price_cents();
+        assertNull(fetchedUser);
+        assertEquals(0, fetchedUsers.size());
 
-        user.addOrder(order1);
-        System.out.println("in test add order: " + user);
+        System.out.println("Add user test complete, fetched user:\n" + fetchedUser + "\nEntered user:\n" + user);
+    }
+
+    @Test
+    public void testUpdateUser() {
         userDAO.save(user);
 
-        User userWithOrders = userDAO.findByUsernameJoinFetchOrders(user.getUsername());
+        User fetchedUser = userDAO.findByUsername(user.getUsername());
+        UserDetail fetchedUserDetail = fetchedUser.getUserDetail();
+        System.out.println("Fetched user:\n" + fetchedUser);
 
-        System.out.println("Add user test complete, fetched user:\n" + userWithOrders + "\nEntered user:\n" + user);
-        System.out.println("orders: \n" + userWithOrders.getOrders());
+        fetchedUserDetail.setFirstName("TestFirstName_changed");
+        fetchedUser.setUserDetail(fetchedUserDetail);
 
-        assertNotNull(userWithOrders);
-        assertEquals(userWithOrders.getUsername(), user.getUsername());
-        assertEquals(1, userWithOrders.getOrders().size());
-        assertEquals(userWithOrders.getOrders().getFirst().getMenuItems().getFirst(), order1.getMenuItems().getFirst());
+        User changedUser = userDAO.findByUsername(user.getUsername());
+
+        System.out.println("Updated user:\n" + changedUser);
+        // ensure same identifier
+        assertEquals(changedUser.getId(), fetchedUser.getId());
+        assertEquals(changedUser.getUserDetail().getFirstName(), user.getUserDetail().getFirstName());
     }
+
 
 }
