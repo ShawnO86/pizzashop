@@ -2,9 +2,12 @@ package com.pizzashop.dao;
 
 import com.pizzashop.entities.User;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public class UserDAOImpl implements UserDAO {
@@ -17,9 +20,20 @@ public class UserDAOImpl implements UserDAO {
 
     @Override
     public User findByUsername(String username) {
-        TypedQuery<User> query = em.createQuery("Select u From User u Where u.username = :username", User.class);
+        TypedQuery<User> query = em.createQuery("FROM User WHERE username = :username", User.class);
         query.setParameter("username", username);
-        return query.getSingleResult();
+        try {
+            return query.getSingleResult();
+        } catch (NoResultException e) {
+            System.out.println("No user found by username: " + username);
+            return null;
+        }
+    }
+
+    @Override
+    public List<User> findAll() {
+        TypedQuery<User> query = em.createQuery("FROM User", User.class);
+        return query.getResultList();
     }
 
     @Override
@@ -29,7 +43,12 @@ public class UserDAOImpl implements UserDAO {
                 "JOIN FETCH u.orders " +
                 "WHERE u.username = :username", User.class);
         query.setParameter("username", username);
-        return query.getSingleResult();
+        try {
+            return query.getSingleResult();
+        } catch (NoResultException e) {
+            System.out.println("No user found by username: " + username);
+            return null;
+        }
     }
 
     @Override
@@ -43,4 +62,10 @@ public class UserDAOImpl implements UserDAO {
     public void update(User user) {
         em.merge(user);
     }
+
+    @Override
+    public void delete(User user) {
+        em.remove(user);
+    }
+
 }
