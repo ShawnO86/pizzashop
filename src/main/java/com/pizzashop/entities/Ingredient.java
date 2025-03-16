@@ -2,6 +2,8 @@ package com.pizzashop.entities;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "ingredient")
 public class Ingredient {
@@ -21,6 +23,9 @@ public class Ingredient {
 
     @Column(name = "cents_cost_per")
     private int centsCostPer;
+
+    @OneToMany(mappedBy = "ingredient", cascade = CascadeType.ALL)
+    private List<MenuItemIngredient> menuItemIngredients;
 
     public Ingredient() {}
 

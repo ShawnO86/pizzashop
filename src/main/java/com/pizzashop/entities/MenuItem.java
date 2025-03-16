@@ -2,6 +2,7 @@ package com.pizzashop.entities;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -26,12 +27,15 @@ public class MenuItem {
             cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private List<Order> orders;
 
+    @OneToMany(mappedBy = "menuItem", cascade = CascadeType.ALL)
+    private List<MenuItemIngredient> menuItemIngredients;
+
+
     public MenuItem() {}
 
-    public MenuItem(String dishName, String description, int priceCents) {
+    public MenuItem(String dishName, String description) {
         this.dishName = dishName;
         this.description = description;
-        this.priceCents = priceCents;
     }
 
     public int getId() {
@@ -72,6 +76,21 @@ public class MenuItem {
 
     public void setOrders(List<Order> orders) {
         this.orders = orders;
+    }
+
+    public List<MenuItemIngredient> getMenuItemIngredients() {
+        return menuItemIngredients;
+    }
+
+    public void setMenuItemIngredients(List<MenuItemIngredient> menuItemIngredients) {
+        this.menuItemIngredients = menuItemIngredients;
+    }
+
+    public void addIngredient(MenuItemIngredient menuItemIngredient) {
+        if (menuItemIngredients == null) {
+            menuItemIngredients = new ArrayList<>();
+        }
+        menuItemIngredients.add(menuItemIngredient);
     }
 
     @Override
