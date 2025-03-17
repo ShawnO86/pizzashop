@@ -36,7 +36,7 @@ public class User {
     private List<Role> roles;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user",
-            cascade = CascadeType.ALL)
+            cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private List<Order> orders;
 
     public User() {}

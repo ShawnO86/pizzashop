@@ -23,31 +23,28 @@ public class MenuItemServiceImpl implements MenuItemService {
         this.ingredientDAO = ingredientDAO;
     }
 
+
+    //ToDo: reduce inventory using this map when menu item is ordered
     @Override
     @Transactional
     public void mapIngredientsToMenuItem(String menuItemName, Map<String, Integer> ingredientsQuantities) {
         MenuItem menuItem = menuItemDAO.findByName(menuItemName);
 
-        ingredientsQuantities.forEach((ingredientName, quantityUsed) -> {
-            Ingredient ingredient = ingredientDAO.findByName(ingredientName);
-            int currentStock = ingredient.getCurrentStock();
-            if (currentStock >= quantityUsed) {
+        if (menuItem != null) {
+            ingredientsQuantities.forEach((ingredientName, quantityUsed) -> {
+
+                Ingredient ingredient = ingredientDAO.findByName(ingredientName);
                 // set join table record
                 MenuItemIngredient menuItemIngredient = new MenuItemIngredient(menuItem, ingredient, quantityUsed);
-                // add map to ingredient table
+                // map to ingredient table
                 menuItem.addIngredient(menuItemIngredient);
-                // reduce ingredient inventory
-                ingredient.setCurrentStock(currentStock - quantityUsed);
                 // calculate price
                 int cost = ingredient.getCentsCostPer() * quantityUsed;
-                int charge = (int) (cost * 0.05);
                 // add to the running total
-                menuItem.setPriceCents(menuItem.getPriceCents() + (cost + charge));
-                // update menuItem with mapped ingredient and final price
-                menuItemDAO.update(menuItem);
-            } else {
-                throw new IllegalArgumentException("Not enough stock of : " + ingredientName + " current stock is: " + currentStock);
-            }
-        });
+                menuItem.setPriceCents(menuItem.getPriceCents() + cost);
+            });
+            // update menuItem with mapped ingredient and final price
+            menuItemDAO.update(menuItem);
+        }
     }
 }

@@ -23,6 +23,10 @@ public class MenuItem {
     @Column(name = "price_cents")
     private int priceCents;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "category")
+    private MenuCategoryEnum menuCategory;
+
     @ManyToMany(mappedBy = "menuItems", fetch = FetchType.LAZY,
             cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private List<Order> orders;
@@ -33,9 +37,10 @@ public class MenuItem {
 
     public MenuItem() {}
 
-    public MenuItem(String dishName, String description) {
+    public MenuItem(String dishName, String description, MenuCategoryEnum menuCategory) {
         this.dishName = dishName;
         this.description = description;
+        this.menuCategory = menuCategory;
     }
 
     public int getId() {
@@ -68,6 +73,14 @@ public class MenuItem {
 
     public void setPriceCents(int priceCents) {
         this.priceCents = priceCents;
+    }
+
+    public MenuCategoryEnum getMenuCategory() {
+        return menuCategory;
+    }
+
+    public void setMenuCategory(MenuCategoryEnum menuCategory) {
+        this.menuCategory = menuCategory;
     }
 
     public List<Order> getOrders() {

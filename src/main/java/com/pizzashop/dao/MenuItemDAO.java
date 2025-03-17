@@ -1,8 +1,10 @@
 package com.pizzashop.dao;
 
+import com.pizzashop.entities.Ingredient;
 import com.pizzashop.entities.MenuItem;
 
 import java.util.List;
+import java.util.Map;
 
 public interface MenuItemDAO {
     MenuItem findByName(String name);

@@ -4,8 +4,11 @@ import com.pizzashop.config.SecConfig;
 import com.pizzashop.controllers.RegistrationController;
 import com.pizzashop.dao.IngredientDAO;
 import com.pizzashop.dao.MenuItemDAO;
+import com.pizzashop.dao.OrderDAO;
+import com.pizzashop.dto.OrderDTO;
 import com.pizzashop.entities.*;
 import com.pizzashop.services.MenuItemService;
+import com.pizzashop.services.OrderService;
 import com.pizzashop.services.UserRegistrationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +31,9 @@ import static org.junit.jupiter.api.Assertions.*;
         includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {
                 MenuItemDAO.class,
                 IngredientDAO.class,
+                OrderDAO.class,
                 MenuItemService.class,
+                OrderService.class,
         }),
         excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {
                 UserRegistrationService.class,
@@ -40,25 +46,29 @@ public class MenuTests {
     @Autowired
     private MenuItemService menuItemService;
     @Autowired
+    private OrderService orderService;
+    @Autowired
+    private OrderDAO orderDAO;
+    @Autowired
     private MenuItemDAO menuItemDAO;
     @Autowired
     private IngredientDAO ingredientDAO;
 
-    private Map<String, Integer> sodaSizes = new HashMap<>();
-
-    @BeforeEach
-    void setUp() {
+    private static final Map<String, Integer> sodaSizes = new HashMap<>();
+    static {
         sodaSizes.put("Lg", 32);
         sodaSizes.put("Md", 24);
         sodaSizes.put("Sm", 16);
+    }
 
-
+    @BeforeEach
+    void setUp() {
 //        order = new Order(user, LocalDateTime.now());
 
-        // Creating dishes and quantities are done once upon dish creation.
+        // Creating dishes and quantities are done once upon dish creation outside of testing.
 
         //create breadsticks dish and it's ingredients
-        MenuItem breadSticks = new MenuItem("Bread sticks", "sticks of bread");
+        MenuItem breadSticks = new MenuItem("Bread sticks", "sticks of bread", MenuCategoryEnum.APP);
         menuItemDAO.save(breadSticks);
         Ingredient dough = new Ingredient("Dough", 50, "pounds", 100);
         ingredientDAO.save(dough);
@@ -68,7 +78,7 @@ public class MenuTests {
         menuItemService.mapIngredientsToMenuItem(breadSticks.getDishName(), breadSticksIngredientsQuantities);
 
         //create spaghetti dish and it's ingredients
-        MenuItem spaghetti = new MenuItem("Spaghetti Bolognese", "Pasta with a meat and tomato sauce");
+        MenuItem spaghetti = new MenuItem("Spaghetti Bolognese", "Pasta with a meat and tomato sauce", MenuCategoryEnum.PASTA);
         menuItemDAO.save(spaghetti);
         Ingredient tomatoSauce = new Ingredient("Tomato sauce", 2000, "cups", 25);
         ingredientDAO.save(tomatoSauce);
@@ -84,7 +94,7 @@ public class MenuTests {
         menuItemService.mapIngredientsToMenuItem(spaghetti.getDishName(), spaghettiIngredientsQuantities);
 
         //create soda and it's ingredients
-        MenuItem lgSoda = new MenuItem("Lg Soda", "Large Soda");
+        MenuItem lgSoda = new MenuItem("Lg Soda", "Large Soda", MenuCategoryEnum.DRINK);
         menuItemDAO.save(lgSoda);
         Ingredient soda = new Ingredient("Soda", 1280, "oz", 10);
         ingredientDAO.save(soda);
@@ -101,12 +111,52 @@ public class MenuTests {
         // look at menu items and mapped ingredients
         for (MenuItem menuItem : menuItems) {
             System.out.println("Menu Item Name: " + menuItem.getDishName() + "\nIngredients:");
+            System.out.println("Category: " + menuItem.getMenuCategory() + "\nCost: " + menuItem.getPriceCents());
             for (MenuItemIngredient menuItemIngredient : menuItem.getMenuItemIngredients()) {
                 Ingredient ingredient = menuItemIngredient.getIngredient();
-                System.out.println(ingredient.getIngredientName() + " quantity: " + menuItemIngredient.getQuantityUsed());
+                System.out.println(ingredient.getIngredientName() + " -- quantity: " + menuItemIngredient.getQuantityUsed());
             }
         }
 
         assertEquals(3, menuItems.size());
+    }
+
+    @Test
+    public void createOrderTest() {
+        User user = new User();
+        user.setUsername("TestName");
+        user.setPassword("TestPassword");
+        user.setActive(true);
+        UserDetail userDetail = new UserDetail();
+        userDetail.setFirstName("TestFirstName");
+        userDetail.setLastName("TestLastName");
+        userDetail.setEmail("TestEmail");
+        userDetail.setPhone("TestPhone");
+        userDetail.setAddress("TestAddress");
+        userDetail.setCity("TestCity");
+        userDetail.setState("TestState");
+        user.setUserDetail(userDetail);
+
+        Role role = new Role(RoleEnum.ROLE_CUSTOMER);
+        user.addRole(role);
+
+        List<MenuItem> menuItems = menuItemDAO.findAll();
+
+        OrderDTO orderDTO  = new OrderDTO();
+        for (MenuItem menuItem : menuItems) {
+            orderDTO.addMenuItem(menuItem);
+        }
+        // 1071 for added menuitems
+        orderService.addOrderToDB(orderDTO, user);
+
+        Order checkOrder = orderDAO.findOrderById(1);
+
+        List<Ingredient> ingredients = ingredientDAO.findAll();
+
+
+        //NEED TO REMOVE INGREDIENTS WHILE IN ORDER SERVICE!!!
+        System.out.println(ingredients);
+
+        assertEquals(1122, checkOrder.getFinal_price_cents());
     }
 }
