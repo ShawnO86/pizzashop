@@ -153,8 +153,6 @@ public class MenuTests {
 
         List<Ingredient> ingredients = ingredientDAO.findAll();
 
-
-        //NEED TO REMOVE INGREDIENTS WHILE IN ORDER SERVICE!!!
         System.out.println(ingredients);
 
         assertEquals(1122, checkOrder.getFinal_price_cents());
