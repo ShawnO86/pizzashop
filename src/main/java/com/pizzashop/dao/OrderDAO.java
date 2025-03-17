@@ -7,6 +7,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface OrderDAO {
+
+    Order findOrderById(int id);
+
     List<Order> findAllOrders();
 
     List<Order> findAllOrdersByDate(LocalDateTime date);
@@ -16,4 +19,6 @@ public interface OrderDAO {
     List<Order> findAllOrdersByUsername(String username);
 
     List<Order> findAllOrdersByMenuItem(MenuItem menuItem);
+
+    void save(Order order);
 }

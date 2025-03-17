@@ -73,14 +73,8 @@ public class Order {
         return final_price_cents;
     }
 
-    public void setFinal_price_cents() {
-        int price = 0;
-        if (this.menuItems != null) {
-            for (MenuItem menuItem : this.menuItems) {
-                price += menuItem.getPriceCents();
-            }
-        }
-        this.final_price_cents = price;
+    public void setFinal_price_cents(int final_price_cents) {
+        this.final_price_cents = final_price_cents;
     }
 
     public List<MenuItem> getMenuItems() {
