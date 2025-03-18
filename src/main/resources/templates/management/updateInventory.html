@@ -17,7 +17,7 @@
 
 <main>
   <section class="form-container">
-    <form method="POST" th:action="@{/system/saveUpdatedInventory}" th:object="${inventoryItem}">
+    <form method="POST" th:action="@{/inventory/saveUpdatedInventory}" th:object="${inventoryItem}">
 
       <p th:if="${inventoryError}" class="error form-info">
         <i class="error" th:text="${inventoryError}"></i>

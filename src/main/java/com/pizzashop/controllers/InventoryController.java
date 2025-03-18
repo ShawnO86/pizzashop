@@ -15,13 +15,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Controller
-@RequestMapping("/system")
-public class MenuController {
+@RequestMapping("/inventory")
+public class InventoryController {
 
     MenuItemService menuItemService;
 
     @Autowired
-    public MenuController(MenuItemService menuItemService) {
+    public InventoryController(MenuItemService menuItemService) {
         this.menuItemService = menuItemService;
     }
 
@@ -62,7 +62,7 @@ public class MenuController {
     @GetMapping("/deleteInventory")
     public String deleteInventory(@RequestParam("ingredientId") int ingredientId) {
         menuItemService.deleteIngredient(ingredientId);
-        return "redirect:/system/showInventory";
+        return "redirect:/inventory/showInventory";
     }
 
     @PostMapping("/saveInventory")
@@ -82,7 +82,7 @@ public class MenuController {
         }
 
         menuItemService.saveIngredient(ingredientDTO);
-        return "redirect:/system/showInventory";
+        return "redirect:/inventory/showInventory";
     }
 
     // thymeleaf gets ingredientId from model and sends with form data as requestParam
@@ -100,6 +100,6 @@ public class MenuController {
 
         menuItemService.updateIngredient(ingredientId, ingredientDTO);
 
-        return "redirect:/system/showInventory";
+        return "redirect:/inventory/showInventory";
     }
 }

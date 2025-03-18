@@ -32,7 +32,7 @@ public class SecConfig {
                                 .requestMatchers("/","/register/**","/loginPage","/styles/**", "/js/**", "/images/**").permitAll()
                                 .requestMatchers("/order/**").hasRole("CUSTOMER")
                                 .requestMatchers("/employees/**").hasRole("EMPLOYEE")
-                                .requestMatchers("/system/**").hasRole("MANAGER")
+                                .requestMatchers("/inventory/**", "/menu/**").hasRole("MANAGER")
                                 .anyRequest().authenticated()
                 )
                 .formLogin(form ->
