@@ -3,8 +3,14 @@ package com.pizzashop.services;
 import com.pizzashop.dao.IngredientDAO;
 import com.pizzashop.dao.MenuItemDAO;
 import com.pizzashop.dao.OrderDAO;
+import com.pizzashop.dao.UserDAO;
 import com.pizzashop.dto.OrderDTO;
-import com.pizzashop.entities.*;
+import com.pizzashop.entities.MenuItem;
+import com.pizzashop.entities.Order;
+import com.pizzashop.entities.MenuItemIngredient;
+import com.pizzashop.entities.User;
+import com.pizzashop.entities.Ingredient;
+
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,19 +26,21 @@ public class OrderServiceImpl implements OrderService {
     IngredientDAO ingredientDAO;
     MenuItemDAO menuItemDAO;
     OrderDAO orderDAO;
+    UserDAO userDAO;
 
     @Autowired
-    public OrderServiceImpl(IngredientDAO ingredientDAO, MenuItemDAO menuItemDAO, OrderDAO orderDAO) {
+    public OrderServiceImpl(IngredientDAO ingredientDAO, MenuItemDAO menuItemDAO, OrderDAO orderDAO, UserDAO userDAO) {
         this.ingredientDAO = ingredientDAO;
         this.menuItemDAO = menuItemDAO;
         this.orderDAO = orderDAO;
+        this.userDAO = userDAO;
     }
 
-    // user directly added for now for testing will grab from session later ... I think
-    // test adding From DTO
     @Override
     @Transactional
-    public void addOrderToDB(OrderDTO orderDTO, User user) {
+    public void addOrderToDB(OrderDTO orderDTO, String username) {
+        User user = userDAO.findByUsername(username);
+
         Order newOrder = new Order(user, LocalDateTime.now());
         List<MenuItem> menuItems = orderDTO.getMenuItems();
         int finalPrice = calculateTotalPrice(menuItems);
@@ -41,11 +49,11 @@ public class OrderServiceImpl implements OrderService {
         newOrder.setFinal_price_cents(finalPrice);
 
         orderDAO.save(newOrder);
-        updateIngredients(menuItems);
+        updateIngredientQuantities(menuItems);
     }
 
     @Transactional
-    public void updateIngredients(List<MenuItem> menuItems) {
+    public void updateIngredientQuantities(List<MenuItem> menuItems) {
         for (MenuItem menuItem : menuItems) {
             List<MenuItemIngredient> ingredients = menuItem.getMenuItemIngredients();
             for (MenuItemIngredient menuItemIngredient : ingredients) {

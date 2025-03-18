@@ -9,6 +9,5 @@ import java.util.List;
 
 public interface OrderService {
 
-    // ToDo: create method to reduce inventory when order is added
-    void addOrderToDB(OrderDTO orderDTO, User user);
+    void addOrderToDB(OrderDTO orderDTO, String username);
 }

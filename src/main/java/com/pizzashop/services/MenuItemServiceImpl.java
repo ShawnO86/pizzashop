@@ -23,28 +23,22 @@ public class MenuItemServiceImpl implements MenuItemService {
         this.ingredientDAO = ingredientDAO;
     }
 
-
-    //ToDo: reduce inventory using this map when menu item is ordered
     @Override
     @Transactional
-    public void mapIngredientsToMenuItem(String menuItemName, Map<String, Integer> ingredientsQuantities) {
-        MenuItem menuItem = menuItemDAO.findByName(menuItemName);
-
-        if (menuItem != null) {
-            ingredientsQuantities.forEach((ingredientName, quantityUsed) -> {
-
-                Ingredient ingredient = ingredientDAO.findByName(ingredientName);
-                // set join table record
-                MenuItemIngredient menuItemIngredient = new MenuItemIngredient(menuItem, ingredient, quantityUsed);
-                // map to ingredient table
-                menuItem.addIngredient(menuItemIngredient);
-                // calculate price
-                int cost = ingredient.getCentsCostPer() * quantityUsed;
-                // add to the running total
-                menuItem.setPriceCents(menuItem.getPriceCents() + cost);
-            });
-            // update menuItem with mapped ingredient and final price
-            menuItemDAO.update(menuItem);
-        }
+    public void mapIngredientsToMenuItem(MenuItem menuItem, Map<String, Integer> ingredientsQuantities) {
+        ingredientsQuantities.forEach((ingredientName, quantityUsed) -> {
+            Ingredient ingredient = ingredientDAO.findByName(ingredientName);
+            // set join table record
+            MenuItemIngredient menuItemIngredient = new MenuItemIngredient(menuItem, ingredient, quantityUsed);
+            // map to ingredient table
+            menuItem.addIngredient(menuItemIngredient);
+            // calculate price
+            int cost = ingredient.getCentsCostPer() * quantityUsed;
+            // add to the running total
+            menuItem.setPriceCents(menuItem.getPriceCents() + cost);
+        });
+        // save menuItem with mapped ingredient and final price
+        menuItemDAO.save(menuItem);
     }
+
 }

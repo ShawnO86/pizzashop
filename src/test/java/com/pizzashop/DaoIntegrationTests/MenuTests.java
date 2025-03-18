@@ -5,6 +5,7 @@ import com.pizzashop.controllers.RegistrationController;
 import com.pizzashop.dao.IngredientDAO;
 import com.pizzashop.dao.MenuItemDAO;
 import com.pizzashop.dao.OrderDAO;
+import com.pizzashop.dao.UserDAO;
 import com.pizzashop.dto.OrderDTO;
 import com.pizzashop.entities.*;
 import com.pizzashop.services.MenuItemService;
@@ -32,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.*;
                 MenuItemDAO.class,
                 IngredientDAO.class,
                 OrderDAO.class,
+                UserDAO.class,
                 MenuItemService.class,
                 OrderService.class,
         }),
@@ -53,6 +55,8 @@ public class MenuTests {
     private MenuItemDAO menuItemDAO;
     @Autowired
     private IngredientDAO ingredientDAO;
+    @Autowired
+    private UserDAO userDAO;
 
     private static final Map<String, Integer> sodaSizes = new HashMap<>();
     static {
@@ -69,17 +73,15 @@ public class MenuTests {
 
         //create breadsticks dish and it's ingredients
         MenuItem breadSticks = new MenuItem("Bread sticks", "sticks of bread", MenuCategoryEnum.APP);
-        menuItemDAO.save(breadSticks);
         Ingredient dough = new Ingredient("Dough", 50, "pounds", 100);
         ingredientDAO.save(dough);
-        // set ingredient quantities
+        // set ingredient quantities and save menuItem
         Map<String, Integer> breadSticksIngredientsQuantities = new HashMap<>();
         breadSticksIngredientsQuantities.put(dough.getIngredientName(), 1);
-        menuItemService.mapIngredientsToMenuItem(breadSticks.getDishName(), breadSticksIngredientsQuantities);
+        menuItemService.mapIngredientsToMenuItem(breadSticks, breadSticksIngredientsQuantities);
 
         //create spaghetti dish and it's ingredients
         MenuItem spaghetti = new MenuItem("Spaghetti Bolognese", "Pasta with a meat and tomato sauce", MenuCategoryEnum.PASTA);
-        menuItemDAO.save(spaghetti);
         Ingredient tomatoSauce = new Ingredient("Tomato sauce", 2000, "cups", 25);
         ingredientDAO.save(tomatoSauce);
         Ingredient pasta = new Ingredient("Pasta", 100, "pounds", 200);
@@ -91,17 +93,16 @@ public class MenuTests {
         spaghettiIngredientsQuantities.put(tomatoSauce.getIngredientName(), 2);
         spaghettiIngredientsQuantities.put(pasta.getIngredientName(), 1);
         spaghettiIngredientsQuantities.put(groundBeef.getIngredientName(), 1);
-        menuItemService.mapIngredientsToMenuItem(spaghetti.getDishName(), spaghettiIngredientsQuantities);
+        menuItemService.mapIngredientsToMenuItem(spaghetti, spaghettiIngredientsQuantities);
 
         //create soda and it's ingredients
         MenuItem lgSoda = new MenuItem("Lg Soda", "Large Soda", MenuCategoryEnum.DRINK);
-        menuItemDAO.save(lgSoda);
         Ingredient soda = new Ingredient("Soda", 1280, "oz", 10);
         ingredientDAO.save(soda);
         // set ingredient quantities
         Map<String, Integer> sodaIngredientsQuantities = new HashMap<>();
         sodaIngredientsQuantities.put(soda.getIngredientName(), sodaSizes.get("Lg"));
-        menuItemService.mapIngredientsToMenuItem(lgSoda.getDishName(), sodaIngredientsQuantities);
+        menuItemService.mapIngredientsToMenuItem(lgSoda, sodaIngredientsQuantities);
     }
 
     @Test
@@ -140,14 +141,16 @@ public class MenuTests {
         Role role = new Role(RoleEnum.ROLE_CUSTOMER);
         user.addRole(role);
 
+        userDAO.save(user);
+
         List<MenuItem> menuItems = menuItemDAO.findAll();
 
         OrderDTO orderDTO  = new OrderDTO();
         for (MenuItem menuItem : menuItems) {
             orderDTO.addMenuItem(menuItem);
         }
-        // 1071 for added menuitems
-        orderService.addOrderToDB(orderDTO, user);
+
+        orderService.addOrderToDB(orderDTO, user.getUsername());
 
         Order checkOrder = orderDAO.findOrderById(1);
 
@@ -155,6 +158,7 @@ public class MenuTests {
 
         System.out.println(ingredients);
 
+        //1122 cost of added menuItems
         assertEquals(1122, checkOrder.getFinal_price_cents());
     }
 }

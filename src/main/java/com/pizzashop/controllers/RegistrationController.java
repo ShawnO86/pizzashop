@@ -52,6 +52,7 @@ public class RegistrationController {
 
         // form validation
         if (theBindingResult.hasErrors()){
+            theModel.addAttribute("registrationError", "You must correct the errors before proceeding");
             return "auth/register";
         }
 
