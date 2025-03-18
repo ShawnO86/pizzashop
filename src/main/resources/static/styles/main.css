@@ -1,14 +1,14 @@
-#error {
+:root {
+    --bg: #c6d3e6;
+}
+
+.error {
     color: red;
 }
 #logout {
     color: green;
 }
-h2 {
-    text-align: center;
-    background-color: #c6d3e6;
-    color: #4d70ae;
-}
+
 .form-container {
     border: 1px solid #c6d3e6;
     color: #333333;
@@ -18,7 +18,7 @@ h2 {
 .form-info {
     width: 100%;
     text-align: center;
-    background-color: #fcfcfc;
+    background-color: var(--bg);
     border-top: 1px solid #343434;
     border-bottom: 1px solid #343434;
     padding: 0.25rem 0;
@@ -33,4 +33,13 @@ form {
 input[type=submit] {
     padding: 0 1rem;
     cursor: pointer;
+}
+table {
+    border-collapse: collapse;
+
+}
+th, td {
+    border: 1px dashed #c6d3e6;
+    text-align: center;
+    padding: 1rem;
 }

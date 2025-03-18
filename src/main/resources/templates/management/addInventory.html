@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Pizza Shop System</title>
+  <link rel="stylesheet" type="text/css" href="/styles/main.css">
+</head>
+
+<body>
+<header>
+  <h1>Add Inventory Form</h1>
+  <hr>
+  <form action="#" th:action="@{/logout}" method="POST">
+    <input type="submit" value="Logout"/>
+  </form>
+</header>
+
+<main>
+  <section class="form-container">
+    <form method="POST" th:action="@{/system/saveInventory}" th:object="${inventoryItem}">
+
+      <p th:if="${inventoryError}" class="error form-info">
+        <i class="error" th:text="${inventoryError}"></i>
+      </p>
+
+      <label>Name:
+        <input type="text" th:field="*{ingredientName}" placeholder="name">
+        <span th:if="${#fields.hasErrors('ingredientName')}" th:errors="*{ingredientName}" class="error"></span>
+      </label>
+
+      <label>Stock quantity:
+        <input type="number" th:field="*{currentStock}" placeholder="quantity">
+        <span th:if="${#fields.hasErrors('currentStock')}" th:errors="*{currentStock}" class="error"></span>
+      </label>
+
+      <label>Unit of measure:
+        <select th:field="*{unitOfMeasure}">
+          <option value="ounces">Ounces</option>
+          <option value="cups">Cups</option>
+          <option value="pounds">Pounds</option>
+        </select>
+        <span th:if="${#fields.hasErrors('unitOfMeasure')}" th:errors="*{unitOfMeasure}" class="error"></span>
+      </label>
+
+      <label>Cost in cents:
+        <input type="number" th:field="*{centsCostPer}" placeholder="cost">
+        <span th:if="${#fields.hasErrors('centsCostPer')}" th:errors="*{centsCostPer}" class="error"></span>
+      </label>
+
+      <input type="submit" value="Submit">
+    </form>
+  </section>
+</main>
+
+
+</body>
+</html>
