@@ -76,6 +76,14 @@ public class Ingredient {
         this.centsCostPer = centsCostPer;
     }
 
+    public List<MenuItemIngredient> getMenuItemIngredients() {
+        return menuItemIngredients;
+    }
+
+    public void setMenuItemIngredients(List<MenuItemIngredient> menuItemIngredients) {
+        this.menuItemIngredients = menuItemIngredients;
+    }
+
     @Override
     public String toString() {
         return "Ingredient{" +

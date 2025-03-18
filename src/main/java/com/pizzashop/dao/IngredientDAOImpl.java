@@ -3,6 +3,7 @@ package com.pizzashop.dao;
 import com.pizzashop.entities.Ingredient;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
+import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,18 @@ public class IngredientDAOImpl implements IngredientDAO {
     @Autowired
     public IngredientDAOImpl(EntityManager em) {
         this.em = em;
+    }
+
+    @Override
+    public Ingredient findById(int id) {
+        TypedQuery<Ingredient> query = em.createQuery("FROM Ingredient WHERE id = :id", Ingredient.class);
+        query.setParameter("id", id);
+        try {
+            return query.getSingleResult();
+        } catch (NoResultException e) {
+            System.out.println("No ingredient found with id: " + id);
+            return null;
+        }
     }
 
     @Override
@@ -47,6 +60,13 @@ public class IngredientDAOImpl implements IngredientDAO {
     @Transactional
     public void delete(Ingredient ingredient) {
         em.remove(ingredient);
+    }
+
+    @Override
+    public void deleteById(int id) {
+        Query query = em.createQuery("DELETE FROM Ingredient i WHERE i.id = :id");
+        query.setParameter("id", id);
+        query.executeUpdate();
     }
 
     @Override
