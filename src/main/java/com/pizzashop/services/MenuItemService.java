@@ -1,6 +1,7 @@
 package com.pizzashop.services;
 
 import com.pizzashop.dto.IngredientDTO;
+import com.pizzashop.dto.MenuItemDTO;
 import com.pizzashop.entities.Ingredient;
 import com.pizzashop.entities.MenuItem;
 
@@ -20,5 +21,17 @@ public interface MenuItemService {
 
     void deleteIngredient(int id);
 
-    void mapIngredientsToMenuItem(MenuItem menuItem, Map<String, Integer> ingredientsQuantities);
+    List<MenuItem> findAllMenuItems();
+
+    MenuItem findMenuItemByName(String name);
+
+    MenuItem findMenuItemById(int id);
+
+    Map<String, String> findMenuItemRecipeByMenuId(int menuItemId);
+
+    void saveMenuItem(MenuItemDTO menuItemDTO);
+
+    void updateMenuItem(int menuItemId, MenuItemDTO menuItemDTO);
+
+    void deleteMenuItem(int menuItemId);
 }

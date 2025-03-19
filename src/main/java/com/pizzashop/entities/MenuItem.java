@@ -6,13 +6,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "menuItem")
+@Table(name = "menuitem")
 public class MenuItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private int id;
+    private Integer id;
 
     @Column(name = "dish_name")
     private String dishName;
@@ -31,7 +31,8 @@ public class MenuItem {
             cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private List<Order> orders;
 
-    @OneToMany(mappedBy = "menuItem", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "menuItem",
+            cascade = {CascadeType.ALL})
     private List<MenuItemIngredient> menuItemIngredients;
 
 
@@ -43,11 +44,11 @@ public class MenuItem {
         this.menuCategory = menuCategory;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

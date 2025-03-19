@@ -11,4 +11,9 @@ public class ViewController {
         return "index";
     }
 
+    @GetMapping("/system")
+    public String showManagementPage() {
+        return "management/system";
+    }
+
 }

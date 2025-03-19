@@ -6,6 +6,7 @@ import com.pizzashop.dao.IngredientDAO;
 import com.pizzashop.dao.MenuItemDAO;
 import com.pizzashop.dao.OrderDAO;
 import com.pizzashop.dao.UserDAO;
+import com.pizzashop.dto.MenuItemDTO;
 import com.pizzashop.dto.OrderDTO;
 import com.pizzashop.entities.*;
 import com.pizzashop.services.MenuItemService;
@@ -17,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.HashMap;
 import java.util.List;
@@ -72,37 +72,43 @@ public class MenuTests {
         // Creating dishes and quantities are done once upon dish creation outside of testing.
 
         //create breadsticks dish and it's ingredients
-        MenuItem breadSticks = new MenuItem("Bread sticks", "sticks of bread", MenuCategoryEnum.APP);
+        MenuItemDTO breadSticks = new MenuItemDTO("Bread sticks", "sticks of bread", MenuCategoryEnum.APP);
         Ingredient dough = new Ingredient("Dough", 50, "pounds", 100);
         ingredientDAO.save(dough);
         // set ingredient quantities and save menuItem
-        Map<String, Integer> breadSticksIngredientsQuantities = new HashMap<>();
-        breadSticksIngredientsQuantities.put(dough.getIngredientName(), 1);
-        menuItemService.mapIngredientsToMenuItem(breadSticks, breadSticksIngredientsQuantities);
+        Map<Integer, Integer> breadSticksIngredientsQuantities = new HashMap<>();
+        breadSticksIngredientsQuantities.put(dough.getId(), 1);
+        breadSticks.setIngredientIdAmounts(breadSticksIngredientsQuantities);
+
+        menuItemService.saveMenuItem(breadSticks);
 
         //create spaghetti dish and it's ingredients
-        MenuItem spaghetti = new MenuItem("Spaghetti Bolognese", "Pasta with a meat and tomato sauce", MenuCategoryEnum.PASTA);
-        Ingredient tomatoSauce = new Ingredient("Tomato sauce", 2000, "cups", 25);
+        MenuItemDTO spaghetti = new MenuItemDTO("Spaghetti Bolognese", "Pasta with a meat and tomato sauce", MenuCategoryEnum.PASTA);
+        Ingredient tomatoSauce = new Ingredient("Tomato sauce", 2000, "cups", 50);
         ingredientDAO.save(tomatoSauce);
-        Ingredient pasta = new Ingredient("Pasta", 100, "pounds", 200);
+        Ingredient pasta = new Ingredient("Pasta", 100, "pounds", 50);
         ingredientDAO.save(pasta);
-        Ingredient groundBeef = new Ingredient("Ground Beef", 50, "pounds", 350);
+        Ingredient groundBeef = new Ingredient("Ground Beef", 50, "pounds", 300);
         ingredientDAO.save(groundBeef);
         // set ingredient quantities
-        Map<String, Integer> spaghettiIngredientsQuantities = new HashMap<>();
-        spaghettiIngredientsQuantities.put(tomatoSauce.getIngredientName(), 2);
-        spaghettiIngredientsQuantities.put(pasta.getIngredientName(), 1);
-        spaghettiIngredientsQuantities.put(groundBeef.getIngredientName(), 1);
-        menuItemService.mapIngredientsToMenuItem(spaghetti, spaghettiIngredientsQuantities);
+        Map<Integer, Integer> spaghettiIngredientsQuantities = new HashMap<>();
+        spaghettiIngredientsQuantities.put(tomatoSauce.getId(), 2);
+        spaghettiIngredientsQuantities.put(pasta.getId(), 1);
+        spaghettiIngredientsQuantities.put(groundBeef.getId(), 1);
+        spaghetti.setIngredientIdAmounts(spaghettiIngredientsQuantities);
+
+        menuItemService.saveMenuItem(spaghetti);
 
         //create soda and it's ingredients
-        MenuItem lgSoda = new MenuItem("Lg Soda", "Large Soda", MenuCategoryEnum.DRINK);
-        Ingredient soda = new Ingredient("Soda", 1280, "oz", 10);
+        MenuItemDTO lgSoda = new MenuItemDTO("Lg Soda", "Large Soda", MenuCategoryEnum.DRINK);
+        Ingredient soda = new Ingredient("Soda", 1280, "oz", 3);
         ingredientDAO.save(soda);
         // set ingredient quantities
-        Map<String, Integer> sodaIngredientsQuantities = new HashMap<>();
-        sodaIngredientsQuantities.put(soda.getIngredientName(), sodaSizes.get("Lg"));
-        menuItemService.mapIngredientsToMenuItem(lgSoda, sodaIngredientsQuantities);
+        Map<Integer, Integer> sodaIngredientsQuantities = new HashMap<>();
+        sodaIngredientsQuantities.put(soda.getId(), sodaSizes.get("Lg"));
+        lgSoda.setIngredientIdAmounts(sodaIngredientsQuantities);
+
+        menuItemService.saveMenuItem(lgSoda);
     }
 
     @Test
@@ -111,8 +117,8 @@ public class MenuTests {
 
         // look at menu items and mapped ingredients
         for (MenuItem menuItem : menuItems) {
-            System.out.println("Menu Item Name: " + menuItem.getDishName() + "\nIngredients:");
-            System.out.println("Category: " + menuItem.getMenuCategory() + "\nCost: " + menuItem.getPriceCents());
+            System.out.println("Menu Item Name: " + menuItem.getDishName());
+            System.out.println("Category: " + menuItem.getMenuCategory() + "\nprice: " + menuItem.getPriceCents() + "\nIngredients:");
             for (MenuItemIngredient menuItemIngredient : menuItem.getMenuItemIngredients()) {
                 Ingredient ingredient = menuItemIngredient.getIngredient();
                 System.out.println(ingredient.getIngredientName() + " -- quantity: " + menuItemIngredient.getQuantityUsed());

@@ -1,11 +1,10 @@
 package com.pizzashop.dto;
 
 import com.pizzashop.entities.MenuCategoryEnum;
-import com.pizzashop.entities.MenuItemIngredient;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-import java.util.List;
+import java.util.Map;
 
 public class MenuItemDTO {
 
@@ -20,9 +19,18 @@ public class MenuItemDTO {
     @NotNull(message = "required")
     private MenuCategoryEnum menuCategory;
 
+    @NotNull(message = "required")
     @Size.List(
             @Size(min = 1, message = "Must have at least one ingredient"))
-    private List<MenuItemIngredient> menuItemIngredients;
+    private Map<Integer, Integer> ingredientIdAmounts;
+
+    public MenuItemDTO() {}
+
+    public MenuItemDTO(String dishName, String description, MenuCategoryEnum menuCategory) {
+        this.dishName = dishName;
+        this.description = description;
+        this.menuCategory = menuCategory;
+    }
 
     public String getDishName() {
         return dishName;
@@ -48,12 +56,12 @@ public class MenuItemDTO {
         this.menuCategory = menuCategory;
     }
 
-    public List<MenuItemIngredient> getMenuItemIngredients() {
-        return menuItemIngredients;
+    public Map<Integer, Integer> getIngredientIdAmounts() {
+        return ingredientIdAmounts;
     }
 
-    public void setMenuItemIngredients(List<MenuItemIngredient> menuItemIngredients) {
-        this.menuItemIngredients = menuItemIngredients;
+    public void setIngredientIdAmounts(Map<Integer, Integer> ingredientIdAmounts) {
+        this.ingredientIdAmounts = ingredientIdAmounts;
     }
 
     @Override
@@ -62,7 +70,7 @@ public class MenuItemDTO {
                 "dishName='" + dishName + '\'' +
                 ", description='" + description + '\'' +
                 ", menuCategory=" + menuCategory +
-                ", menuItemIngredients=" + menuItemIngredients +
+                ", menuItemIngredients=" + ingredientIdAmounts +
                 '}';
     }
 }

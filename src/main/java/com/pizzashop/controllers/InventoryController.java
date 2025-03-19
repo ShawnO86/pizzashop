@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Controller
-@RequestMapping("/inventory")
+@RequestMapping("/system/inventory")
 public class InventoryController {
 
     MenuItemService menuItemService;
@@ -31,15 +31,11 @@ public class InventoryController {
         dataBinder.registerCustomEditor(String.class, stringTrimmerEditor);
     }
 
-    @GetMapping("/")
-    public String showManagementPage() {
-        return "management/system";
-    }
-
     @GetMapping("/showInventory")
     public String showInventory(Model model) {
         List<Ingredient> inventory = menuItemService.findAllIngredients();
         model.addAttribute("inventory", inventory);
+
         return "management/showInventory";
     }
 
@@ -47,22 +43,24 @@ public class InventoryController {
     @GetMapping("/addInventory")
     public String showAddInventoryForm(Model model) {
         model.addAttribute("inventoryItem", new IngredientDTO());
+
         return "management/addInventory";
     }
 
     //shows update inventory form
     @GetMapping("/updateInventory")
     public String showUpdateInventoryForm(@RequestParam("ingredientId") int ingredientId, Model model) {
-
         model.addAttribute("inventoryItem", menuItemService.findIngredientById(ingredientId));
         model.addAttribute("ingredientId", ingredientId);
+
         return "management/updateInventory";
     }
 
     @GetMapping("/deleteInventory")
     public String deleteInventory(@RequestParam("ingredientId") int ingredientId) {
         menuItemService.deleteIngredient(ingredientId);
-        return "redirect:/inventory/showInventory";
+
+        return "redirect:/system/inventory/showInventory";
     }
 
     @PostMapping("/saveInventory")
@@ -72,17 +70,20 @@ public class InventoryController {
         if (theBindingResult.hasErrors()) {
             model.addAttribute("inventoryError", "You must correct the errors before proceeding");
             model.addAttribute("inventoryItem", ingredientDTO);
+
             return "management/addInventory";
         }
 
         if (menuItemService.findIngredientByName(ingredientDTO.getIngredientName()) != null) {
             model.addAttribute("inventoryError", "Ingredient already exists with this name");
             model.addAttribute("inventoryItem", ingredientDTO);
+
             return "management/addInventory";
         }
 
         menuItemService.saveIngredient(ingredientDTO);
-        return "redirect:/inventory/showInventory";
+
+        return "redirect:/system/inventory/showInventory";
     }
 
     // thymeleaf gets ingredientId from model and sends with form data as requestParam
@@ -95,11 +96,12 @@ public class InventoryController {
             model.addAttribute("inventoryError", "You must correct the errors before proceeding");
             model.addAttribute("inventoryItem", ingredientDTO);
             model.addAttribute("ingredientId", ingredientId);
+
             return "management/updateInventory";
         }
 
         menuItemService.updateIngredient(ingredientId, ingredientDTO);
 
-        return "redirect:/inventory/showInventory";
+        return "redirect:/system/inventory/showInventory";
     }
 }

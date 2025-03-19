@@ -2,7 +2,9 @@ package com.pizzashop.services;
 
 import com.pizzashop.dao.IngredientDAO;
 import com.pizzashop.dao.MenuItemDAO;
+import com.pizzashop.dao.MenuItemIngredientDAO;
 import com.pizzashop.dto.IngredientDTO;
+import com.pizzashop.dto.MenuItemDTO;
 import com.pizzashop.entities.Ingredient;
 import com.pizzashop.entities.MenuItem;
 import com.pizzashop.entities.MenuItemIngredient;
@@ -10,6 +12,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,11 +21,13 @@ public class MenuItemServiceImpl implements MenuItemService {
 
     MenuItemDAO menuItemDAO;
     IngredientDAO ingredientDAO;
+    MenuItemIngredientDAO menuItemIngredientDAO;
 
     @Autowired
-    public MenuItemServiceImpl(MenuItemDAO menuItemDAO, IngredientDAO ingredientDAO) {
+    public MenuItemServiceImpl(MenuItemDAO menuItemDAO, IngredientDAO ingredientDAO, MenuItemIngredientDAO menuItemIngredientDAO) {
         this.menuItemDAO = menuItemDAO;
         this.ingredientDAO = ingredientDAO;
+        this.menuItemIngredientDAO = menuItemIngredientDAO;
     }
 
     @Override
@@ -73,24 +78,87 @@ public class MenuItemServiceImpl implements MenuItemService {
         ingredientDAO.deleteById(id);
     }
 
+    @Override
+    public List<MenuItem> findAllMenuItems() {
+        return menuItemDAO.findAll();
+    }
 
-    // set this in the menu creation form
+    @Override
+    public MenuItem findMenuItemByName(String name) {
+        return menuItemDAO.findByName(name);
+    }
+
+    @Override
+    public MenuItem findMenuItemById(int id) {
+        return menuItemDAO.findById(id);
+    }
+
+    @Override
+    public Map<String, String> findMenuItemRecipeByMenuId(int menuItemId) {
+        List<MenuItemIngredient> menuItemIngredients = menuItemIngredientDAO.findAllByMenuItemId(menuItemId);
+        Map<String, String> menuItemIngredientQuantityMap = new HashMap<String, String>();
+
+
+        for (MenuItemIngredient menuItemIngredient : menuItemIngredients) {
+            String menuItemQuantityWithUnit = menuItemIngredient.getQuantityUsed() + " " + menuItemIngredient.getIngredient().getUnitOfMeasure();
+            menuItemIngredientQuantityMap.put(menuItemIngredient.getIngredient().getIngredientName(), menuItemQuantityWithUnit);
+        }
+
+        return menuItemIngredientQuantityMap;
+    }
+
     @Override
     @Transactional
-    public void mapIngredientsToMenuItem(MenuItem menuItem, Map<String, Integer> ingredientsQuantities) {
-        ingredientsQuantities.forEach((ingredientName, quantityUsed) -> {
-            Ingredient ingredient = ingredientDAO.findByName(ingredientName);
-            // set join table record
-            MenuItemIngredient menuItemIngredient = new MenuItemIngredient(menuItem, ingredient, quantityUsed);
-            // map to ingredient table
+    public void saveMenuItem(MenuItemDTO menuItemDTO) {
+        MenuItem menuItem = new MenuItem(
+                menuItemDTO.getDishName(),
+                menuItemDTO.getDescription(),
+                menuItemDTO.getMenuCategory()
+        );
+
+        Map<Integer, Integer> ingredientIdQuantityMap = menuItemDTO.getIngredientIdAmounts();
+
+        mapIngredientsToMenuItem(menuItem, ingredientIdQuantityMap);
+
+        menuItemDAO.save(menuItem);
+    }
+
+    @Override
+    @Transactional
+    public void updateMenuItem(int menuItemId, MenuItemDTO menuItemDTO) {
+        MenuItem menuItem = menuItemDAO.findById(menuItemId);
+        menuItemIngredientDAO.deleteByMenuItemId(menuItemId);
+
+        menuItem.setPriceCents(0);
+        menuItem.setDishName(menuItemDTO.getDishName());
+        menuItem.setDescription(menuItemDTO.getDescription());
+        menuItem.setMenuCategory(menuItemDTO.getMenuCategory());
+
+        Map<Integer, Integer> newIngredientQuantityMap = menuItemDTO.getIngredientIdAmounts();
+
+        mapIngredientsToMenuItem(menuItem, newIngredientQuantityMap);
+
+        menuItemDAO.update(menuItem);
+    }
+
+    @Override
+    @Transactional
+    public void deleteMenuItem(int menuItemId) {
+        MenuItem menuItem = menuItemDAO.findById(menuItemId);
+
+        menuItemDAO.delete(menuItem);
+    }
+
+    private void mapIngredientsToMenuItem(MenuItem menuItem, Map<Integer, Integer> ingredientsQuantities) {
+        ingredientsQuantities.forEach((ingredientId,quantity) -> {
+            Ingredient ingredient = ingredientDAO.findById(ingredientId);
+            MenuItemIngredient menuItemIngredient = new MenuItemIngredient(menuItem, ingredient, quantity);
             menuItem.addIngredient(menuItemIngredient);
-            // calculate price
-            int cost = ingredient.getCentsCostPer() * quantityUsed;
-            // add to the running total
+            int cost = ingredient.getCentsCostPer() * quantity;
             menuItem.setPriceCents(menuItem.getPriceCents() + cost);
         });
-        // save menuItem with mapped ingredient and final price
-        menuItemDAO.save(menuItem);
+        //adds price markup to total cost of ingredients
+        menuItem.setPriceCents(menuItem.getPriceCents() * 3);
     }
 
 }

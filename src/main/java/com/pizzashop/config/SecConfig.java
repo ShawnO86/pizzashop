@@ -29,10 +29,10 @@ public class SecConfig {
 
         http.authorizeHttpRequests(configurer ->
                         configurer
-                                .requestMatchers("/","/register/**","/loginPage","/styles/**", "/js/**", "/images/**").permitAll()
+                                .requestMatchers("/","/register/**","/login","/styles/**", "/js/**", "/images/**").permitAll()
                                 .requestMatchers("/order/**").hasRole("CUSTOMER")
                                 .requestMatchers("/employees/**").hasRole("EMPLOYEE")
-                                .requestMatchers("/inventory/**", "/menu/**").hasRole("MANAGER")
+                                .requestMatchers("/system/**").hasRole("MANAGER")
                                 .anyRequest().authenticated()
                 )
                 .formLogin(form ->

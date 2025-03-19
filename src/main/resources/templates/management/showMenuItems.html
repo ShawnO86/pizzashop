@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Pizza Shop System</title>
+  <link rel="stylesheet" type="text/css" href="/styles/main.css">
+</head>
+
+<body>
+<header>
+  <h1>Menu Items</h1>
+  <hr>
+
+  <form action="#" th:action="@{/logout}" method="POST">
+    <input type="submit" value="Logout"/>
+  </form>
+</header>
+
+<main>
+
+  <section class="form-container">
+    <a th:href="@{/system/changeMenu/addMenuItem}">Add Item</a>
+
+    <table>
+      <thead>
+      <tr>
+        <th>Dish Name</th>
+        <th>Description</th>
+        <th>Category</th>
+        <th>Cost (cents)</th>
+        <th>Action</th>
+      </tr>
+      </thead>
+
+      <tbody>
+      <tr th:each="item : ${menuItems}">
+        <td th:text="${item.getDishName()}"></td>
+        <td th:text="${item.getDescription()}"></td>
+        <td th:text="${item.getMenuCategory()}"></td>
+        <td th:text="${item.getPriceCents()}"></td>
+        <td>
+          <a th:href="@{/system/changeMenu/showMenuItemRecipe(menuItemId=${item.getId()}, menuItemName=${item.getDishName()})}">Show Recipe</a>
+          <a th:href="@{/system/changeMenu/updateMenuItem(menuItemId=${item.getId()})}">Update</a>
+          <a th:href="@{/system/changeMenu/deleteMenuItem(menuItemId=${item.getId()})}"
+             onclick="if (!(confirm('Are you sure you want to delete this record?'))) return false">Delete</a>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </section>
+
+</main>
+
+
+</body>
+</html>
