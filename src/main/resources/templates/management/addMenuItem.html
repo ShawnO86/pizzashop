@@ -7,13 +7,7 @@
 </head>
 
 <body>
-<header>
-  <h1>Add A Menu Item</h1>
-  <hr>
-  <form action="#" th:action="@{/logout}" method="POST">
-    <input type="submit" value="Logout"/>
-  </form>
-</header>
+<header th:insert="~{header :: head}"></header>
 
 <main class="inline">
   <section class="form-container">
@@ -34,10 +28,20 @@
       </label>
 
       <label>Dish Category:
-        <select th:field="*{menuCategory}">
+        <select th:field="*{menuCategory}" name="menuCategory">
           <option th:each="category : ${categories}" th:value="${category}" th:text="${category}"></option>
         </select>
-        <span th:if="${#fields.hasErrors('menuCategory')}" th:errors="*{menuCategory}" class="error"></span>
+      </label>
+
+
+      <label>Currently Available:
+        <span th:if="${#fields.hasErrors('isAvailable')}" th:errors="*{isAvailable}" class="error"></span>
+      </label>
+      <label>Yes:
+        <input type="radio" th:name="isAvailable" th:field="*{isAvailable}" th:value="true" >
+      </label>
+      <label>No:
+        <input type="radio" th:name="isAvailable" th:field="*{isAvailable}" th:value="false">
       </label>
 
       <div id="ingredientAmountsContainer">

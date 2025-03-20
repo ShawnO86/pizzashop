@@ -8,26 +8,14 @@
 
 <body>
 
+<header th:insert="~{header :: head}"></header>
+
 <main>
-  <h1>Pizza Shop Home</h1>
-
-
   <div sec:authorize="isAuthenticated()">
-    <p>Welcome to The Pizza Shop
+    <p>Welcome
     <span sec:authentication="principal.username"></span>!
     </p>
-
-    <form action="#" th:action="@{/logout}" method="POST">
-      <input type="submit" value="Logout"/>
-    </form>
   </div>
-
-  <p sec:authorize="isAnonymous()">
-    <a th:href="@{/login}">Login</a>
-    or
-    <a th:href="@{/register/showRegistrationForm}">Register</a>
-  </p>
-
 
 </main>
 

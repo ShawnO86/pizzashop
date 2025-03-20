@@ -7,17 +7,10 @@
 </head>
 
 <body>
-<header>
-  <h1>Menu Items</h1>
-  <hr>
 
-  <form action="#" th:action="@{/logout}" method="POST">
-    <input type="submit" value="Logout"/>
-  </form>
-</header>
+<header th:insert="~{header :: head}"></header>
 
 <main>
-
   <section class="form-container">
     <a th:href="@{/system/changeMenu/addMenuItem}">Add Item</a>
 
@@ -27,6 +20,7 @@
         <th>Dish Name</th>
         <th>Description</th>
         <th>Category</th>
+        <th>Available</th>
         <th>Cost (cents)</th>
         <th>Action</th>
       </tr>
@@ -37,6 +31,7 @@
         <td th:text="${item.getDishName()}"></td>
         <td th:text="${item.getDescription()}"></td>
         <td th:text="${item.getMenuCategory()}"></td>
+        <td th:text="${item.getIsAvailable()}"></td>
         <td th:text="${item.getPriceCents()}"></td>
         <td>
           <a th:href="@{/system/changeMenu/showMenuItemRecipe(menuItemId=${item.getId()}, menuItemName=${item.getDishName()})}">Show Recipe</a>

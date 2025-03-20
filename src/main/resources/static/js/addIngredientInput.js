@@ -1,13 +1,11 @@
-
 document.addEventListener('DOMContentLoaded', ()=> {
-
     const ingredientAmountsContainer = document.getElementById('ingredientAmountsContainer');
     const addIngredientAmountButton = document.getElementById('addIngredient');
-    let ingredientInputFieldAmount = ingredientAmountsContainer.querySelectorAll('.ingredient-amount').length;
+    let ingredientInputFieldAmount = 1;
 
     addIngredientAmountButton.addEventListener('click', () => {
+        // copies everything within 'ingredient-amount' div
         const newIngredientAmountDiv = ingredientAmountsContainer.querySelector('.ingredient-amount').cloneNode(true);
-
         const ingredientSelect = newIngredientAmountDiv.querySelector('select');
         const amountInput = newIngredientAmountDiv.querySelector('input[type="number"]');
 
@@ -15,8 +13,8 @@ document.addEventListener('DOMContentLoaded', ()=> {
         amountInput.name = "ingredientIdAmountsValues";
 
         ingredientAmountsContainer.appendChild(newIngredientAmountDiv);
-        ingredientInputFieldAmount = ingredientAmountsContainer.querySelectorAll('.ingredient-amount').length;
-        console.log(ingredientInputFieldAmount);
+
+        ingredientInputFieldAmount += 1;
     });
 
     ingredientAmountsContainer.addEventListener('click',  handleRemoveIngredient);
@@ -24,8 +22,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
     function handleRemoveIngredient(event) {
         if (event.target.classList.contains('remove-ingredient') && ingredientInputFieldAmount >= 2) {
             event.target.parentElement.remove();
-            ingredientInputFieldAmount = ingredientAmountsContainer.querySelectorAll('.ingredient-amount').length;
+            ingredientInputFieldAmount -= 1;
         }
     }
-
 });
