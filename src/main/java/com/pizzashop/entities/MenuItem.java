@@ -27,6 +27,9 @@ public class MenuItem {
     @Column(name = "category")
     private MenuCategoryEnum menuCategory;
 
+    @Column(name = "available")
+    private Boolean isAvailable;
+
     @ManyToMany(mappedBy = "menuItems", fetch = FetchType.LAZY,
             cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private List<Order> orders;
@@ -38,10 +41,11 @@ public class MenuItem {
 
     public MenuItem() {}
 
-    public MenuItem(String dishName, String description, MenuCategoryEnum menuCategory) {
+    public MenuItem(String dishName, String description, MenuCategoryEnum menuCategory, Boolean isAvailable) {
         this.dishName = dishName;
         this.description = description;
         this.menuCategory = menuCategory;
+        this.isAvailable = isAvailable;
     }
 
     public Integer getId() {
@@ -82,6 +86,14 @@ public class MenuItem {
 
     public void setMenuCategory(MenuCategoryEnum menuCategory) {
         this.menuCategory = menuCategory;
+    }
+
+    public Boolean getIsAvailable() {
+        return isAvailable;
+    }
+
+    public void setIsAvailable(Boolean isAvailable) {
+        this.isAvailable = isAvailable;
     }
 
     public List<Order> getOrders() {

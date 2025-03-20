@@ -4,6 +4,7 @@ import com.pizzashop.dto.MenuItemDTO;
 import com.pizzashop.entities.MenuCategoryEnum;
 import com.pizzashop.entities.MenuItem;
 import com.pizzashop.services.MenuItemService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.stereotype.Controller;
@@ -37,7 +38,7 @@ public class MenuItemController {
     public String showMenuItems(Model model) {
         List<MenuItem> menuItems = menuItemService.findAllMenuItems();
         model.addAttribute("menuItems", menuItems);
-
+        model.addAttribute("heading", "All Menu Items");
         return "management/showMenuItems";
     }
 
@@ -57,18 +58,21 @@ public class MenuItemController {
         model.addAttribute("menuItem", new MenuItemDTO());
         model.addAttribute("categories", MenuCategoryEnum.values());
         model.addAttribute("ingredients", menuItemService.findAllIngredients());
+        model.addAttribute("heading", "Create A New Menu Item");
 
         return "management/addMenuItem";
     }
 
     @GetMapping("/updateMenuItem")
     public String showUpdateMenuItemForm(@RequestParam("menuItemId") int menuItemId, Model model) {
-        model.addAttribute("menuItem", menuItemService.findMenuItemById(menuItemId));
+        MenuItem menuItem = menuItemService.findMenuItemById(menuItemId);
+        Map<String, String> menuItemRecipe = menuItemService.findMenuItemRecipeByMenuId(menuItemId);
+
+        model.addAttribute("menuItem", menuItem);
         model.addAttribute("ingredients", menuItemService.findAllIngredients());
         model.addAttribute("menuItemId", menuItemId);
         model.addAttribute("categories", MenuCategoryEnum.values());
-
-        Map<String, String> menuItemRecipe = menuItemService.findMenuItemRecipeByMenuId(menuItemId);
+        model.addAttribute("heading", "Update " + menuItem.getDishName());
         model.addAttribute("menuItemRecipe", menuItemRecipe);
 
         return "management/updateMenuItem";
@@ -82,8 +86,7 @@ public class MenuItemController {
     }
 
     @PostMapping("/saveMenuItem")
-    public String saveMenuItem(@ModelAttribute("menuItem") MenuItemDTO menuItemDTO, Model model,
-                               BindingResult theBindingResult,
+    public String saveMenuItem(@Valid @ModelAttribute("menuItem") MenuItemDTO menuItemDTO, BindingResult theBindingResult, Model model,
                                @RequestParam("ingredientIdAmountsKeys") Integer[] ingredientIdAmountsKeys,
                                @RequestParam("ingredientIdAmountsValues") Integer[] ingredientIdAmountValues) {
 
@@ -125,11 +128,10 @@ public class MenuItemController {
     }
 
     @PostMapping("/updateMenuItem")
-    public String updateMenuItem(@ModelAttribute("menuItem") MenuItemDTO menuItemDTO, Model model,
-                               BindingResult theBindingResult,
-                               @RequestParam("menuItemId") int menuItemId,
-                               @RequestParam("ingredientIdAmountsKeys") Integer[] ingredientIdAmountsKeys,
-                               @RequestParam("ingredientIdAmountsValues") Integer[] ingredientIdAmountValues) {
+    public String updateMenuItem(@Valid @ModelAttribute("menuItem") MenuItemDTO menuItemDTO, BindingResult theBindingResult, Model model,
+                                 @RequestParam("menuItemId") int menuItemId,
+                                 @RequestParam("ingredientIdAmountsKeys") Integer[] ingredientIdAmountsKeys,
+                                 @RequestParam("ingredientIdAmountsValues") Integer[] ingredientIdAmountValues) {
 
         if (theBindingResult.hasErrors()) {
             model.addAttribute("menuItemError", "You must correct the errors before proceeding");

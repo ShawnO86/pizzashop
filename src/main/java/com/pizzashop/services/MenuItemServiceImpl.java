@@ -113,7 +113,8 @@ public class MenuItemServiceImpl implements MenuItemService {
         MenuItem menuItem = new MenuItem(
                 menuItemDTO.getDishName(),
                 menuItemDTO.getDescription(),
-                menuItemDTO.getMenuCategory()
+                menuItemDTO.getMenuCategory(),
+                menuItemDTO.getIsAvailable()
         );
 
         Map<Integer, Integer> ingredientIdQuantityMap = menuItemDTO.getIngredientIdAmounts();

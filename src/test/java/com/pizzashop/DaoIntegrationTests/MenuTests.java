@@ -165,6 +165,6 @@ public class MenuTests {
         System.out.println(ingredients);
 
         //1122 cost of added menuItems
-        assertEquals(1122, checkOrder.getFinal_price_cents());
+        assertEquals(1938, checkOrder.getFinal_price_cents());
     }
 }

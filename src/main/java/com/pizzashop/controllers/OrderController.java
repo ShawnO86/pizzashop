@@ -26,11 +26,6 @@ public class OrderController {
         this.orderService = orderService;
     }
 
-    @GetMapping("/")
-    public String order() {
-        return "ordering/order";
-    }
-
     @GetMapping("/addOrder")
     public String showOrderForm(Model model) {
         model.addAttribute("order", new OrderDTO());

@@ -49,11 +49,11 @@ public class OrderServiceImpl implements OrderService {
         newOrder.setFinal_price_cents(finalPrice);
 
         orderDAO.save(newOrder);
-        updateIngredientQuantities(menuItems);
+        updateInventoryIngredientQuantities(menuItems);
     }
 
     @Transactional
-    public void updateIngredientQuantities(List<MenuItem> menuItems) {
+    public void updateInventoryIngredientQuantities(List<MenuItem> menuItems) {
         for (MenuItem menuItem : menuItems) {
             List<MenuItemIngredient> ingredients = menuItem.getMenuItemIngredients();
             for (MenuItemIngredient menuItemIngredient : ingredients) {
@@ -68,7 +68,6 @@ public class OrderServiceImpl implements OrderService {
 
     private int calculateTotalPrice(List<MenuItem> menuItems) {
         int totalPrice = 0;
-        double priceMarkup = 0.10;
 
         for (MenuItem menuItem : menuItems) {
             MenuItem currentMenuItem = menuItemDAO.findByName(menuItem.getDishName());
@@ -80,6 +79,6 @@ public class OrderServiceImpl implements OrderService {
             }
         }
 
-        return (int) (totalPrice + (totalPrice * priceMarkup));
+        return totalPrice;
     }
 }
