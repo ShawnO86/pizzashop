@@ -73,7 +73,7 @@ public class MenuTests {
 
         //create breadsticks dish and it's ingredients
         MenuItemDTO breadSticks = new MenuItemDTO("Bread sticks", "sticks of bread", MenuCategoryEnum.APP);
-        Ingredient dough = new Ingredient("Dough", 50, "pounds", 100);
+        Ingredient dough = new Ingredient("Dough", 50, 100);
         ingredientDAO.save(dough);
         // set ingredient quantities and save menuItem
         Map<Integer, Integer> breadSticksIngredientsQuantities = new HashMap<>();
@@ -84,11 +84,11 @@ public class MenuTests {
 
         //create spaghetti dish and it's ingredients
         MenuItemDTO spaghetti = new MenuItemDTO("Spaghetti Bolognese", "Pasta with a meat and tomato sauce", MenuCategoryEnum.PASTA);
-        Ingredient tomatoSauce = new Ingredient("Tomato sauce", 2000, "cups", 50);
+        Ingredient tomatoSauce = new Ingredient("Tomato sauce", 2000, 50);
         ingredientDAO.save(tomatoSauce);
-        Ingredient pasta = new Ingredient("Pasta", 100, "pounds", 50);
+        Ingredient pasta = new Ingredient("Pasta", 100, 50);
         ingredientDAO.save(pasta);
-        Ingredient groundBeef = new Ingredient("Ground Beef", 50, "pounds", 300);
+        Ingredient groundBeef = new Ingredient("Ground Beef", 50,300);
         ingredientDAO.save(groundBeef);
         // set ingredient quantities
         Map<Integer, Integer> spaghettiIngredientsQuantities = new HashMap<>();
@@ -101,7 +101,7 @@ public class MenuTests {
 
         //create soda and it's ingredients
         MenuItemDTO lgSoda = new MenuItemDTO("Lg Soda", "Large Soda", MenuCategoryEnum.DRINK);
-        Ingredient soda = new Ingredient("Soda", 1280, "oz", 3);
+        Ingredient soda = new Ingredient("Soda", 1280, 3);
         ingredientDAO.save(soda);
         // set ingredient quantities
         Map<Integer, Integer> sodaIngredientsQuantities = new HashMap<>();

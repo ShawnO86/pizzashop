@@ -14,9 +14,6 @@ public class IngredientDTO {
     private Integer currentStock;
 
     @NotNull(message = "required")
-    private String unitOfMeasure;
-
-    @NotNull(message = "required")
     @Min(value = 1, message = "minimum of 1")
     private Integer centsCostPer;
 
@@ -38,14 +35,6 @@ public class IngredientDTO {
         this.currentStock = currentStock;
     }
 
-    public String getUnitOfMeasure() {
-        return unitOfMeasure;
-    }
-
-    public void setUnitOfMeasure(String unitOfMeasure) {
-        this.unitOfMeasure = unitOfMeasure;
-    }
-
     public Integer getCentsCostPer() {
         return centsCostPer;
     }
@@ -59,7 +48,6 @@ public class IngredientDTO {
         return "IngredientDTO{" +
                 "ingredientName='" + ingredientName + '\'' +
                 ", currentStock=" + currentStock +
-                ", unitOfMeasure='" + unitOfMeasure + '\'' +
                 ", centsCostPer=" + centsCostPer +
                 '}';
     }

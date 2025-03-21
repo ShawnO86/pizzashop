@@ -9,7 +9,11 @@ public interface MenuItemIngredientDAO {
 
     List<MenuItemIngredient> findAllByMenuItemId(Integer menuItemId);
 
+    List<MenuItemIngredient> findAllByIngredientId(Integer ingredientId);
+
     MenuItemIngredient findById(Integer id);
 
     void deleteByMenuItemId(Integer menuItemId);
+
+    void deleteByMenuItemIdIngredientId(Integer menuItemId, Integer ingredientId);
 }

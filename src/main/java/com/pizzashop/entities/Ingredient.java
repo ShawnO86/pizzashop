@@ -29,10 +29,9 @@ public class Ingredient {
 
     public Ingredient() {}
 
-    public Ingredient(String ingredientName, int currentStock, String unitOfMeasure, int centsCostPer) {
+    public Ingredient(String ingredientName, int currentStock, int centsCostPer) {
         this.ingredientName = ingredientName;
         this.currentStock = currentStock;
-        this.unitOfMeasure = unitOfMeasure;
         this.centsCostPer = centsCostPer;
     }
 

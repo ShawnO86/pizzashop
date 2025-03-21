@@ -46,6 +46,7 @@ public class MenuItemController {
     public String showMenuItemRecipe(@RequestParam("menuItemId") int menuItemId,
                                      @RequestParam("menuItemName") String menuItemName, Model model) {
         Map<String, String> menuItemRecipe = menuItemService.findMenuItemRecipeByMenuId(menuItemId);
+
         model.addAttribute("menuItemRecipe", menuItemRecipe);
         model.addAttribute("menuItemName", menuItemName);
         model.addAttribute("menuItemId", menuItemId);
@@ -79,7 +80,7 @@ public class MenuItemController {
     }
 
     @GetMapping("/deleteMenuItem")
-    public String deleteMenuItem(@RequestParam("menuItemId") int menuItemId, Model model) {
+    public String deleteMenuItem(@RequestParam("menuItemId") int menuItemId) {
         menuItemService.deleteMenuItem(menuItemId);
 
         return "redirect:/system/changeMenu/showMenuItems";
@@ -90,41 +91,33 @@ public class MenuItemController {
                                @RequestParam("ingredientIdAmountsKeys") Integer[] ingredientIdAmountsKeys,
                                @RequestParam("ingredientIdAmountsValues") Integer[] ingredientIdAmountValues) {
 
+        String errorMsg = "";
+
         if (theBindingResult.hasErrors()) {
-            model.addAttribute("menuItemError", "You must correct the errors before proceeding");
-            model.addAttribute("menuItem", menuItemDTO);
-            model.addAttribute("ingredients", menuItemService.findAllIngredients());
-            model.addAttribute("categories", MenuCategoryEnum.values());
-            return "management/addMenuItem";
+            errorMsg = "You must correct the errors before proceeding";
+        } else if (menuItemService.findIngredientByName(menuItemDTO.getDishName()) != null) {
+            errorMsg = "Menu item already exists with this name";
+        } else if (ingredientIdAmountsKeys.length == 0 || ingredientIdAmountValues.length == 0 || ingredientIdAmountsKeys.length != ingredientIdAmountValues.length) {
+            errorMsg = "Ingredients must have associated quantities";
         }
 
-        if (menuItemService.findIngredientByName(menuItemDTO.getDishName()) != null) {
-            model.addAttribute("menuItemError", "Menu item already exists with this name");
-            model.addAttribute("menuItem", menuItemDTO);
-            model.addAttribute("ingredients", menuItemService.findAllIngredients());
-            model.addAttribute("categories", MenuCategoryEnum.values());
-            return "management/addMenuItem";
-        }
-
-        Map<Integer, Integer> ingredientMap = new HashMap<>();
-
-        if(ingredientIdAmountsKeys.length != 0 && ingredientIdAmountValues.length != 0 && ingredientIdAmountsKeys.length == ingredientIdAmountValues.length){
+        if (errorMsg.isEmpty()) {
+            Map<Integer, Integer> ingredientMap = new HashMap<>();
             for(int i = 0; i < ingredientIdAmountsKeys.length; i++){
                 ingredientMap.put(ingredientIdAmountsKeys[i], ingredientIdAmountValues[i]);
             }
+            menuItemDTO.setIngredientIdAmounts(ingredientMap);
+            menuItemService.saveMenuItem(menuItemDTO);
+            return "redirect:/system/changeMenu/showMenuItems";
+
         } else {
-            model.addAttribute("menuItemError", "Must have amounts with ingredients");
+            model.addAttribute("menuItemError", errorMsg);
             model.addAttribute("menuItem", menuItemDTO);
             model.addAttribute("ingredients", menuItemService.findAllIngredients());
             model.addAttribute("categories", MenuCategoryEnum.values());
+            model.addAttribute("heading", "Create A New Menu Item");
             return "management/addMenuItem";
         }
-
-        menuItemDTO.setIngredientIdAmounts(ingredientMap);
-
-        menuItemService.saveMenuItem(menuItemDTO);
-
-        return "redirect:/system/changeMenu/showMenuItems";
     }
 
     @PostMapping("/updateMenuItem")
@@ -133,40 +126,35 @@ public class MenuItemController {
                                  @RequestParam("ingredientIdAmountsKeys") Integer[] ingredientIdAmountsKeys,
                                  @RequestParam("ingredientIdAmountsValues") Integer[] ingredientIdAmountValues) {
 
+        String errorMsg = "";
+
         if (theBindingResult.hasErrors()) {
-            model.addAttribute("menuItemError", "You must correct the errors before proceeding");
-            model.addAttribute("menuItem", menuItemDTO);
-            model.addAttribute("ingredients", menuItemService.findAllIngredients());
-            model.addAttribute("categories", MenuCategoryEnum.values());
-            return "management/addMenuItem";
+            errorMsg = "You must correct the errors before proceeding";
+        } else if (menuItemService.findIngredientByName(menuItemDTO.getDishName()) != null) {
+            errorMsg = "Menu item already exists with this name";
+        } else if (ingredientIdAmountsKeys.length == 0 || ingredientIdAmountValues.length == 0 || ingredientIdAmountsKeys.length != ingredientIdAmountValues.length) {
+            errorMsg = "Ingredients must have associated quantities";
         }
 
-        if (menuItemService.findIngredientByName(menuItemDTO.getDishName()) != null) {
-            model.addAttribute("menuItemError", "Menu item already exists with this name");
-            model.addAttribute("menuItem", menuItemDTO);
-            model.addAttribute("ingredients", menuItemService.findAllIngredients());
-            model.addAttribute("categories", MenuCategoryEnum.values());
-            return "management/addMenuItem";
-        }
-
-        Map<Integer, Integer> ingredientMap = new HashMap<>();
-
-        if(ingredientIdAmountsKeys.length != 0 && ingredientIdAmountValues.length != 0 && ingredientIdAmountsKeys.length == ingredientIdAmountValues.length){
+        if (errorMsg.isEmpty()) {
+            Map<Integer, Integer> ingredientMap = new HashMap<>();
             for(int i = 0; i < ingredientIdAmountsKeys.length; i++){
                 ingredientMap.put(ingredientIdAmountsKeys[i], ingredientIdAmountValues[i]);
             }
+            menuItemDTO.setIngredientIdAmounts(ingredientMap);
+            menuItemService.saveMenuItem(menuItemDTO);
+            return "redirect:/system/changeMenu/showMenuItems";
+
         } else {
-            model.addAttribute("menuItemError", "Must have amounts with ingredients");
+            MenuItem menuItem = menuItemService.findMenuItemById(menuItemId);
+            Map<String, String> menuItemRecipe = menuItemService.findMenuItemRecipeByMenuId(menuItemId);
+            model.addAttribute("menuItemError", errorMsg);
             model.addAttribute("menuItem", menuItemDTO);
             model.addAttribute("ingredients", menuItemService.findAllIngredients());
             model.addAttribute("categories", MenuCategoryEnum.values());
-            return "management/addMenuItem";
+            model.addAttribute("heading", "Update " + menuItem.getDishName());
+            model.addAttribute("menuItemRecipe", menuItemRecipe);
+            return "management/updateMenuItem";
         }
-
-        menuItemDTO.setIngredientIdAmounts(ingredientMap);
-
-        menuItemService.updateMenuItem(menuItemId, menuItemDTO);
-
-        return "redirect:/system/changeMenu/showMenuItems";
     }
 }

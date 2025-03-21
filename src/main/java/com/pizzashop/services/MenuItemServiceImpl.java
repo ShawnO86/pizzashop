@@ -12,9 +12,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class MenuItemServiceImpl implements MenuItemService {
@@ -51,7 +49,6 @@ public class MenuItemServiceImpl implements MenuItemService {
         Ingredient ingredient = new Ingredient(
                 ingredientDTO.getIngredientName(),
                 ingredientDTO.getCurrentStock(),
-                ingredientDTO.getUnitOfMeasure(),
                 ingredientDTO.getCentsCostPer()
         );
         ingredientDAO.save(ingredient);
@@ -60,16 +57,19 @@ public class MenuItemServiceImpl implements MenuItemService {
     @Override
     @Transactional
     public void updateIngredient(int ingredientId, IngredientDTO ingredientDTO) {
-        System.out.println("in updateIngredient" + ingredientId + "\n" + ingredientDTO);
-
         Ingredient ingredient = ingredientDAO.findById(ingredientId);
+        int oldCost = ingredient.getCentsCostPer();
 
         ingredient.setIngredientName(ingredientDTO.getIngredientName());
         ingredient.setCurrentStock(ingredientDTO.getCurrentStock());
-        ingredient.setUnitOfMeasure(ingredientDTO.getUnitOfMeasure());
         ingredient.setCentsCostPer(ingredientDTO.getCentsCostPer());
 
         ingredientDAO.update(ingredient);
+
+        System.out.println("old cost: " + oldCost + " new cost: " + ingredient.getCentsCostPer());
+        if (oldCost != ingredient.getCentsCostPer()) {
+            updateSingleIngredientInMenuItems(ingredientId, oldCost);
+        }
     }
 
     @Override
@@ -158,8 +158,29 @@ public class MenuItemServiceImpl implements MenuItemService {
             int cost = ingredient.getCentsCostPer() * quantity;
             menuItem.setPriceCents(menuItem.getPriceCents() + cost);
         });
-        //adds price markup to total cost of ingredients
-        menuItem.setPriceCents(menuItem.getPriceCents() * 3);
+    }
+
+    //updates cost of menuItem
+    private void updateSingleIngredientInMenuItems(int ingredientId, int oldCost) {
+        List<MenuItemIngredient> menuItemIngredients = menuItemIngredientDAO.findAllByIngredientId(ingredientId);
+
+        Ingredient ingredient = ingredientDAO.findById(ingredientId);
+
+        for (MenuItemIngredient menuItemIngredient : menuItemIngredients) {
+            MenuItem currentMenuItem = menuItemDAO.findById(menuItemIngredient.getMenuItem().getId());
+            menuItemIngredientDAO.deleteByMenuItemIdIngredientId(currentMenuItem.getId(), ingredientId);
+
+            List<MenuItemIngredient> currentMenuItemIngredients = currentMenuItem.getMenuItemIngredients();
+            currentMenuItemIngredients.remove(menuItemIngredient);
+
+            MenuItemIngredient newMenuItemIngredient = new MenuItemIngredient(currentMenuItem, ingredient, menuItemIngredient.getQuantityUsed());
+            currentMenuItemIngredients.add(newMenuItemIngredient);
+
+            int newCost = ( currentMenuItem.getPriceCents() - (oldCost * menuItemIngredient.getQuantityUsed()) + (ingredient.getCentsCostPer() * menuItemIngredient.getQuantityUsed()) );
+            currentMenuItem.setPriceCents(newCost);
+
+            menuItemDAO.update(currentMenuItem);
+        }
     }
 
 }

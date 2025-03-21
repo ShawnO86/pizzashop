@@ -31,6 +31,13 @@ public class MenuItemIngredientDAOImpl implements MenuItemIngredientDAO {
     }
 
     @Override
+    public List<MenuItemIngredient> findAllByIngredientId(Integer ingredientId) {
+        TypedQuery<MenuItemIngredient> query = em.createQuery("FROM MenuItemIngredient m WHERE m.ingredient.id = :ingredientId", MenuItemIngredient.class);
+        query.setParameter("ingredientId", ingredientId);
+        return query.getResultList();
+    }
+
+    @Override
     public MenuItemIngredient findById(Integer id) {
         return em.find(MenuItemIngredient.class, id);
     }
@@ -39,6 +46,14 @@ public class MenuItemIngredientDAOImpl implements MenuItemIngredientDAO {
     public void deleteByMenuItemId(Integer menuItemId) {
         Query query = em.createQuery("DELETE FROM MenuItemIngredient m WHERE m.menuItem.id = :menuItemId");
         query.setParameter("menuItemId", menuItemId);
+        query.executeUpdate();
+    }
+
+    @Override
+    public void deleteByMenuItemIdIngredientId(Integer menuItemId, Integer ingredientId) {
+        Query query = em.createQuery("DELETE from MenuItemIngredient m WHERE m.menuItem.id = :menuItemId AND m.ingredient.id = :ingredientId");
+        query.setParameter("menuItemId", menuItemId);
+        query.setParameter("ingredientId", ingredientId);
         query.executeUpdate();
     }
 }
