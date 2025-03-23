@@ -47,18 +47,31 @@ public class OrderController {
                                @RequestParam("menuItemsNamesList") String[] menuItemsNamesList,
                                @RequestParam("menuItemsAmountsList") Integer[] menuItemsAmountsList) {
 
-        // check for duplicates in names list and produce error msg if so
-        // check for difference in each array lengths
-        // check for item amounts over amount possible based on inventory
 
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String username = ((UserDetails) principal).getUsername();
+        // ToDo: check for item amounts over amount possible based on inventory used for them
 
-        System.out.println("Item Names :" + Arrays.toString(menuItemsNamesList));
-        System.out.println("Item Amounts :" + Arrays.toString(menuItemsAmountsList));
+        // checks for difference in array's lengths or if there are no items added.
+        String errMsg = "";
+        if (menuItemsNamesList.length != menuItemsAmountsList.length) {
+            errMsg = "Menu items and quantity mismatch!";
+        } else if (menuItemsNamesList.length == 0) {
+            errMsg = "No menu items added!";
+        }
 
-        orderService.submitOrderForFulfillment(orderDTO, username);
-        return "ordering/order-confirmation";
+        if (errMsg.isEmpty()) {
+            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            String username = ((UserDetails) principal).getUsername();
+
+            orderService.submitOrderForFulfillment(orderDTO, username);
+            return "ordering/order-confirmation";
+        } else {
+            Map<String, List<MenuItem>> menuItemsByCategory = seperateMenuItemsByCategory(menuItemDAO.findAll());
+            model.addAttribute("menuItemsByCategory", menuItemsByCategory);
+            model.addAttribute("orderError", errMsg);
+            model.addAttribute("order", orderDTO);
+            model.addAttribute("heading", "Hungry? Create an order!");
+            return "ordering/orderForm";
+        }
     }
 
 

@@ -29,14 +29,18 @@
   </section>
 
 
-  <section class="form-container stay-top" style="visibility: visible;">
-    <!--  set up js to show/hide order receipt on click-->
-<!--    <button class="open-close">X</button>-->
+  <section class="form-container stay-top">
+    <!--  set up js to show/hide "cart" on click of some button  -->
 
     <form action="#" th:action="@{/order/processOrder}" th:object="${order}" method="POST">
 
-      <div id="menuAmount-container">
+      <p th:if="${orderError}" class="error form-info">
+        <i class="error" th:text="${orderError}"></i>
+      </p>
 
+      <div id="menuAmount-container">
+        <input type="hidden" name="menuItemsNamesList">
+        <input type="hidden" name="menuItemsAmountsList">
       </div>
 
       <input type="submit" value="Submit Order"/>

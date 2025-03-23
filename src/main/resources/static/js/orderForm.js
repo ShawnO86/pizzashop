@@ -1,14 +1,20 @@
 document.addEventListener('DOMContentLoaded', ()=> {
 
+    // turn off error message after 4 seconds
+    const errorMessage = document.querySelector(".error");
+    if (errorMessage != null) {
+        setTimeout(() => {
+            errorMessage.style.display = "none";
+        }, 4000);
+    }
+
     const menuItemsContainer = document.getElementById("menuItems-container");
     const menuAmountContainer = document.getElementById("menuAmount-container");
 
     let menuItemNamesAndQuantities = {};
 
     menuItemsContainer.addEventListener("click", handleAddMenuItem);
-
     menuAmountContainer.addEventListener("click", handleRemoveMenuItem);
-
 
     function handleAddMenuItem(event) {
         event.preventDefault();
@@ -18,14 +24,13 @@ document.addEventListener('DOMContentLoaded', ()=> {
                 createOrderItemAmountSelector(event.target.name);
                 menuItemNamesAndQuantities[orderItemName] = 1;
             } else {
-                alert(orderItemName + " already part of order. Select a quantity if you want more of this item.")
+                alert(orderItemName + " is already part of this order. You must increase the qty if you want to add more.")
             }
         }
     }
 
     function handleRemoveMenuItem(event){
         event.preventDefault();
-        //console.log(event.target.value);
         if (event.target.classList.contains("remove-item")) {
             event.target.parentElement.remove();
             delete menuItemNamesAndQuantities[event.target.value];
@@ -50,6 +55,9 @@ document.addEventListener('DOMContentLoaded', ()=> {
         itemAmount.name = "menuItemsAmountsList";
         itemAmount.required = true;
 
+        const itemAmountLabel = document.createElement("label")
+        itemAmountLabel.innerText = "Qty"
+
         const removeItemBtn = document.createElement("button");
         removeItemBtn.innerText = "Remove Item";
         removeItemBtn.value = orderItemName;
@@ -57,13 +65,13 @@ document.addEventListener('DOMContentLoaded', ()=> {
 
         itemContainer.appendChild(itemNameHiddenInput);
         itemContainer.appendChild(itemName);
-        itemContainer.appendChild(itemAmount);
+        itemContainer.appendChild(itemAmountLabel);
         itemContainer.appendChild(removeItemBtn);
+        itemAmountLabel.appendChild(itemAmount);
 
         const itemContent = document.createTextNode(orderItemName);
         itemName.appendChild(itemContent);
 
         menuAmountContainer.appendChild(itemContainer);
     }
-
 });
