@@ -19,10 +19,5 @@ public class ViewController {
         return "management/system";
     }
 
-    @GetMapping("/order")
-    public String order(Model model) {
-        model.addAttribute("heading", "Hungry? Create an order!");
-        return "ordering/order";
-    }
 
 }

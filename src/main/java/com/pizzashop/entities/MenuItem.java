@@ -27,7 +27,7 @@ public class MenuItem {
     @Column(name = "category")
     private MenuCategoryEnum menuCategory;
 
-    @Column(name = "available")
+    @Column(name = "is_available")
     private Boolean isAvailable;
 
     @ManyToMany(mappedBy = "menuItems", fetch = FetchType.LAZY,
@@ -125,6 +125,7 @@ public class MenuItem {
                 "dishName='" + dishName + '\'' +
                 ", description='" + description + '\'' +
                 ", priceCents=" + priceCents +
+                ", is available=" + isAvailable +
                 '}';
     }
 }

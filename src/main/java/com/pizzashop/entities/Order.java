@@ -25,6 +25,9 @@ public class Order {
     @Column(name = "final_price_cents")
     private int final_price_cents;
 
+    @Column(name = "is_complete")
+    private boolean is_complete;
+
     @ManyToMany(fetch = FetchType.EAGER,
             cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(name = "orders_menuitems",
@@ -39,10 +42,11 @@ public class Order {
         this.order_date = order_date;
     }
 
-    public Order(User user, LocalDateTime order_date, List<MenuItem> menuItems) {
+    public Order(User user, LocalDateTime order_date, List<MenuItem> menuItems, boolean is_complete) {
         this.user = user;
         this.order_date = order_date;
         this.menuItems = menuItems;
+        this.is_complete = is_complete;
     }
 
     public int getId() {
@@ -77,6 +81,14 @@ public class Order {
         this.final_price_cents = final_price_cents;
     }
 
+    public boolean getIs_complete() {
+        return is_complete;
+    }
+
+    public void setIs_complete(boolean is_complete) {
+        this.is_complete = is_complete;
+    }
+
     public List<MenuItem> getMenuItems() {
         return menuItems;
     }
@@ -99,6 +111,7 @@ public class Order {
                 ", order_date=" + order_date +
                 ", final_price_cents=" + final_price_cents +
                 ", menuItems=" + menuItems +
+                ", is_complete=" + is_complete +
                 '}';
     }
 }

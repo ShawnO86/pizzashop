@@ -50,6 +50,7 @@ public class MenuItemController {
         model.addAttribute("menuItemRecipe", menuItemRecipe);
         model.addAttribute("menuItemName", menuItemName);
         model.addAttribute("menuItemId", menuItemId);
+        model.addAttribute("heading", menuItemName + " recipe");
 
         return "management/showMenuItemRecipe";
     }

@@ -9,12 +9,27 @@
     color: green;
 }
 
+.inline {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.stay-top {
+    position: fixed;
+    top: 10rem;
+    right: 5rem;
+}
+
 .form-container {
     border: 1px solid #c6d3e6;
     color: #333333;
     width: fit-content;
-    margin: 15vh auto;
+    min-height: 20rem;
 }
+
 .form-info {
     width: 100%;
     text-align: center;

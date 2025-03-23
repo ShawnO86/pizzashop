@@ -1,38 +1,25 @@
 package com.pizzashop.dto;
 
-import com.pizzashop.entities.MenuItem;
-import jakarta.validation.constraints.Size;
-
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 
 public class OrderDTO {
 
-    @Size.List(
-            @Size(min = 1, message = "Must have at least one item"))
-    private List<MenuItem> menuItems;
+    private Map<String, Integer> menuItemsNamesAndQuantity;
 
     public OrderDTO() {}
 
-    public List<MenuItem> getMenuItems() {
-        return menuItems;
+    public Map<String, Integer> getMenuItemsNamesAndQuantity() {
+        return menuItemsNamesAndQuantity;
     }
 
-    public void setMenuItems(List<MenuItem> menuItems) {
-        this.menuItems = menuItems;
-    }
-
-    public void addMenuItem(MenuItem menuItem) {
-        if (menuItems == null) {
-            menuItems = new ArrayList<>();
-        }
-        menuItems.add(menuItem);
+    public void setMenuItemsNames(Map<String, Integer> menuItemsNamesAndQuantity) {
+        this.menuItemsNamesAndQuantity = menuItemsNamesAndQuantity;
     }
 
     @Override
     public String toString() {
         return "OrderDTO{" +
-                "menuItems=" + menuItems +
+                "menuItems=" + menuItemsNamesAndQuantity +
                 '}';
     }
 }

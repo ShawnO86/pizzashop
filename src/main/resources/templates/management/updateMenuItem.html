@@ -7,7 +7,6 @@
 </head>
 
 <body>
-
 <header th:insert="~{header :: head}"></header>
 
 <main class="inline">
@@ -58,7 +57,13 @@
       </label>
 
       <label>Currently Available:
-
+        <span th:if="${#fields.hasErrors('isAvailable')}" th:errors="*{isAvailable}" class="error"></span>
+      </label>
+      <label>Yes:
+        <input type="radio" th:name="isAvailable" th:field="*{isAvailable}" th:value="true" >
+      </label>
+      <label>No:
+        <input type="radio" th:name="isAvailable" th:field="*{isAvailable}" th:value="false">
       </label>
 
       <div id="ingredientAmountsContainer">
@@ -72,7 +77,7 @@
           <label>Amount:
             <input type="number" name="ingredientIdAmountsValues" required/>
           </label>
-          <button type="button" class="remove-ingredient">Remove</button>
+          <button type="button" class="remove-item">Remove</button>
         </div>
       </div>
       <button type="button" id="addIngredient">Add Ingredient</button>

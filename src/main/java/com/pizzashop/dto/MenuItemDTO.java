@@ -68,7 +68,6 @@ public class MenuItemDTO {
     }
 
     public void setIngredientIdAmounts(Map<Integer, Integer> ingredientIdAmounts) {
-        System.out.println("in menuItem DTO set ingredients: " + ingredientIdAmounts.toString());
         this.ingredientIdAmounts = ingredientIdAmounts;
     }
 

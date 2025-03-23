@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Pizza Shop System</title>
+  <link rel="stylesheet" type="text/css" href="/styles/main.css">
+</head>
+
+<body>
+<header th:insert="~{header :: head}"></header>
+
+<main class="inline">
+
+  <section id="menuItems-container">
+    <div th:each="category : ${menuItemsByCategory}">
+      <h3 th:text="${category.key}"></h3>
+
+      <div th:each="menuItem : ${category.value}">
+        <div th:if="${menuItem.isAvailable}">
+          <p th:text="${menuItem.dishName}"></p>
+          <p th:text="${menuItem.description}"></p>
+          <p th:text="${menuItem.priceCents}"></p>
+        </div>
+
+        <button class="addMenuItem-btn" th:name="${menuItem.dishName}">Add To Order</button>
+      </div>
+
+    </div>
+  </section>
+
+
+  <section class="form-container stay-top" style="visibility: visible;">
+    <!--  set up js to show/hide order receipt on click-->
+<!--    <button class="open-close">X</button>-->
+
+    <form action="#" th:action="@{/order/processOrder}" th:object="${order}" method="POST">
+
+      <div id="menuAmount-container">
+
+      </div>
+
+      <input type="submit" value="Submit Order"/>
+
+    </form>
+
+</section>
+
+</main>
+
+</body>
+<script src="/js/orderForm.js" type="text/javascript"></script>
+</html>

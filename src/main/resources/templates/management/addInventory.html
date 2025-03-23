@@ -27,15 +27,6 @@
         <span th:if="${#fields.hasErrors('currentStock')}" th:errors="*{currentStock}" class="error"></span>
       </label>
 
-      <label>Unit of measure:
-        <select th:field="*{unitOfMeasure}">
-          <option value="ounces">Ounces</option>
-          <option value="cups">Cups</option>
-          <option value="pounds">Pounds</option>
-        </select>
-        <span th:if="${#fields.hasErrors('unitOfMeasure')}" th:errors="*{unitOfMeasure}" class="error"></span>
-      </label>
-
       <label>Cost in cents:
         <input type="number" th:field="*{centsCostPer}" placeholder="cost">
         <span th:if="${#fields.hasErrors('centsCostPer')}" th:errors="*{centsCostPer}" class="error"></span>

@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
     ingredientAmountsContainer.addEventListener('click',  handleRemoveIngredient);
 
     function handleRemoveIngredient(event) {
-        if (event.target.classList.contains('remove-ingredient') && ingredientInputFieldAmount >= 2) {
+        if (event.target.classList.contains('remove-item') && ingredientInputFieldAmount >= 2) {
             event.target.parentElement.remove();
             ingredientInputFieldAmount -= 1;
         }

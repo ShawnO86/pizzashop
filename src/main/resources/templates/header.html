@@ -14,7 +14,7 @@
         <a th:href="@{/}">Home</a>
       </li>
       <li sec:authorize="hasRole('ROLE_CUSTOMER')">
-        <a th:href="@{/order}">Order</a>
+        <a th:href="@{/order/showMenu}">Menu</a>
       </li>
       <li sec:authorize="hasRole('ROLE_EMPLOYEE')">
         Employee Portal
@@ -28,7 +28,7 @@
         </form>
       </li>
       <li sec:authorize="isAnonymous()">
-        <a th:href="@{/login}">Login</a> or <a th:href="@{/register/showRegistrationForm}">Register</a>
+        <a th:href="@{/login}">Login</a>
       </li>
     </ul>
   </nav>

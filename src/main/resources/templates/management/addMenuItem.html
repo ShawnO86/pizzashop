@@ -29,7 +29,7 @@
 
       <label>Dish Category:
         <select th:field="*{menuCategory}" name="menuCategory">
-          <option th:each="category : ${categories}" th:value="${category}" th:text="${category}"></option>
+          <option th:each="category : ${T(com.pizzashop.entities.MenuCategoryEnum).values()}" th:value="${category}" th:text="${category}"></option>
         </select>
       </label>
 
@@ -55,7 +55,7 @@
           <label>Amount:
             <input type="number" name="ingredientIdAmountsValues" required/>
           </label>
-          <button type="button" class="remove-ingredient">Remove</button>
+          <button type="button" class="remove-item">Remove</button>
         </div>
       </div>
       <button type="button" id="addIngredient">Add Ingredient</button>

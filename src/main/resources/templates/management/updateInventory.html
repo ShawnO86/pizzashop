@@ -7,13 +7,7 @@
 </head>
 
 <body>
-<header>
-  <h1>Update Inventory Form</h1>
-  <hr>
-  <form action="#" th:action="@{/logout}" method="POST">
-    <input type="submit" value="Logout"/>
-  </form>
-</header>
+<header th:insert="~{header :: head}"></header>
 
 <main>
   <section class="form-container">
@@ -33,15 +27,6 @@
       <label>Stock quantity:
         <input type="number" th:field="*{currentStock}" placeholder="quantity">
         <span th:if="${#fields.hasErrors('currentStock')}" th:errors="*{currentStock}" class="error"></span>
-      </label>
-
-      <label>Unit of measure:
-        <select th:field="*{unitOfMeasure}">
-          <option value="ounces">Ounces</option>
-          <option value="cups">Cups</option>
-          <option value="pounds">Pounds</option>
-        </select>
-        <span th:if="${#fields.hasErrors('unitOfMeasure')}" th:errors="*{unitOfMeasure}" class="error"></span>
       </label>
 
       <label>Cost in cents:
