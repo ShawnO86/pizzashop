@@ -1,18 +1,18 @@
 package com.pizzashop.dto;
 
-import java.util.Map;
+import java.util.List;
 
 public class OrderDTO {
 
-    private Map<String, Integer> menuItemsNamesAndQuantity;
+    private List<int[]> menuItemsNamesAndQuantity;
 
     public OrderDTO() {}
 
-    public Map<String, Integer> getMenuItemsNamesAndQuantity() {
+    public List<int[]> getMenuItemsNamesAndQuantity() {
         return menuItemsNamesAndQuantity;
     }
 
-    public void setMenuItemsNames(Map<String, Integer> menuItemsNamesAndQuantity) {
+    public void setMenuItemsNames(List<int[]> menuItemsNamesAndQuantity) {
         this.menuItemsNamesAndQuantity = menuItemsNamesAndQuantity;
     }
 

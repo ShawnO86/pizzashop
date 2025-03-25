@@ -28,12 +28,8 @@ public class Order {
     @Column(name = "is_complete")
     private boolean is_complete;
 
-    @ManyToMany(fetch = FetchType.EAGER,
-            cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-    @JoinTable(name = "orders_menuitems",
-            joinColumns = @JoinColumn(name = "order_id"),
-            inverseJoinColumns = @JoinColumn(name = "menu_item_id"))
-    private List<MenuItem> menuItems;
+    @OneToMany(mappedBy = "order" , cascade = CascadeType.ALL)
+    private List<OrderMenuItem> orderMenuItems;
 
     public Order() {}
 
@@ -42,10 +38,10 @@ public class Order {
         this.order_date = order_date;
     }
 
-    public Order(User user, LocalDateTime order_date, List<MenuItem> menuItems, boolean is_complete) {
+    public Order(User user, LocalDateTime order_date, List<OrderMenuItem> orderMenuItems, boolean is_complete) {
         this.user = user;
         this.order_date = order_date;
-        this.menuItems = menuItems;
+        this.orderMenuItems = orderMenuItems;
         this.is_complete = is_complete;
     }
 
@@ -89,19 +85,19 @@ public class Order {
         this.is_complete = is_complete;
     }
 
-    public List<MenuItem> getMenuItems() {
-        return menuItems;
+    public List<OrderMenuItem> getOrderMenuItems() {
+        return orderMenuItems;
     }
 
-    public void setMenuItems(List<MenuItem> menuItems) {
-        this.menuItems = menuItems;
+    public void setMenuItems(List<OrderMenuItem> orderMenuItems) {
+        this.orderMenuItems = orderMenuItems;
     }
 
-    public void addMenuItem(MenuItem menuItem) {
-        if (menuItems == null) {
-            menuItems = new ArrayList<>();
+    public void addMenuItem(OrderMenuItem orderMenuItem) {
+        if (orderMenuItems == null) {
+            orderMenuItems = new ArrayList<>();
         }
-        this.menuItems.add(menuItem);
+        this.orderMenuItems.add(orderMenuItem);
     }
 
     @Override
@@ -110,7 +106,7 @@ public class Order {
                 "user=" + user.getUsername() +
                 ", order_date=" + order_date +
                 ", final_price_cents=" + final_price_cents +
-                ", menuItems=" + menuItems +
+                ", menuItems=" + orderMenuItems +
                 ", is_complete=" + is_complete +
                 '}';
     }
