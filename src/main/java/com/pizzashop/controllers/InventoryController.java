@@ -110,13 +110,6 @@ public class InventoryController {
 
             return "management/updateInventory";
         }
-        else if (menuItemService.findIngredientById(ingredientId) != null) {
-            model.addAttribute("inventoryError", "Ingredient already exists with this name");
-            model.addAttribute("inventoryItem", ingredientDTO);
-            model.addAttribute("ingredientId", ingredientId);
-
-            return "management/updateInventory";
-        }
 
         menuItemService.updateIngredient(ingredientId, ingredientDTO);
 

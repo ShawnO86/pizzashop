@@ -30,8 +30,7 @@ public class MenuItem {
     @Column(name = "is_available")
     private Boolean isAvailable;
 
-    //ToDo : test if menu item deleted if order also deleted with cascade all??? Lazy Fetch on orders and ingredients???
-    @OneToMany(mappedBy = "menuItem",
+    @OneToMany(mappedBy = "menuItem", fetch = FetchType.LAZY,
             cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private List<OrderMenuItem> orderMenuItems;
 

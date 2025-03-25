@@ -28,7 +28,7 @@ public interface MenuItemService {
 
     MenuItem findMenuItemById(int id);
 
-    Map<String, String> findMenuItemRecipeByMenuId(int menuItemId);
+    List<MenuItemIngredient> findIngredientsByMenuItemId(int menuItemId);
 
     void saveMenuItem(MenuItemDTO menuItemDTO);
 

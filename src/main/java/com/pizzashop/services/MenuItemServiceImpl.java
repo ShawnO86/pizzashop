@@ -98,17 +98,8 @@ public class MenuItemServiceImpl implements MenuItemService {
     }
 
     @Override
-    public Map<String, String> findMenuItemRecipeByMenuId(int menuItemId) {
-        List<MenuItemIngredient> menuItemIngredients = menuItemIngredientDAO.findAllByMenuItemId(menuItemId);
-        Map<String, String> menuItemIngredientQuantityMap = new HashMap<>();
-
-
-        for (MenuItemIngredient menuItemIngredient : menuItemIngredients) {
-            String menuItemQuantityWithUnit = menuItemIngredient.getQuantityUsed() + " " + menuItemIngredient.getIngredient().getUnitOfMeasure();
-            menuItemIngredientQuantityMap.put(menuItemIngredient.getIngredient().getIngredientName(), menuItemQuantityWithUnit);
-        }
-
-        return menuItemIngredientQuantityMap;
+    public List<MenuItemIngredient> findIngredientsByMenuItemId(int menuItemId) {
+        return menuItemIngredientDAO.findAllByMenuItemId(menuItemId);
     }
 
     @Override
@@ -170,11 +161,10 @@ public class MenuItemServiceImpl implements MenuItemService {
     @Transactional
     protected void updateSingleIngredientInMenuItems(int ingredientId, int oldCost) {
         List<MenuItemIngredient> menuItemIngredients = menuItemIngredientDAO.findAllByIngredientId(ingredientId);
-
-        Ingredient ingredient = ingredientDAO.findById(ingredientId);
+        Ingredient ingredient = menuItemIngredients.get(0).getIngredient();
 
         for (MenuItemIngredient menuItemIngredient : menuItemIngredients) {
-            MenuItem currentMenuItem = menuItemDAO.findById(menuItemIngredient.getMenuItem().getId());
+            MenuItem currentMenuItem = menuItemIngredient.getMenuItem();
             menuItemIngredientDAO.deleteByMenuItemIdIngredientId(currentMenuItem.getId(), ingredientId);
 
             List<MenuItemIngredient> currentMenuItemIngredients = currentMenuItem.getMenuItemIngredients();
@@ -187,6 +177,7 @@ public class MenuItemServiceImpl implements MenuItemService {
             currentMenuItem.setPriceCents(newCost);
 
             menuItemDAO.update(currentMenuItem);
+
         }
     }
 
