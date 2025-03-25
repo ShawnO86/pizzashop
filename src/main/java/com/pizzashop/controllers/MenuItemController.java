@@ -3,7 +3,6 @@ package com.pizzashop.controllers;
 import com.pizzashop.dto.MenuItemDTO;
 import com.pizzashop.entities.MenuCategoryEnum;
 import com.pizzashop.entities.MenuItem;
-import com.pizzashop.entities.MenuItemIngredient;
 import com.pizzashop.services.MenuItemService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +13,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -46,9 +44,8 @@ public class MenuItemController {
     public String showMenuItemRecipe(@RequestParam("menuItemId") int menuItemId,
                                      @RequestParam("menuItemName") String menuItemName, Model model) {
         MenuItem menuItem = menuItemService.findMenuItemById(menuItemId);
-        List<String[]> menuItemRecipe = buildRecipeByMenuItem(menuItem);
 
-        model.addAttribute("menuItemRecipe", menuItemRecipe);
+        model.addAttribute("menuItemRecipe", menuItemService.buildRecipeByMenuItem(menuItem));
         model.addAttribute("menuItemName", menuItemName);
         model.addAttribute("menuItemId", menuItemId);
         model.addAttribute("heading", menuItemName + " recipe");
@@ -69,14 +66,13 @@ public class MenuItemController {
     @GetMapping("/updateMenuItem")
     public String showUpdateMenuItemForm(@RequestParam("menuItemId") int menuItemId, Model model) {
         MenuItem menuItem = menuItemService.findMenuItemById(menuItemId);
-        List<String[]> menuItemRecipe = buildRecipeByMenuItem(menuItem);
 
         model.addAttribute("menuItem", menuItem);
         model.addAttribute("ingredients", menuItemService.findAllIngredients());
         model.addAttribute("menuItemId", menuItemId);
         model.addAttribute("categories", MenuCategoryEnum.values());
         model.addAttribute("heading", "Update " + menuItem.getDishName());
-        model.addAttribute("menuItemRecipe", menuItemRecipe);
+        model.addAttribute("menuItemRecipe", menuItemService.buildRecipeByMenuItem(menuItem));
 
         return "management/updateMenuItem";
     }
@@ -97,18 +93,15 @@ public class MenuItemController {
 
         if (theBindingResult.hasErrors()) {
             errorMsg = "You must correct the errors before proceeding";
-        } else if (menuItemService.findIngredientByName(menuItemDTO.getDishName()) != null) {
+        } else if (menuItemService.findMenuItemByName(menuItemDTO.getDishName()) != null) {
             errorMsg = "Menu item already exists with this name";
         } else if (ingredientIdAmountsKeys.length == 0 || ingredientIdAmountValues.length == 0 || ingredientIdAmountsKeys.length != ingredientIdAmountValues.length) {
             errorMsg = "Ingredients must have associated quantities";
         }
 
         if (errorMsg.isEmpty()) {
-            List<int[]> ingredientIdsQty = new ArrayList<>();
-            for(int i = 0; i < ingredientIdAmountsKeys.length; i++){
-                ingredientIdsQty.add(new int[]{ingredientIdAmountsKeys[i], ingredientIdAmountValues[i]});
-            }
-            menuItemDTO.setIngredientIdAmounts(ingredientIdsQty);
+            menuItemDTO.setIngredientIdAmounts(
+                    menuItemService.buildIngredientIdAmounts(ingredientIdAmountsKeys, ingredientIdAmountValues));
             menuItemService.saveMenuItem(menuItemDTO);
             return "redirect:/system/changeMenu/showMenuItems";
         } else {
@@ -131,23 +124,19 @@ public class MenuItemController {
 
         if (theBindingResult.hasErrors()) {
             errorMsg = "You must correct the errors before proceeding";
-        } else if (menuItemService.findIngredientByName(menuItemDTO.getDishName()) != null) {
-            errorMsg = "Menu item already exists with this name";
         } else if (ingredientIdAmountsKeys.length == 0 || ingredientIdAmountValues.length == 0 || ingredientIdAmountsKeys.length != ingredientIdAmountValues.length) {
             errorMsg = "Ingredients must have associated quantities";
         }
 
         if (errorMsg.isEmpty()) {
-            List<int[]> ingredientIdsQty = new ArrayList<>();
-            for(int i = 0; i < ingredientIdAmountsKeys.length; i++){
-                ingredientIdsQty.add(new int[]{ingredientIdAmountsKeys[i], ingredientIdAmountValues[i]});
-            }
-            menuItemDTO.setIngredientIdAmounts(ingredientIdsQty);
-            menuItemService.saveMenuItem(menuItemDTO);
+            menuItemDTO.setIngredientIdAmounts(
+                    menuItemService.buildIngredientIdAmounts(ingredientIdAmountsKeys, ingredientIdAmountValues));
+
+            menuItemService.updateMenuItem(menuItemId, menuItemDTO);
             return "redirect:/system/changeMenu/showMenuItems";
         } else {
             MenuItem menuItem = menuItemService.findMenuItemById(menuItemId);
-            List<String[]> menuItemRecipe = buildRecipeByMenuItem(menuItem);
+            List<String[]> menuItemRecipe = menuItemService.buildRecipeByMenuItem(menuItem);
             model.addAttribute("menuItemError", errorMsg);
             model.addAttribute("menuItem", menuItemDTO);
             model.addAttribute("ingredients", menuItemService.findAllIngredients());
@@ -156,16 +145,6 @@ public class MenuItemController {
             model.addAttribute("menuItemRecipe", menuItemRecipe);
             return "management/updateMenuItem";
         }
-    }
-
-    private List<String[]> buildRecipeByMenuItem(MenuItem menuItem) {
-        List<String[]> menuItemRecipe = new ArrayList<>();
-        List<MenuItemIngredient> ingredients = menuItem.getMenuItemIngredients();
-        for (MenuItemIngredient menuItemIngredient : ingredients) {
-            String menuItemQuantityWithUnit = menuItemIngredient.getQuantityUsed() + " " + menuItemIngredient.getIngredient().getUnitOfMeasure();
-            menuItemRecipe.add(new String[]{menuItemIngredient.getIngredient().getIngredientName(), menuItemQuantityWithUnit});
-        }
-        return menuItemRecipe;
     }
 
 }

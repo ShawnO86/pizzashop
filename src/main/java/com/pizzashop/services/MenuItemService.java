@@ -7,7 +7,6 @@ import com.pizzashop.entities.MenuItem;
 import com.pizzashop.entities.MenuItemIngredient;
 
 import java.util.List;
-import java.util.Map;
 
 public interface MenuItemService {
     Ingredient findIngredientByName(String name);
@@ -28,11 +27,14 @@ public interface MenuItemService {
 
     MenuItem findMenuItemById(int id);
 
-    List<MenuItemIngredient> findIngredientsByMenuItemId(int menuItemId);
-
     void saveMenuItem(MenuItemDTO menuItemDTO);
 
     void updateMenuItem(int menuItemId, MenuItemDTO menuItemDTO);
 
     void deleteMenuItem(int menuItemId);
+
+    List<String[]> buildRecipeByMenuItem(MenuItem menuItem);
+
+    List<int[]> buildIngredientIdAmounts(Integer[] ingredientIdsAmountsKeys, Integer[] ingredientIdAmountValues);
+
 }

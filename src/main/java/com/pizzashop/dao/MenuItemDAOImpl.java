@@ -24,11 +24,9 @@ public class MenuItemDAOImpl implements MenuItemDAO {
     public MenuItem findByName(String name) {
         TypedQuery<MenuItem> query = em.createQuery("FROM MenuItem m WHERE m.dishName = :dishName", MenuItem.class);
         query.setParameter("dishName", name);
-
         try {
             return query.getSingleResult();
         } catch (NoResultException e) {
-            System.out.println("No dish found by name: " + name);
             return null;
         }
     }
@@ -41,7 +39,6 @@ public class MenuItemDAOImpl implements MenuItemDAO {
         try {
             return query.getSingleResult();
         } catch (NoResultException e) {
-            System.out.println("No dish found by id: " + id);
             return null;
         }
     }
@@ -60,15 +57,10 @@ public class MenuItemDAOImpl implements MenuItemDAO {
 
     @Override
     @Transactional
-    public void delete(MenuItem menuItem) {
-        em.remove(menuItem);
-    }
-
-    @Override
-    public void deleteById(int id) {
+    public int deleteById(int id) {
         Query query = em.createQuery("DELETE FROM MenuItem m WHERE m.id = :id");
         query.setParameter("id", id);
-        query.executeUpdate();
+        return query.executeUpdate();
     }
 
     @Override

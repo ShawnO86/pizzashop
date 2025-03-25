@@ -13,9 +13,7 @@ public interface MenuItemDAO {
 
     void save(MenuItem menuItem);
 
-    void delete(MenuItem menuItem);
-
-    void deleteById(int id);
+    int deleteById(int id);
 
     void update(MenuItem menuItem);
 

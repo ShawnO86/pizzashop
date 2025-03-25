@@ -76,7 +76,7 @@ public class MenuItemServiceImpl implements MenuItemService {
     @Transactional
     public List<MenuItemIngredient> deleteIngredient(int id) {
         List<MenuItemIngredient> assocMenuItems = menuItemIngredientDAO.findAllByIngredientId(id);
-        if (assocMenuItems.size() == 0) {
+        if (assocMenuItems.isEmpty()) {
             ingredientDAO.deleteById(id);
         }
         return assocMenuItems;
@@ -95,11 +95,6 @@ public class MenuItemServiceImpl implements MenuItemService {
     @Override
     public MenuItem findMenuItemById(int id) {
         return menuItemDAO.findById(id);
-    }
-
-    @Override
-    public List<MenuItemIngredient> findIngredientsByMenuItemId(int menuItemId) {
-        return menuItemIngredientDAO.findAllByMenuItemId(menuItemId);
     }
 
     @Override
@@ -140,9 +135,8 @@ public class MenuItemServiceImpl implements MenuItemService {
     @Override
     @Transactional
     public void deleteMenuItem(int menuItemId) {
-        MenuItem menuItem = menuItemDAO.findById(menuItemId);
-
-        menuItemDAO.delete(menuItem);
+        menuItemIngredientDAO.deleteByMenuItemId(menuItemId);
+        menuItemDAO.deleteById(menuItemId);
     }
 
     private void mapIngredientsToMenuItem(MenuItem menuItem, List<int[]> ingredientsQuantities) {
@@ -161,7 +155,7 @@ public class MenuItemServiceImpl implements MenuItemService {
     @Transactional
     protected void updateSingleIngredientInMenuItems(int ingredientId, int oldCost) {
         List<MenuItemIngredient> menuItemIngredients = menuItemIngredientDAO.findAllByIngredientId(ingredientId);
-        Ingredient ingredient = menuItemIngredients.get(0).getIngredient();
+        Ingredient ingredient = menuItemIngredients.getFirst().getIngredient();
 
         for (MenuItemIngredient menuItemIngredient : menuItemIngredients) {
             MenuItem currentMenuItem = menuItemIngredient.getMenuItem();
@@ -181,4 +175,23 @@ public class MenuItemServiceImpl implements MenuItemService {
         }
     }
 
+    @Override
+    public List<String[]> buildRecipeByMenuItem(MenuItem menuItem) {
+        List<String[]> menuItemRecipe = new ArrayList<>();
+        List<MenuItemIngredient> ingredients = menuItem.getMenuItemIngredients();
+        for (MenuItemIngredient menuItemIngredient : ingredients) {
+            String menuItemQuantityWithUnit = menuItemIngredient.getQuantityUsed() + " " + menuItemIngredient.getIngredient().getUnitOfMeasure();
+            menuItemRecipe.add(new String[]{menuItemIngredient.getIngredient().getIngredientName(), menuItemQuantityWithUnit});
+        }
+        return menuItemRecipe;
+    }
+
+    @Override
+    public List<int[]> buildIngredientIdAmounts(Integer[] ingredientIdsAmountsKeys, Integer[] ingredientIdAmountValues) {
+        List<int[]> ingredientIdsQty = new ArrayList<>();
+        for(int i = 0; i < ingredientIdsAmountsKeys.length; i++){
+            ingredientIdsQty.add(new int[]{ingredientIdsAmountsKeys[i], ingredientIdAmountValues[i]});
+        }
+        return ingredientIdsQty;
+    }
 }
