@@ -1,13 +1,5 @@
 document.addEventListener('DOMContentLoaded', ()=> {
 
-    // turn off error message after 4 seconds
-    const errorMessage = document.querySelector(".error");
-    if (errorMessage != null) {
-        setTimeout(() => {
-            errorMessage.style.display = "none";
-        }, 4000);
-    }
-
     const menuItemsContainer = document.getElementById("menuItems-container");
     const menuAmountContainer = document.getElementById("menuAmount-container");
 
@@ -16,6 +8,8 @@ document.addEventListener('DOMContentLoaded', ()=> {
     menuItemsContainer.addEventListener("click", handleAddMenuItem);
     menuAmountContainer.addEventListener("click", handleRemoveMenuItem);
 
+
+    // ToDo: set up initial qty input when 'Add To Order' clicked
     function handleAddMenuItem(event) {
         event.preventDefault();
         if (event.target.classList.contains("addMenuItem-btn")) {
