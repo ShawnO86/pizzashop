@@ -21,9 +21,9 @@
       </thead>
 
       <tbody>
-      <tr th:each="ingredientIdAmountsKeys, ingredientIdAmountValues : ${menuItemRecipe}">
-        <td th:text="${ingredientIdAmountValues.current.key}"></td>
-        <td th:text="${ingredientIdAmountValues.current.value}"></td>
+      <tr th:each="ingredientArr : ${menuItemRecipe}">
+        <td th:text="${ingredientArr[0]}"></td>
+        <td th:text="${ingredientArr[1]}"></td>
       </tr>
       </tbody>
     </table>

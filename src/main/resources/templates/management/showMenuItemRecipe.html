@@ -22,9 +22,9 @@
       </thead>
 
       <tbody>
-      <tr th:each="key, value : ${menuItemRecipe}">
-        <td th:text="${key.getKey()}"></td>
-        <td th:text="${key.getValue()}"></td>
+      <tr th:each="ingredientArr : ${menuItemRecipe}">
+        <td th:text="${ingredientArr[0]}"></td>
+        <td th:text="${ingredientArr[1]}"></td>
       </tr>
       </tbody>
     </table>

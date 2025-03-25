@@ -30,12 +30,13 @@ public class MenuItem {
     @Column(name = "is_available")
     private Boolean isAvailable;
 
-    @ManyToMany(mappedBy = "menuItems", fetch = FetchType.LAZY,
+    //ToDo : test if menu item deleted if order also deleted with cascade all??? Lazy Fetch on orders and ingredients???
+    @OneToMany(mappedBy = "menuItem",
             cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-    private List<Order> orders;
+    private List<OrderMenuItem> orderMenuItems;
 
     @OneToMany(mappedBy = "menuItem",
-            cascade = {CascadeType.ALL})
+            cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
     private List<MenuItemIngredient> menuItemIngredients;
 
 
@@ -96,12 +97,12 @@ public class MenuItem {
         this.isAvailable = isAvailable;
     }
 
-    public List<Order> getOrders() {
-        return orders;
+    public List<OrderMenuItem> getOrderMenuItems() {
+        return orderMenuItems;
     }
 
-    public void setOrders(List<Order> orders) {
-        this.orders = orders;
+    public void setOrderMenuItems(List<OrderMenuItem> orderMenuItems) {
+        this.orderMenuItems = orderMenuItems;
     }
 
     public List<MenuItemIngredient> getMenuItemIngredients() {

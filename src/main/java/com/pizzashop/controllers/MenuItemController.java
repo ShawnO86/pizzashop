@@ -3,6 +3,7 @@ package com.pizzashop.controllers;
 import com.pizzashop.dto.MenuItemDTO;
 import com.pizzashop.entities.MenuCategoryEnum;
 import com.pizzashop.entities.MenuItem;
+import com.pizzashop.entities.MenuItemIngredient;
 import com.pizzashop.services.MenuItemService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Controller
 @RequestMapping("/system/changeMenu")
@@ -45,7 +45,8 @@ public class MenuItemController {
     @GetMapping("/showMenuItemRecipe")
     public String showMenuItemRecipe(@RequestParam("menuItemId") int menuItemId,
                                      @RequestParam("menuItemName") String menuItemName, Model model) {
-        Map<String, String> menuItemRecipe = menuItemService.findMenuItemRecipeByMenuId(menuItemId);
+        MenuItem menuItem = menuItemService.findMenuItemById(menuItemId);
+        List<String[]> menuItemRecipe = buildRecipeByMenuItem(menuItem);
 
         model.addAttribute("menuItemRecipe", menuItemRecipe);
         model.addAttribute("menuItemName", menuItemName);
@@ -68,7 +69,7 @@ public class MenuItemController {
     @GetMapping("/updateMenuItem")
     public String showUpdateMenuItemForm(@RequestParam("menuItemId") int menuItemId, Model model) {
         MenuItem menuItem = menuItemService.findMenuItemById(menuItemId);
-        Map<String, String> menuItemRecipe = menuItemService.findMenuItemRecipeByMenuId(menuItemId);
+        List<String[]> menuItemRecipe = buildRecipeByMenuItem(menuItem);
 
         model.addAttribute("menuItem", menuItem);
         model.addAttribute("ingredients", menuItemService.findAllIngredients());
@@ -146,7 +147,7 @@ public class MenuItemController {
             return "redirect:/system/changeMenu/showMenuItems";
         } else {
             MenuItem menuItem = menuItemService.findMenuItemById(menuItemId);
-            Map<String, String> menuItemRecipe = menuItemService.findMenuItemRecipeByMenuId(menuItemId);
+            List<String[]> menuItemRecipe = buildRecipeByMenuItem(menuItem);
             model.addAttribute("menuItemError", errorMsg);
             model.addAttribute("menuItem", menuItemDTO);
             model.addAttribute("ingredients", menuItemService.findAllIngredients());
@@ -156,4 +157,15 @@ public class MenuItemController {
             return "management/updateMenuItem";
         }
     }
+
+    private List<String[]> buildRecipeByMenuItem(MenuItem menuItem) {
+        List<String[]> menuItemRecipe = new ArrayList<>();
+        List<MenuItemIngredient> ingredients = menuItem.getMenuItemIngredients();
+        for (MenuItemIngredient menuItemIngredient : ingredients) {
+            String menuItemQuantityWithUnit = menuItemIngredient.getQuantityUsed() + " " + menuItemIngredient.getIngredient().getUnitOfMeasure();
+            menuItemRecipe.add(new String[]{menuItemIngredient.getIngredient().getIngredientName(), menuItemQuantityWithUnit});
+        }
+        return menuItemRecipe;
+    }
+
 }
