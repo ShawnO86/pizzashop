@@ -4,7 +4,7 @@ import com.pizzashop.entities.MenuCategoryEnum;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-import java.util.Map;
+import java.util.List;
 
 public class MenuItemDTO {
     @NotNull(message = "required")
@@ -21,7 +21,7 @@ public class MenuItemDTO {
     @NotNull(message = "required")
     private Boolean isAvailable;
 
-    private Map<Integer, Integer> ingredientIdAmounts;
+    private List<int[]> ingredientIdAmounts;
 
     public MenuItemDTO() {}
 
@@ -63,11 +63,11 @@ public class MenuItemDTO {
         this.isAvailable = isAvailable;
     }
 
-    public Map<Integer, Integer> getIngredientIdAmounts() {
+    public List<int[]> getIngredientIdAmounts() {
         return ingredientIdAmounts;
     }
 
-    public void setIngredientIdAmounts(Map<Integer, Integer> ingredientIdAmounts) {
+    public void setIngredientIdAmounts(List<int[]> ingredientIdAmounts) {
         this.ingredientIdAmounts = ingredientIdAmounts;
     }
 

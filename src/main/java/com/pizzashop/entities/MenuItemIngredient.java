@@ -2,10 +2,8 @@ package com.pizzashop.entities;
 
 import jakarta.persistence.*;
 
-import java.util.Objects;
-
 @Entity
-@Table(name = "menuitems_ingredients", uniqueConstraints = @UniqueConstraint(columnNames = {"menu_item_id", "ingredient_id"}))
+@Table(name = "menuitems_ingredients")
 public class MenuItemIngredient {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,7 +19,7 @@ public class MenuItemIngredient {
     private Ingredient ingredient;
 
     @Column(name = "quantity_used")
-    private Integer quantityUsed;
+    private int quantityUsed;
 
     public MenuItemIngredient() {}
 
@@ -55,11 +53,11 @@ public class MenuItemIngredient {
         this.ingredient = ingredient;
     }
 
-    public Integer getQuantityUsed() {
+    public int getQuantityUsed() {
         return quantityUsed;
     }
 
-    public void setQuantityUsed(Integer quantityUsed) {
+    public void setQuantityUsed(int quantityUsed) {
         this.quantityUsed = quantityUsed;
     }
 
@@ -70,17 +68,5 @@ public class MenuItemIngredient {
                 ", ingredient=" + ingredient +
                 ", quantityUsed=" + quantityUsed +
                 '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        MenuItemIngredient that = (MenuItemIngredient) o;
-        return id == that.id && Objects.equals(menuItem, that.menuItem) && Objects.equals(ingredient, that.ingredient) && Objects.equals(quantityUsed, that.quantityUsed);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, menuItem, ingredient, quantityUsed);
     }
 }

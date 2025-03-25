@@ -19,6 +19,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -77,8 +78,8 @@ public class MenuTests {
         System.out.println("inserting test ingredients...");
         ingredientDAO.save(dough);
         // set ingredient quantities and save menuItem
-        Map<Integer, Integer> breadSticksIngredientsQuantities = new HashMap<>();
-        breadSticksIngredientsQuantities.put(dough.getId(), 1);
+        List<int[]> breadSticksIngredientsQuantities = new ArrayList<>();
+        breadSticksIngredientsQuantities.add(new int[]{dough.getId(), 1});
         breadSticks.setIngredientIdAmounts(breadSticksIngredientsQuantities);
 
         System.out.println("inserting test breadsticks...");
@@ -94,10 +95,10 @@ public class MenuTests {
         Ingredient groundBeef = new Ingredient("Ground Beef", 50,300);
         ingredientDAO.save(groundBeef);
         // set ingredient quantities
-        Map<Integer, Integer> spaghettiIngredientsQuantities = new HashMap<>();
-        spaghettiIngredientsQuantities.put(tomatoSauce.getId(), 2);
-        spaghettiIngredientsQuantities.put(pasta.getId(), 1);
-        spaghettiIngredientsQuantities.put(groundBeef.getId(), 1);
+        List<int[]> spaghettiIngredientsQuantities = new ArrayList<>();
+        spaghettiIngredientsQuantities.add(new int[]{tomatoSauce.getId(), 2});
+        spaghettiIngredientsQuantities.add(new int[]{pasta.getId(), 1});
+        spaghettiIngredientsQuantities.add(new int[]{groundBeef.getId(), 1});
         spaghetti.setIngredientIdAmounts(spaghettiIngredientsQuantities);
 
         System.out.println("inserting test spaghetti...");
@@ -109,8 +110,8 @@ public class MenuTests {
         System.out.println("inserting test ingredients...");
         ingredientDAO.save(soda);
         // set ingredient quantities
-        Map<Integer, Integer> sodaIngredientsQuantities = new HashMap<>();
-        sodaIngredientsQuantities.put(soda.getId(), sodaSizes.get("Lg"));
+        List<int[]> sodaIngredientsQuantities = new ArrayList<>();
+        sodaIngredientsQuantities.add(new int[]{soda.getId(), sodaSizes.get("Lg")});
         lgSoda.setIngredientIdAmounts(sodaIngredientsQuantities);
 
         System.out.println("inserting test soda...");
@@ -159,6 +160,10 @@ public class MenuTests {
         System.out.println("finding test menu...");
         List<MenuItem> menuItems = menuItemDAO.findAll();
 
-        //
+        System.out.println("menu items before order: " + menuItems.toString());
+        OrderDTO orderDTO = new OrderDTO();
+
+
+
     }
 }

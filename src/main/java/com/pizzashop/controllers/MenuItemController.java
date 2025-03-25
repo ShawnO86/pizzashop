@@ -13,7 +13,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -103,14 +103,13 @@ public class MenuItemController {
         }
 
         if (errorMsg.isEmpty()) {
-            Map<Integer, Integer> ingredientMap = new HashMap<>();
+            List<int[]> ingredientIdsQty = new ArrayList<>();
             for(int i = 0; i < ingredientIdAmountsKeys.length; i++){
-                ingredientMap.put(ingredientIdAmountsKeys[i], ingredientIdAmountValues[i]);
+                ingredientIdsQty.add(new int[]{ingredientIdAmountsKeys[i], ingredientIdAmountValues[i]});
             }
-            menuItemDTO.setIngredientIdAmounts(ingredientMap);
+            menuItemDTO.setIngredientIdAmounts(ingredientIdsQty);
             menuItemService.saveMenuItem(menuItemDTO);
             return "redirect:/system/changeMenu/showMenuItems";
-
         } else {
             model.addAttribute("menuItemError", errorMsg);
             model.addAttribute("menuItem", menuItemDTO);
@@ -138,14 +137,13 @@ public class MenuItemController {
         }
 
         if (errorMsg.isEmpty()) {
-            Map<Integer, Integer> ingredientMap = new HashMap<>();
+            List<int[]> ingredientIdsQty = new ArrayList<>();
             for(int i = 0; i < ingredientIdAmountsKeys.length; i++){
-                ingredientMap.put(ingredientIdAmountsKeys[i], ingredientIdAmountValues[i]);
+                ingredientIdsQty.add(new int[]{ingredientIdAmountsKeys[i], ingredientIdAmountValues[i]});
             }
-            menuItemDTO.setIngredientIdAmounts(ingredientMap);
+            menuItemDTO.setIngredientIdAmounts(ingredientIdsQty);
             menuItemService.saveMenuItem(menuItemDTO);
             return "redirect:/system/changeMenu/showMenuItems";
-
         } else {
             MenuItem menuItem = menuItemService.findMenuItemById(menuItemId);
             Map<String, String> menuItemRecipe = menuItemService.findMenuItemRecipeByMenuId(menuItemId);

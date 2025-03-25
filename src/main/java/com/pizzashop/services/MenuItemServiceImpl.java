@@ -66,7 +66,6 @@ public class MenuItemServiceImpl implements MenuItemService {
 
         ingredientDAO.update(ingredient);
 
-        System.out.println("old cost: " + oldCost + " new cost: " + ingredient.getCentsCostPer());
         if (oldCost != ingredient.getCentsCostPer()) {
             updateSingleIngredientInMenuItems(ingredientId, oldCost);
         }
@@ -96,7 +95,7 @@ public class MenuItemServiceImpl implements MenuItemService {
     @Override
     public Map<String, String> findMenuItemRecipeByMenuId(int menuItemId) {
         List<MenuItemIngredient> menuItemIngredients = menuItemIngredientDAO.findAllByMenuItemId(menuItemId);
-        Map<String, String> menuItemIngredientQuantityMap = new HashMap<String, String>();
+        Map<String, String> menuItemIngredientQuantityMap = new HashMap<>();
 
 
         for (MenuItemIngredient menuItemIngredient : menuItemIngredients) {
@@ -117,9 +116,9 @@ public class MenuItemServiceImpl implements MenuItemService {
                 menuItemDTO.getIsAvailable()
         );
 
-        Map<Integer, Integer> ingredientIdQuantityMap = menuItemDTO.getIngredientIdAmounts();
+        List<int[]> newIngredientQuantityArray = menuItemDTO.getIngredientIdAmounts();
 
-        mapIngredientsToMenuItem(menuItem, ingredientIdQuantityMap);
+        mapIngredientsToMenuItem(menuItem, newIngredientQuantityArray);
 
         menuItemDAO.save(menuItem);
     }
@@ -135,9 +134,9 @@ public class MenuItemServiceImpl implements MenuItemService {
         menuItem.setDescription(menuItemDTO.getDescription());
         menuItem.setMenuCategory(menuItemDTO.getMenuCategory());
 
-        Map<Integer, Integer> newIngredientQuantityMap = menuItemDTO.getIngredientIdAmounts();
+        List<int[]> newIngredientQuantityArray = menuItemDTO.getIngredientIdAmounts();
 
-        mapIngredientsToMenuItem(menuItem, newIngredientQuantityMap);
+        mapIngredientsToMenuItem(menuItem, newIngredientQuantityArray);
 
         menuItemDAO.update(menuItem);
     }
@@ -150,18 +149,21 @@ public class MenuItemServiceImpl implements MenuItemService {
         menuItemDAO.delete(menuItem);
     }
 
-    private void mapIngredientsToMenuItem(MenuItem menuItem, Map<Integer, Integer> ingredientsQuantities) {
-        ingredientsQuantities.forEach((ingredientId,quantity) -> {
+    private void mapIngredientsToMenuItem(MenuItem menuItem, List<int[]> ingredientsQuantities) {
+        for (int[] ingredientIdQty : ingredientsQuantities) {
+            int ingredientId = ingredientIdQty[0];
+            int quantity = ingredientIdQty[1];
             Ingredient ingredient = ingredientDAO.findById(ingredientId);
             MenuItemIngredient menuItemIngredient = new MenuItemIngredient(menuItem, ingredient, quantity);
             menuItem.addIngredient(menuItemIngredient);
             int cost = ingredient.getCentsCostPer() * quantity;
             menuItem.setPriceCents(menuItem.getPriceCents() + cost);
-        });
+        }
     }
 
-    //updates cost of menuItem
-    private void updateSingleIngredientInMenuItems(int ingredientId, int oldCost) {
+    //updates cost of menuItem if used ingredient cost has been changed
+    @Transactional
+    protected void updateSingleIngredientInMenuItems(int ingredientId, int oldCost) {
         List<MenuItemIngredient> menuItemIngredients = menuItemIngredientDAO.findAllByIngredientId(ingredientId);
 
         Ingredient ingredient = ingredientDAO.findById(ingredientId);
