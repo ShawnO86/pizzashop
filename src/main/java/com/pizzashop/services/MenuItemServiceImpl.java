@@ -71,10 +71,15 @@ public class MenuItemServiceImpl implements MenuItemService {
         }
     }
 
+    // check if ingredient has associated menu items before deletion
     @Override
     @Transactional
-    public void deleteIngredient(int id) {
-        ingredientDAO.deleteById(id);
+    public List<MenuItemIngredient> deleteIngredient(int id) {
+        List<MenuItemIngredient> assocMenuItems = menuItemIngredientDAO.findAllByIngredientId(id);
+        if (assocMenuItems.size() == 0) {
+            ingredientDAO.deleteById(id);
+        }
+        return assocMenuItems;
     }
 
     @Override

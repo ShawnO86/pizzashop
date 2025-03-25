@@ -24,7 +24,7 @@ public class Ingredient {
     @Column(name = "cents_cost_per")
     private int centsCostPer;
 
-    @OneToMany(mappedBy = "ingredient", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "ingredient", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<MenuItemIngredient> menuItemIngredients;
 
     public Ingredient() {}
@@ -33,6 +33,7 @@ public class Ingredient {
         this.ingredientName = ingredientName;
         this.currentStock = currentStock;
         this.centsCostPer = centsCostPer;
+        this.unitOfMeasure = "ounces";
     }
 
     public int getId() {

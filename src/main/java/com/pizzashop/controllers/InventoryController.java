@@ -2,6 +2,7 @@ package com.pizzashop.controllers;
 
 import com.pizzashop.dto.IngredientDTO;
 import com.pizzashop.entities.Ingredient;
+import com.pizzashop.entities.MenuItemIngredient;
 import com.pizzashop.services.MenuItemService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,8 +58,19 @@ public class InventoryController {
     }
 
     @GetMapping("/deleteInventory")
-    public String deleteInventory(@RequestParam("ingredientId") int ingredientId) {
-        menuItemService.deleteIngredient(ingredientId);
+    public String deleteInventory(@RequestParam("ingredientId") int ingredientId, Model model) {
+        // if associated with a menu item, produce an error message
+        List<MenuItemIngredient> assocMenuItems = menuItemService.deleteIngredient(ingredientId);
+        int listSize = assocMenuItems.size();
+
+        if (listSize > 0) {
+            Ingredient ingredient = assocMenuItems.get(0).getIngredient();
+            List<Ingredient> inventory = menuItemService.findAllIngredients();
+            model.addAttribute("assocMenuItemsErr",
+                    "Cannot delete " + ingredient.getIngredientName() + " it is associated with " + listSize + " menu item(s)");
+            model.addAttribute("inventory", inventory);
+            return "management/showInventory";
+        }
 
         return "redirect:/system/inventory/showInventory";
     }
@@ -73,8 +85,7 @@ public class InventoryController {
 
             return "management/addInventory";
         }
-
-        if (menuItemService.findIngredientByName(ingredientDTO.getIngredientName()) != null) {
+        else if (menuItemService.findIngredientByName(ingredientDTO.getIngredientName()) != null) {
             model.addAttribute("inventoryError", "Ingredient already exists with this name");
             model.addAttribute("inventoryItem", ingredientDTO);
 
@@ -94,6 +105,13 @@ public class InventoryController {
 
         if (theBindingResult.hasErrors()) {
             model.addAttribute("inventoryError", "You must correct the errors before proceeding");
+            model.addAttribute("inventoryItem", ingredientDTO);
+            model.addAttribute("ingredientId", ingredientId);
+
+            return "management/updateInventory";
+        }
+        else if (menuItemService.findIngredientById(ingredientId) != null) {
+            model.addAttribute("inventoryError", "Ingredient already exists with this name");
             model.addAttribute("inventoryItem", ingredientDTO);
             model.addAttribute("ingredientId", ingredientId);
 

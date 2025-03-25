@@ -57,16 +57,10 @@ public class IngredientDAOImpl implements IngredientDAO {
     }
 
     @Override
-    @Transactional
-    public void delete(Ingredient ingredient) {
-        em.remove(ingredient);
-    }
-
-    @Override
-    public void deleteById(int id) {
+    public int deleteById(int id) {
         Query query = em.createQuery("DELETE FROM Ingredient i WHERE i.id = :id");
         query.setParameter("id", id);
-        query.executeUpdate();
+        return query.executeUpdate();
     }
 
     @Override

@@ -13,9 +13,7 @@ public interface IngredientDAO {
 
     void save(Ingredient ingredient);
 
-    void delete(Ingredient ingredient);
-
-    void deleteById(int id);
+    int deleteById(int id);
 
     void update(Ingredient ingredient);
 }

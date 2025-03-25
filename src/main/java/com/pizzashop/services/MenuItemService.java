@@ -4,6 +4,7 @@ import com.pizzashop.dto.IngredientDTO;
 import com.pizzashop.dto.MenuItemDTO;
 import com.pizzashop.entities.Ingredient;
 import com.pizzashop.entities.MenuItem;
+import com.pizzashop.entities.MenuItemIngredient;
 
 import java.util.List;
 import java.util.Map;
@@ -19,7 +20,7 @@ public interface MenuItemService {
 
     void updateIngredient(int ingredientId, IngredientDTO ingredientDTO);
 
-    void deleteIngredient(int id);
+    List<MenuItemIngredient> deleteIngredient(int id);
 
     List<MenuItem> findAllMenuItems();
 
