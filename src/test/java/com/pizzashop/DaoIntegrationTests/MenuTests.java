@@ -126,7 +126,7 @@ public class MenuTests {
         // look at menu items and mapped ingredients
         for (MenuItem menuItem : menuItems) {
             System.out.println("Menu Item Name: " + menuItem.getDishName());
-            System.out.println("Category: " + menuItem.getMenuCategory() + "\nprice: " + menuItem.getPriceCents() + "\nIngredients:");
+            System.out.println("Category: " + menuItem.getMenuCategory() + "\nprice: " + menuItem.getCostCents() + "\nIngredients:");
             for (MenuItemIngredient menuItemIngredient : menuItem.getMenuItemIngredients()) {
                 Ingredient ingredient = menuItemIngredient.getIngredient();
                 System.out.println(ingredient.getIngredientName() + " -- quantity: " + menuItemIngredient.getQuantityUsed());

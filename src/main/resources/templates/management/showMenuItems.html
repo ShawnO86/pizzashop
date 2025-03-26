@@ -23,6 +23,7 @@
         <th>Available</th>
         <th>Qty Available</th>
         <th>Cost (cents)</th>
+        <th>Price (cents)</th>
         <th>Action</th>
       </tr>
       </thead>
@@ -34,6 +35,7 @@
         <td th:text="${item.getMenuCategory()}"></td>
         <td th:text="${item.getIsAvailable()}"></td>
         <td th:text="${item.getAmountAvailable()}"></td>
+        <td th:text="${item.getCostCents()}"></td>
         <td th:text="${item.getPriceCents()}"></td>
         <td>
           <a th:href="@{/system/changeMenu/showMenuItemRecipe(menuItemId=${item.getId()}, menuItemName=${item.getDishName()})}">Show Recipe</a>

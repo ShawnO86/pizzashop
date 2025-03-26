@@ -17,9 +17,12 @@ import java.util.*;
 @Service
 public class MenuItemServiceImpl implements MenuItemService {
 
-    MenuItemDAO menuItemDAO;
-    IngredientDAO ingredientDAO;
-    MenuItemIngredientDAO menuItemIngredientDAO;
+    private MenuItemDAO menuItemDAO;
+    private IngredientDAO ingredientDAO;
+    private MenuItemIngredientDAO menuItemIngredientDAO;
+
+    private final int markupMultiFromCost = 3;
+
 
     @Autowired
     public MenuItemServiceImpl(MenuItemDAO menuItemDAO, IngredientDAO ingredientDAO, MenuItemIngredientDAO menuItemIngredientDAO) {
@@ -116,6 +119,7 @@ public class MenuItemServiceImpl implements MenuItemService {
 
         mapIngredientsToMenuItem(menuItem, newIngredientQuantityArray);
 
+        menuItem.setPriceCents(menuItem.getCostCents() * markupMultiFromCost);
         menuItem.setAmountAvailable(updateMenuItemAmountAvailable(menuItem));
 
         menuItemDAO.save(menuItem);
@@ -127,7 +131,7 @@ public class MenuItemServiceImpl implements MenuItemService {
         MenuItem menuItem = menuItemDAO.findById(menuItemId);
         menuItemIngredientDAO.deleteByMenuItemId(menuItemId);
 
-        menuItem.setPriceCents(0);
+        menuItem.setCostCents(0);
         menuItem.setDishName(menuItemDTO.getDishName());
         menuItem.setDescription(menuItemDTO.getDescription());
         menuItem.setMenuCategory(menuItemDTO.getMenuCategory());
@@ -136,6 +140,7 @@ public class MenuItemServiceImpl implements MenuItemService {
 
         mapIngredientsToMenuItem(menuItem, newIngredientQuantityArray);
 
+        menuItem.setPriceCents(menuItem.getCostCents() * markupMultiFromCost);
         menuItem.setAmountAvailable(updateMenuItemAmountAvailable(menuItem));
 
         menuItemDAO.update(menuItem);
@@ -156,7 +161,7 @@ public class MenuItemServiceImpl implements MenuItemService {
             MenuItemIngredient menuItemIngredient = new MenuItemIngredient(menuItem, ingredient, quantity);
             menuItem.addIngredient(menuItemIngredient);
             int cost = ingredient.getCentsCostPer() * quantity;
-            menuItem.setPriceCents(menuItem.getPriceCents() + cost);
+            menuItem.setCostCents(menuItem.getCostCents() + cost);
         }
     }
 
@@ -168,8 +173,8 @@ public class MenuItemServiceImpl implements MenuItemService {
         for (MenuItemIngredient menuItemIngredient : menuItemIngredients) {
             MenuItem currentMenuItem = menuItemIngredient.getMenuItem();
 
-            int newCost = ( currentMenuItem.getPriceCents() - (oldCost * menuItemIngredient.getQuantityUsed()) + (ingredient.getCentsCostPer() * menuItemIngredient.getQuantityUsed()) );
-            currentMenuItem.setPriceCents(newCost);
+            int newCost = ( currentMenuItem.getCostCents() - (oldCost * menuItemIngredient.getQuantityUsed()) + (ingredient.getCentsCostPer() * menuItemIngredient.getQuantityUsed()) );
+            currentMenuItem.setCostCents(newCost);
 
             menuItemDAO.update(currentMenuItem);
         }

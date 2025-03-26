@@ -20,6 +20,9 @@ public class MenuItem {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "cost_cents")
+    private int costCents;
+
     @Column(name = "price_cents")
     private int priceCents;
 
@@ -75,6 +78,14 @@ public class MenuItem {
         this.description = description;
     }
 
+    public int getCostCents() {
+        return costCents;
+    }
+
+    public void setCostCents(int costCents) {
+        this.costCents = costCents;
+    }
+
     public int getPriceCents() {
         return priceCents;
     }
@@ -121,6 +132,9 @@ public class MenuItem {
 
     public void setAmountAvailable(int amountAvailable) {
         this.amountAvailable = amountAvailable;
+        if (this.amountAvailable < 1) {
+            this.isAvailable = false;
+        }
     }
 
     public void addIngredient(MenuItemIngredient menuItemIngredient) {
