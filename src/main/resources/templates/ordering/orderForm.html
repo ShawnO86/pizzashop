@@ -20,19 +20,14 @@
         <div th:if="${menuItem.isAvailable}">
           <p th:text="${menuItem.dishName}"></p>
           <p th:text="${menuItem.description}"></p>
-          <p th:text="${menuItem.priceCents}"></p>
+          <p th:text="${'$' + menuItem.priceCents / 100 + '.' + menuItem.priceCents % 100}"></p>
         </div>
-
-        <button class="addMenuItem-btn" th:name="${menuItem.id + ' ' + menuItem.dishName}">Add To Order</button>
         <form>
-
-          <!-- set up initial qty input sent to js when 'Add To Order' clicked -->
-
           <label>Qty:
-          <input type="number" placeholder="Qty">
+            <input type="number" placeholder="Qty" value="1" min="1">
           </label>
         </form>
-
+        <button class="addMenuItem-btn" th:name="${menuItem.id + ' ' + menuItem.dishName}">Add To Order</button>
       </div>
     </div>
 
