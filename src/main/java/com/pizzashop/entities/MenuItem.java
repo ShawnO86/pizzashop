@@ -30,6 +30,9 @@ public class MenuItem {
     @Column(name = "is_available")
     private Boolean isAvailable;
 
+    @Column(name = "amount_available")
+    private int amountAvailable;
+
     @OneToMany(mappedBy = "menuItem", fetch = FetchType.LAZY,
             cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private List<OrderMenuItem> orderMenuItems;
@@ -110,6 +113,14 @@ public class MenuItem {
 
     public void setMenuItemIngredients(List<MenuItemIngredient> menuItemIngredients) {
         this.menuItemIngredients = menuItemIngredients;
+    }
+
+    public int getAmountAvailable() {
+        return amountAvailable;
+    }
+
+    public void setAmountAvailable(int amountAvailable) {
+        this.amountAvailable = amountAvailable;
     }
 
     public void addIngredient(MenuItemIngredient menuItemIngredient) {

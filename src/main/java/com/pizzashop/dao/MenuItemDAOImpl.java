@@ -50,6 +50,12 @@ public class MenuItemDAOImpl implements MenuItemDAO {
     }
 
     @Override
+    public List<MenuItem> findAllAvailable() {
+        TypedQuery<MenuItem> query = em.createQuery("FROM MenuItem m WHERE m.isAvailable = true", MenuItem.class);
+        return query.getResultList();
+    }
+
+    @Override
     @Transactional
     public void save(MenuItem menuItem) {
         em.persist(menuItem);

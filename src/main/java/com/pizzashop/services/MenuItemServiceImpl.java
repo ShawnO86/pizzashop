@@ -59,6 +59,7 @@ public class MenuItemServiceImpl implements MenuItemService {
     public void updateIngredient(int ingredientId, IngredientDTO ingredientDTO) {
         Ingredient ingredient = ingredientDAO.findById(ingredientId);
         int oldCost = ingredient.getCentsCostPer();
+        int oldStock = ingredient.getCurrentStock();
 
         ingredient.setIngredientName(ingredientDTO.getIngredientName());
         ingredient.setCurrentStock(ingredientDTO.getCurrentStock());
@@ -66,8 +67,12 @@ public class MenuItemServiceImpl implements MenuItemService {
 
         ingredientDAO.update(ingredient);
 
-        if (oldCost != ingredient.getCentsCostPer()) {
-            updateSingleIngredientInMenuItems(ingredientId, oldCost);
+        if (oldCost != ingredientDTO.getCentsCostPer()) {
+            updateSingleIngredientInAllUsedMenuItemsCost(ingredient, oldCost);
+        }
+
+        if (oldStock != ingredientDTO.getCurrentStock()) {
+            updateAllMenuItemsAmountAvailableByIngredient(ingredient);
         }
     }
 
@@ -111,6 +116,8 @@ public class MenuItemServiceImpl implements MenuItemService {
 
         mapIngredientsToMenuItem(menuItem, newIngredientQuantityArray);
 
+        menuItem.setAmountAvailable(updateMenuItemAmountAvailable(menuItem));
+
         menuItemDAO.save(menuItem);
     }
 
@@ -128,6 +135,8 @@ public class MenuItemServiceImpl implements MenuItemService {
         List<int[]> newIngredientQuantityArray = menuItemDTO.getIngredientIdAmounts();
 
         mapIngredientsToMenuItem(menuItem, newIngredientQuantityArray);
+
+        menuItem.setAmountAvailable(updateMenuItemAmountAvailable(menuItem));
 
         menuItemDAO.update(menuItem);
     }
@@ -151,27 +160,30 @@ public class MenuItemServiceImpl implements MenuItemService {
         }
     }
 
-    //updates cost of menuItem if used ingredient cost has been changed
+    //updates cost of menuItem if used ingredient cost has been changed and amount available if stock changed.
     @Transactional
-    protected void updateSingleIngredientInMenuItems(int ingredientId, int oldCost) {
-        List<MenuItemIngredient> menuItemIngredients = menuItemIngredientDAO.findAllByIngredientId(ingredientId);
-        Ingredient ingredient = menuItemIngredients.getFirst().getIngredient();
+    protected void updateSingleIngredientInAllUsedMenuItemsCost(Ingredient ingredient, int oldCost) {
+        List<MenuItemIngredient> menuItemIngredients = ingredient.getMenuItemIngredients();
 
         for (MenuItemIngredient menuItemIngredient : menuItemIngredients) {
             MenuItem currentMenuItem = menuItemIngredient.getMenuItem();
-            menuItemIngredientDAO.deleteByMenuItemIdIngredientId(currentMenuItem.getId(), ingredientId);
-
-            List<MenuItemIngredient> currentMenuItemIngredients = currentMenuItem.getMenuItemIngredients();
-            currentMenuItemIngredients.remove(menuItemIngredient);
-
-            MenuItemIngredient newMenuItemIngredient = new MenuItemIngredient(currentMenuItem, ingredient, menuItemIngredient.getQuantityUsed());
-            currentMenuItemIngredients.add(newMenuItemIngredient);
 
             int newCost = ( currentMenuItem.getPriceCents() - (oldCost * menuItemIngredient.getQuantityUsed()) + (ingredient.getCentsCostPer() * menuItemIngredient.getQuantityUsed()) );
             currentMenuItem.setPriceCents(newCost);
 
             menuItemDAO.update(currentMenuItem);
+        }
+    }
 
+    @Transactional
+    protected void updateAllMenuItemsAmountAvailableByIngredient(Ingredient ingredient) {
+        List<MenuItemIngredient> menuItemIngredients = ingredient.getMenuItemIngredients();
+
+        for (MenuItemIngredient menuItemIngredient : menuItemIngredients) {
+            MenuItem currentMenuItem = menuItemIngredient.getMenuItem();
+            currentMenuItem.setAmountAvailable(updateMenuItemAmountAvailable(currentMenuItem));
+
+            menuItemDAO.update(currentMenuItem);
         }
     }
 
@@ -194,4 +206,25 @@ public class MenuItemServiceImpl implements MenuItemService {
         }
         return ingredientIdsQty;
     }
+
+    @Override
+    public int updateMenuItemAmountAvailable(MenuItem menuItem) {
+        int lowestInventoryUsed = Integer.MAX_VALUE;
+        List<MenuItemIngredient> menuItemIngredients = menuItem.getMenuItemIngredients();
+
+        for (MenuItemIngredient menuItemIngredient : menuItemIngredients) {
+            Ingredient currentIngredient = menuItemIngredient.getIngredient();
+
+            int qtyUsed = menuItemIngredient.getQuantityUsed();
+            int currentStock = currentIngredient.getCurrentStock();
+            int amountAvailable = currentStock / qtyUsed;
+
+            if (amountAvailable < lowestInventoryUsed) {
+                lowestInventoryUsed = amountAvailable;
+            }
+        }
+
+        return lowestInventoryUsed;
+    }
+
 }

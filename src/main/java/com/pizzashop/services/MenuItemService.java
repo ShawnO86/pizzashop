@@ -37,4 +37,5 @@ public interface MenuItemService {
 
     List<int[]> buildIngredientIdAmounts(Integer[] ingredientIdsAmountsKeys, Integer[] ingredientIdAmountValues);
 
+    int updateMenuItemAmountAvailable(MenuItem menuItem);
 }

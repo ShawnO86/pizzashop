@@ -11,6 +11,8 @@ public interface MenuItemDAO {
 
     List<MenuItem> findAll();
 
+    List<MenuItem> findAllAvailable();
+
     void save(MenuItem menuItem);
 
     int deleteById(int id);
