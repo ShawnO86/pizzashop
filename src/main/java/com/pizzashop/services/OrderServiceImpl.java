@@ -21,20 +21,19 @@ import java.util.List;
 @Service
 public class OrderServiceImpl implements OrderService {
 
-    // may need to grab user from session before testing on web ???
-
     private final IngredientDAO ingredientDAO;
-    private final MenuItemDAO menuItemDAO;
     private final OrderDAO orderDAO;
     private final UserDAO userDAO;
+    private final MenuItemService menuItemService;
 
     @Autowired
-    public OrderServiceImpl(IngredientDAO ingredientDAO, MenuItemDAO menuItemDAO, OrderDAO orderDAO, UserDAO userDAO) {
+    public OrderServiceImpl(IngredientDAO ingredientDAO, MenuItemDAO menuItemDAO, OrderDAO orderDAO, UserDAO userDAO, MenuItemService menuItemService) {
         this.ingredientDAO = ingredientDAO;
-        this.menuItemDAO = menuItemDAO;
         this.orderDAO = orderDAO;
         this.userDAO = userDAO;
+        this.menuItemService = menuItemService;
     }
+
 
     @Override
     @Transactional
@@ -43,11 +42,12 @@ public class OrderServiceImpl implements OrderService {
 
         Order newOrder = new Order(user, LocalDateTime.now());
 
-        //
 
 
     }
 
+    // reduce inventory used from menuItems in order and update available menuItems.
+    @Override
     @Transactional
     public void updateInventoryIngredientQuantities(List<MenuItem> menuItems) {
         for (MenuItem menuItem : menuItems) {
@@ -59,19 +59,22 @@ public class OrderServiceImpl implements OrderService {
                 currentIngredient.setCurrentStock(currentStock - used);
                 ingredientDAO.update(currentIngredient);
             }
+            menuItemService.updateMenuItemAmountAvailable(menuItem);
         }
     }
 
-    private int calculateTotalPrice(List<MenuItem> menuItems) {
+
+    private int calculateTotalOrderPrice(List<MenuItem> menuItems) {
         int totalPrice = 0;
         // 3x is 200% increase
         int markup = 3;
 
         for (MenuItem menuItem : menuItems) {
             //MenuItem currentMenuItem = menuItemDAO.findByName(menuItem.getDishName());
-            totalPrice += menuItem.getPriceCents();
+            totalPrice += menuItem.getCostCents();
         }
 
         return totalPrice * markup;
     }
+
 }

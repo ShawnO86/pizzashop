@@ -37,6 +37,7 @@ public class RegistrationController {
     @GetMapping("/showRegistrationForm")
     public String showRegistrationPage(Model theModel) {
 
+        theModel.addAttribute("heading", "Registration Form");
         theModel.addAttribute("webUser", new UserRegisterDTO());
 
         return "auth/register";
@@ -60,8 +61,6 @@ public class RegistrationController {
         Optional<User> existing = userService.findByUserName(userName);
 
         if (existing.isPresent()){
-            // instead of creating a new blank 'WebUser DTO', just null out the username and password and
-            // provide already populated details
             theWebUser.setUsername(null);
             theWebUser.setPassword(null);
             theModel.addAttribute("webUser", theWebUser);
@@ -70,9 +69,8 @@ public class RegistrationController {
             return "auth/register";
         }
 
-        // create user account and store in the database
-        // I will have to populate userDetails
-        userService.save(theWebUser);
+        // null for default role
+        userService.save(theWebUser, null);
 
         return "auth/registration-confirmation";
     }

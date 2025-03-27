@@ -32,6 +32,10 @@ public class UserDetail {
     @Column(name = "state")
     private String state;
 
+    @OneToOne(mappedBy = "userDetail",
+            cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    private User user;
+
     public UserDetail() {}
 
     public UserDetail(String firstName, String lastName, String email, String phone, String address, String city, String state) {
@@ -106,6 +110,14 @@ public class UserDetail {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     @Override

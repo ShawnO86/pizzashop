@@ -1,8 +1,11 @@
 package com.pizzashop.dto;
 
+import com.pizzashop.entities.Role;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+
+import java.util.List;
 
 public class UserRegisterDTO {
     @NotNull(message = "required")
@@ -34,6 +37,8 @@ public class UserRegisterDTO {
     @NotNull(message = "required")
     @Size(min = 2, message = "minimum of 2 characters required")
     private String state;
+
+    private List<Role> roles;
 
     public UserRegisterDTO() {}
 
@@ -107,6 +112,13 @@ public class UserRegisterDTO {
 
     public void setState(String state) {
         this.state = state;
+    }
+
+    public List<Role> getRoles() {
+        return roles;
+    }
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
     }
 
     @Override

@@ -23,11 +23,10 @@ public class User {
     @Column(name = "active")
     private boolean isActive;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "user_detail_id")
     private UserDetail userDetail;
 
-    //ToDo: test what cascade remove does to join table and role table
     @ManyToMany(fetch = FetchType.EAGER,
             cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(name = "users_roles",
@@ -122,10 +121,8 @@ public class User {
     public String toString() {
         return "User{" +
                 "isActive=" + isActive +
-                ", userDetail=" + userDetail +
                 ", roles=" + roles +
                 ", username='" + username + '\'' +
-                ", orders=" + orders +
                 '}';
     }
 }

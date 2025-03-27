@@ -27,7 +27,6 @@ public class IngredientDAOImpl implements IngredientDAO {
         try {
             return query.getSingleResult();
         } catch (NoResultException e) {
-            System.out.println("No ingredient found with id: " + id);
             return null;
         }
     }
@@ -39,7 +38,6 @@ public class IngredientDAOImpl implements IngredientDAO {
         try {
             return query.getSingleResult();
         } catch (NoResultException e) {
-            System.out.println("No ingredient found by name: " + name);
             return null;
         }
     }

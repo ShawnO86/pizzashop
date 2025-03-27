@@ -11,6 +11,10 @@ public interface UserDAO {
 
     List<User> findAll();
 
+    List<User> findAllFetchUserDetails();
+
+    List<User> findAllByLastName(String lastName);
+
     void save(User user);
 
     void update(User user);

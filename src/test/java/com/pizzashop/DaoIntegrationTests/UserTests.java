@@ -89,5 +89,16 @@ public class UserTests {
         assertEquals(changedUser.getUserDetail().getFirstName(), user.getUserDetail().getFirstName());
     }
 
+    @Test
+    public void testFindUserByLastName() {
+        System.out.println("Save user =>");
+        userDAO.save(user);
+        System.out.println("Find user by last name =>");
+        List<User> fetchedUsers = userDAO.findAllByLastName("TestLastName");
+        System.out.println(fetchedUsers);
+
+        assertNotNull(fetchedUsers);
+    }
+
 
 }

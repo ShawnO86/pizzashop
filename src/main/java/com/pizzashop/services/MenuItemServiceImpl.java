@@ -17,9 +17,9 @@ import java.util.*;
 @Service
 public class MenuItemServiceImpl implements MenuItemService {
 
-    private MenuItemDAO menuItemDAO;
-    private IngredientDAO ingredientDAO;
-    private MenuItemIngredientDAO menuItemIngredientDAO;
+    private final MenuItemDAO menuItemDAO;
+    private final IngredientDAO ingredientDAO;
+    private final MenuItemIngredientDAO menuItemIngredientDAO;
 
     private final int markupMultiFromCost = 3;
 
@@ -82,10 +82,10 @@ public class MenuItemServiceImpl implements MenuItemService {
     // check if ingredient has associated menu items before deletion
     @Override
     @Transactional
-    public List<MenuItemIngredient> deleteIngredient(int id) {
-        List<MenuItemIngredient> assocMenuItems = menuItemIngredientDAO.findAllByIngredientId(id);
+    public List<MenuItemIngredient> deleteIngredient(int ingredientId) {
+        List<MenuItemIngredient> assocMenuItems = menuItemIngredientDAO.findAllByIngredientId(ingredientId);
         if (assocMenuItems.isEmpty()) {
-            ingredientDAO.deleteById(id);
+            ingredientDAO.deleteById(ingredientId);
         }
         return assocMenuItems;
     }

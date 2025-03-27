@@ -37,6 +37,21 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
+    public List<User> findAllFetchUserDetails() {
+        TypedQuery<User> query = em.createQuery("SELECT u FROM User u " +
+                "JOIN FETCH u.userDetail", User.class);
+        return query.getResultList();
+    }
+
+    @Override
+    public List<User> findAllByLastName(String lastName) {
+        TypedQuery<User> query = em.createQuery("SELECT u FROM User u " +
+                "JOIN FETCH u.userDetail d WHERE d.lastName = :lastName", User.class);
+        query.setParameter("lastName", lastName);
+        return query.getResultList();
+    }
+
+    @Override
     public User findByUsernameJoinFetchOrders(String username) {
         TypedQuery<User> query = em.createQuery(
                 "SELECT u FROM User u " +
