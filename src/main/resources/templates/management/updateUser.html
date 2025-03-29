@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Test Registration Page</title>
+  <link rel="stylesheet" type="text/css" href="/styles/main.css">
+</head>
+
+<body>
+
+<header th:insert="~{header :: head}"></header>
+
+<main>
+
+  <section class="form-container">
+      <form action="#" th:action="@{/system/processUpdateUserForm}" th:object="${webUser}" method="POST">
+
+        <p th:if="${registrationError}" class="error form-info">
+          <i class="error" th:text="${registrationError}"></i>
+        </p>
+
+        <input type="hidden" name="userId" th:value="${userId}" />
+
+        <label>
+          Username:
+          <input type="text" name="username" th:field="*{username}" required/>
+        </label>
+        <sub th:if="${#fields.hasErrors('username')}" th:errors="*{username}" class="error"></sub>
+        <label>
+          Password:
+          <input type="password" name="password" th:field="*{password}" required/>
+        </label>
+        <sub th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="error"></sub>
+        <label>
+          First Name:
+          <input type="text" name="firstname" th:field="*{firstName}" required/>
+        </label>
+        <sub th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}" class="error"></sub>
+        <label>
+          Last Name:
+          <input type="text" name="lastName" th:field="*{lastName}" required/>
+        </label>
+        <sub th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}" class="error"></sub>
+        <label>
+          Email:
+          <input type="text" name="email" th:field="*{email}" required/>
+        </label>
+        <sub th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error"></sub>
+        <label>
+          Phone Number:
+          <input type="text" name="phone" th:field="*{phone}" placeholder="123-456-7890" required/>
+        </label>
+        <sub th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}" class="error"></sub>
+        <label>
+          Street Address:
+          <input type="text" name="address" th:field="*{address}" required/>
+        </label>
+        <sub th:if="${#fields.hasErrors('address')}" th:errors="*{address}" class="error"></sub>
+        <label>
+          City:
+          <input type="text" name="city" th:field="*{city}" required/>
+        </label>
+        <sub th:if="${#fields.hasErrors('city')}" th:errors="*{city}" class="error"></sub>
+        <label>
+          State:
+          <input type="text" name="state" th:field="*{state}" required/>
+        </label>
+        <sub th:if="${#fields.hasErrors('state')}" th:errors="*{state}" class="error"></sub>
+
+        <label>
+          Current Role: <span th:text="${highestRole}"></span><br>
+          New Role (if changing):
+          <select name="userRole">
+            <option th:each="role : ${T(com.pizzashop.entities.RoleEnum).values()}" th:value="${role}" th:text="${role}" ></option>
+          </select>
+        </label>
+
+        <br>
+        <input type="submit"/>
+      </form>
+
+  </section>
+
+</main>
+</body>
+</html>

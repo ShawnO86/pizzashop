@@ -6,6 +6,8 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public class RoleDAOImpl implements RoleDAO {
 
@@ -20,5 +22,11 @@ public class RoleDAOImpl implements RoleDAO {
         TypedQuery<Role> query = em.createQuery("SELECT r FROM Role r WHERE r.role = :role", Role.class);
         query.setParameter("role", role);
         return query.getSingleResult();
+    }
+
+    @Override
+    public List<Role> findAll() {
+        TypedQuery<Role> query = em.createQuery("SELECT r FROM Role r", Role.class);
+        return query.getResultList();
     }
 }

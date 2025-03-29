@@ -1,11 +1,8 @@
 package com.pizzashop.dto;
 
-import com.pizzashop.entities.Role;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-
-import java.util.List;
 
 public class UserRegisterDTO {
     @NotNull(message = "required")
@@ -22,25 +19,35 @@ public class UserRegisterDTO {
     private String lastName;
     @NotNull(message = "required")
     @Size(min = 5, message = "minimum of 5 characters required")
-    @Pattern(regexp="^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,})$", message = "invalid format")
+    @Pattern(regexp = "^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,})$", message = "invalid format")
     private String email;
     @NotNull(message = "required")
     @Size(min = 5, message = "minimum of 10 characters required")
-    @Pattern(regexp="^(\\+\\d{1,2}\\s)?\\(?\\d{3}\\)?[\\s.-]\\d{3}[\\s.-]\\d{4}$", message = "invalid format")
+    @Pattern(regexp = "^(\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]\\d{4})$", message = "invalid format. please use format: (123)456-7890 or 123-456-7890")
     private String phone;
     @NotNull(message = "required")
-    @Size(min = 1, message = "minimum of 1 character required")
+    @Size(min = 2, message = "minimum of 2 characters required")
     private String address;
     @NotNull(message = "required")
     @Size(min = 2, message = "minimum of 2 characters required")
     private String city;
     @NotNull(message = "required")
-    @Size(min = 2, message = "minimum of 2 characters required")
+    @Size(min = 2, max = 2, message = "2 characters for state abbreviation required")
     private String state;
 
-    private List<Role> roles;
-
     public UserRegisterDTO() {}
+
+    public UserRegisterDTO(String username, String firstName, String lastName, String email,
+                           String phone, String address, String city, String state) {
+        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.phone = phone;
+        this.address = address;
+        this.city = city;
+        this.state = state;
+    }
 
     public String getUsername() {
         return username;
@@ -112,13 +119,6 @@ public class UserRegisterDTO {
 
     public void setState(String state) {
         this.state = state;
-    }
-
-    public List<Role> getRoles() {
-        return roles;
-    }
-    public void setRoles(List<Role> roles) {
-        this.roles = roles;
     }
 
     @Override

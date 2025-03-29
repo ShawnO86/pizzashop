@@ -1,6 +1,7 @@
 package com.pizzashop.controllers;
 
 import com.pizzashop.dto.UserRegisterDTO;
+import com.pizzashop.entities.RoleEnum;
 import com.pizzashop.entities.User;
 import com.pizzashop.services.UserRegistrationService;
 import jakarta.validation.Valid;
@@ -48,16 +49,12 @@ public class RegistrationController {
             @Valid @ModelAttribute("webUser") UserRegisterDTO theWebUser,
             BindingResult theBindingResult, Model theModel) {
 
-        String userName = theWebUser.getUsername();
-        System.out.println("Processing user: " + theWebUser);
-
-        // form validation
         if (theBindingResult.hasErrors()){
             theModel.addAttribute("registrationError", "You must correct the errors before proceeding");
             return "auth/register";
         }
 
-        // check the database if username already used
+        String userName = theWebUser.getUsername();
         Optional<User> existing = userService.findByUserName(userName);
 
         if (existing.isPresent()){
@@ -69,8 +66,8 @@ public class RegistrationController {
             return "auth/register";
         }
 
-        // null for default role
-        userService.save(theWebUser, null);
+        // Customer is default role
+        userService.save(theWebUser, RoleEnum.ROLE_CUSTOMER.name());
 
         return "auth/registration-confirmation";
     }

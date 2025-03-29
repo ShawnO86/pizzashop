@@ -18,7 +18,7 @@
 
         <!-- params are gathered on load from uri -->
         <p th:if="${param.error}" class="form-info">
-            <i id="error">Invalid username or password.</i>
+            <i id="error">Invalid username, password, <br>or user has been deactivated.</i>
         </p>
 
         <p th:if="${param.logout}" class="form-info">

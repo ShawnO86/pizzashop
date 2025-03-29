@@ -106,7 +106,9 @@ public class User {
         if (this.roles == null) {
             this.roles = new ArrayList<>();
         }
-        this.roles.add(role);
+        if (!this.roles.contains(role)) {
+            this.roles.add(role);
+        }
     }
 
     public void addOrder(Order order) {

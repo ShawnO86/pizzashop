@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Pizza Shop System</title>
+  <link rel="stylesheet" type="text/css" href="/styles/main.css">
+</head>
+
+<body>
+
+<header th:insert="~{header :: head}"></header>
+
+<main>
+  <section class="form-container">
+
+    <p th:if="${registrationError}" class="error form-info">
+      <i class="error" th:text="${registrationError}"></i>
+    </p>
+
+    <a th:href="@{/system/showRegistrationForm}">Add User</a>
+
+    <form th:action="@{/system/userDataByLastname}" METHOD="GET">
+      <label>Search by lastname:
+      <input type="text" th:name="userLastName" placeholder="lastname"/>
+      </label>
+      <input type="submit">
+    </form>
+
+    <p th:if="${noUsers}" >
+      <span th:text="${noUsers}"></span>
+    </p>
+
+    <table th:if="users">
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Role(s)</th>
+          <th>Firstname</th>
+          <th>Lastname</th>
+          <th>Email</th>
+          <th>Phone #</th>
+          <th>Full Address</th>
+          <th>Active</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr th:each="user : ${users}">
+          <td th:text="${user.username}"></td>
+          <td>
+            <sub th:each="role : ${user.roles}">
+              <span th:text="${role.role}"></span><br>
+            </sub>
+          </td>
+          <td th:text="${user.userDetail.firstName}"></td>
+          <td th:text="${user.userDetail.lastName}"></td>
+          <td th:text="${user.userDetail.email}"></td>
+          <td th:text="${user.userDetail.phone}"></td>
+          <td th:text="${user.userDetail.address + ' ' + user.userDetail.city + ', ' + user.userDetail.state}"></td>
+          <td th:text="${user.isActive}"></td>
+          <td>
+            <a th:href="@{/system/showUpdateUserForm(userId=${user.id})}">Update</a>
+            <a th:if="${user.isActive}" th:href="@{/system/deactivateUser(userId=${user.id})}">Deactivate</a>
+            <a th:if="${user.isActive == false}" th:href="@{/system/activateUser(userId=${user.id})}">Activate</a>
+          </td>
+        </tr>
+      </tbody>
+
+    </table>
+
+  </section>
+
+
+
+</main>
+
+</body>
+</html>

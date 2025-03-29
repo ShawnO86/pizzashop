@@ -3,6 +3,7 @@ package com.pizzashop.dao;
 import com.pizzashop.entities.User;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
+import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
@@ -16,6 +17,25 @@ public class UserDAOImpl implements UserDAO {
 
     public UserDAOImpl(EntityManager em) {
         this.em = em;
+    }
+
+    @Override
+    public User findById(int userId) {
+        return em.find(User.class, userId);
+    }
+
+    @Override
+    public User findByIdJoinFetchUserDetailsRoles(int userId) {
+        TypedQuery<User> query = em.createQuery("SELECT u FROM User u " +
+                "JOIN FETCH u.userDetail JOIN FETCH u.roles " +
+                "WHERE u.id = :userId", User.class);
+        query.setParameter("userId", userId);
+        try {
+            return query.getSingleResult();
+        } catch (NoResultException e) {
+            System.out.println("No user found with id: " + userId);
+            return null;
+        }
     }
 
     @Override
@@ -44,9 +64,16 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
+    public List<User> findAllFetchUserDetailsRoles() {
+        TypedQuery<User> query = em.createQuery("SELECT u FROM User u " +
+                "JOIN FETCH u.userDetail JOIN FETCH u.roles", User.class);
+        return query.getResultList();
+    }
+
+    @Override
     public List<User> findAllByLastName(String lastName) {
         TypedQuery<User> query = em.createQuery("SELECT u FROM User u " +
-                "JOIN FETCH u.userDetail d WHERE d.lastName = :lastName", User.class);
+                "JOIN FETCH u.userDetail d JOIN FETCH u.roles WHERE d.lastName = :lastName", User.class);
         query.setParameter("lastName", lastName);
         return query.getResultList();
     }
@@ -74,13 +101,33 @@ public class UserDAOImpl implements UserDAO {
 
     @Override
     @Transactional
-    public void update(User user) {
+    public void updateUser(User user) {
         em.merge(user);
     }
 
     @Override
-    public void delete(User user) {
-        em.remove(user);
+    @Transactional
+    public void deactivateUser(int userId) {
+        Query query = em.createQuery("UPDATE User u SET u.isActive = false WHERE u.id = :userId");
+        query.setParameter("userId", userId);
+        try {
+            query.executeUpdate();
+        } catch (NoResultException e) {
+            System.out.println("No user found with id: " + userId + " error occurred:\n" + e.getMessage());
+        }
     }
+
+    @Override
+    @Transactional
+    public void activateUser(int userId) {
+        Query query = em.createQuery("UPDATE User u SET u.isActive = true WHERE u.id = :userId");
+        query.setParameter("userId", userId);
+        try {
+            query.executeUpdate();
+        } catch (NoResultException e) {
+            System.out.println("No user found with id: " + userId + " error occurred:\n" + e.getMessage());
+        }
+    }
+
 
 }

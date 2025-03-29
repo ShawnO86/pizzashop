@@ -7,16 +7,13 @@ import com.pizzashop.entities.User;
 import com.pizzashop.dao.RoleDAO;
 import com.pizzashop.dao.UserDAO;
 import com.pizzashop.entities.UserDetail;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class UserRegistrationServiceImpl implements UserRegistrationService {
@@ -34,20 +31,12 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
 
     @Override
     public Optional<User> findByUserName(String userName) {
-        User user;
-        try {
-           user = userDAO.findByUsername(userName);
-           return Optional.of(user);
-        } catch (EmptyResultDataAccessException e_2) {
-            System.out.println("User not found" + e_2.getMessage());
-            return Optional.empty();
-        }
+        User user = userDAO.findByUsername(userName);
+        return Optional.ofNullable(user);
     }
 
     @Override
-    public void save(UserRegisterDTO userRegisterDTO) {
-        System.out.println("Saving user: " + userRegisterDTO);
-
+    public void save(UserRegisterDTO userRegisterDTO, String role) {
         User user = new User();
         user.setUsername(userRegisterDTO.getUsername());
         user.setPassword(bCryptPasswordEncoder.encode(userRegisterDTO.getPassword()));
@@ -65,12 +54,32 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
 
         user.setUserDetail(userDetails);
 
-        // set default role of customer
-        // ToDo: allow adding other roles in management view
-        Role role = roleDAO.findByRole(RoleEnum.ROLE_CUSTOMER);
-        user.addRole(role);
+        this.setUserRoles(user, role);
 
         userDAO.save(user);
+    }
+
+    @Override
+    public void update(UserRegisterDTO userRegisterDTO, int userId, String role) {
+        User user = userDAO.findByIdJoinFetchUserDetailsRoles(userId);
+        user.setUsername(userRegisterDTO.getUsername());
+        user.setPassword(bCryptPasswordEncoder.encode(userRegisterDTO.getPassword()));
+
+        user.setRoles(null);
+        this.setUserRoles(user, role);
+
+        UserDetail userDetails = user.getUserDetail();
+        userDetails.setFirstName(userRegisterDTO.getFirstName());
+        userDetails.setLastName(userRegisterDTO.getLastName());
+        userDetails.setEmail(userRegisterDTO.getEmail());
+        userDetails.setPhone(userRegisterDTO.getPhone());
+        userDetails.setAddress(userRegisterDTO.getAddress());
+        userDetails.setCity(userRegisterDTO.getCity());
+        userDetails.setState(userRegisterDTO.getState());
+
+        user.setUserDetail(userDetails);
+
+        userDAO.updateUser(user);
     }
 
     @Override
@@ -78,7 +87,9 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
         User user = userDAO.findByUsername(username);
 
         if (user == null) {
-            throw new UsernameNotFoundException("Invalid username or password.");
+            throw new UsernameNotFoundException("Invalid username or password!");
+        } else if (!user.isActive()) {
+            throw new UsernameNotFoundException(username + " is not active!");
         }
 
         Collection<SimpleGrantedAuthority> authorities = mapRolesToAuthorities(user.getRoles());
@@ -97,4 +108,25 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
 
         return authorities;
     }
+
+    private void setUserRoles(User user, String role) {
+        Role customer;
+        switch(role) {
+            case "ROLE_EMPLOYEE":
+                customer = roleDAO.findByRole(RoleEnum.ROLE_CUSTOMER);
+                Role employee = roleDAO.findByRole(RoleEnum.ROLE_EMPLOYEE);
+                user.addRole(customer);
+                user.addRole(employee);
+                break;
+            case "ROLE_MANAGER":
+                List<Role> roles = roleDAO.findAll();
+                user.setRoles(roles);
+                break;
+            default:
+                customer = roleDAO.findByRole(RoleEnum.ROLE_CUSTOMER);
+                user.addRole(customer);
+                break;
+        }
+    }
+
 }

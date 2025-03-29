@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -64,10 +63,16 @@ public class UserTests {
         User fetchedUser = userDAO.findByUsername(user.getUsername());
         List<User> fetchedUsers = userDAO.findAll();
 
+        User fetchedUserById = userDAO.findById(8);
+
+
+        System.out.println("Add user test complete, fetched user 1:\n" + fetchedUser + "\nEntered user:\n" + user);
+        System.out.println("Add user test complete, fetched user 2:\n" + fetchedUserById);
+
         assertNull(fetchedUser);
         assertEquals(0, fetchedUsers.size());
 
-        System.out.println("Add user test complete, fetched user:\n" + fetchedUser + "\nEntered user:\n" + user);
+        assertNull(fetchedUserById);
     }
 
     @Test
@@ -99,6 +104,4 @@ public class UserTests {
 
         assertNotNull(fetchedUsers);
     }
-
-
 }
