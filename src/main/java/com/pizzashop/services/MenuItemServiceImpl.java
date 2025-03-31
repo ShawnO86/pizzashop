@@ -54,6 +54,8 @@ public class MenuItemServiceImpl implements MenuItemService {
                 ingredientDTO.getCurrentStock(),
                 ingredientDTO.getCentsCostPer()
         );
+        ingredient.setIsPizzaTopping(ingredientDTO.getIsPizzaTopping());
+
         ingredientDAO.save(ingredient);
     }
 
@@ -67,6 +69,7 @@ public class MenuItemServiceImpl implements MenuItemService {
         ingredient.setIngredientName(ingredientDTO.getIngredientName());
         ingredient.setCurrentStock(ingredientDTO.getCurrentStock());
         ingredient.setCentsCostPer(ingredientDTO.getCentsCostPer());
+        ingredient.setIsPizzaTopping(ingredientDTO.getIsPizzaTopping());
 
         ingredientDAO.update(ingredient);
 
@@ -175,7 +178,7 @@ public class MenuItemServiceImpl implements MenuItemService {
 
             int newCost = ( currentMenuItem.getCostCents() - (oldCost * menuItemIngredient.getQuantityUsed()) + (ingredient.getCentsCostPer() * menuItemIngredient.getQuantityUsed()) );
             currentMenuItem.setCostCents(newCost);
-
+            currentMenuItem.setPriceCents(newCost * markupMultiFromCost);
             menuItemDAO.update(currentMenuItem);
         }
     }

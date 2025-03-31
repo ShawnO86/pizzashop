@@ -34,6 +34,10 @@
         <span th:if="${#fields.hasErrors('centsCostPer')}" th:errors="*{centsCostPer}" class="error"></span>
       </label>
 
+      <label>Pizza topping?:
+        <input type="checkbox" th:field="*{isPizzaTopping}">
+      </label>
+
       <input type="submit" value="Submit">
     </form>
   </section>

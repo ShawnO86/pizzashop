@@ -18,7 +18,6 @@ public class MenuItemDTO {
     @NotNull(message = "required")
     private MenuCategoryEnum menuCategory;
 
-    @NotNull(message = "required")
     private Boolean isAvailable;
 
     private List<int[]> ingredientIdAmounts;

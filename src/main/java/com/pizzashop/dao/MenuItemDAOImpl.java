@@ -56,6 +56,14 @@ public class MenuItemDAOImpl implements MenuItemDAO {
     }
 
     @Override
+    public List<MenuItem> findAllIn(List<Integer> ids) {
+        TypedQuery<MenuItem> query = em.createQuery("FROM MenuItem m WHERE m.id IN (:ids)", MenuItem.class);
+        query.setParameter("ids", ids);
+        return query.getResultList();
+    }
+
+
+    @Override
     @Transactional
     public void save(MenuItem menuItem) {
         em.persist(menuItem);

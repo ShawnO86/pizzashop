@@ -57,13 +57,7 @@
       </label>
 
       <label>Currently Available:
-        <span th:if="${#fields.hasErrors('isAvailable')}" th:errors="*{isAvailable}" class="error"></span>
-      </label>
-      <label>Yes:
-        <input type="radio" th:name="isAvailable" th:field="*{isAvailable}" th:value="true" >
-      </label>
-      <label>No:
-        <input type="radio" th:name="isAvailable" th:field="*{isAvailable}" th:value="false">
+        <input type="checkbox" th:field="*{isAvailable}">
       </label>
 
       <div id="ingredientAmountsContainer">

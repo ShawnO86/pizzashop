@@ -27,9 +27,13 @@
         <span th:if="${#fields.hasErrors('currentStock')}" th:errors="*{currentStock}" class="error"></span>
       </label>
 
-      <label>Cost in cents:
+      <label>Cost per oz in cents:
         <input type="number" th:field="*{centsCostPer}" placeholder="cost">
         <span th:if="${#fields.hasErrors('centsCostPer')}" th:errors="*{centsCostPer}" class="error"></span>
+      </label>
+
+      <label>Pizza topping?:
+        <input type="checkbox" th:field="*{isPizzaTopping}">
       </label>
 
       <input type="submit" value="Submit">

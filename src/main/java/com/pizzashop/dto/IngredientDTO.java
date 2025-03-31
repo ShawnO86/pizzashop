@@ -17,6 +17,8 @@ public class IngredientDTO {
     @Min(value = 1, message = "minimum of 1")
     private Integer centsCostPer;
 
+    private boolean isPizzaTopping;
+
     public IngredientDTO() {}
 
     public String getIngredientName() {
@@ -43,12 +45,21 @@ public class IngredientDTO {
         this.centsCostPer = centsCostPer;
     }
 
+    public Boolean getIsPizzaTopping() {
+        return isPizzaTopping;
+    }
+
+    public void setIsPizzaTopping(Boolean isPizzaTopping) {
+        this.isPizzaTopping = isPizzaTopping;
+    }
+
     @Override
     public String toString() {
         return "IngredientDTO{" +
                 "ingredientName='" + ingredientName + '\'' +
                 ", currentStock=" + currentStock +
                 ", centsCostPer=" + centsCostPer +
+                ", isPizzaTopping=" + isPizzaTopping +
                 '}';
     }
 }

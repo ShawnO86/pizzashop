@@ -24,8 +24,14 @@ public class Ingredient {
     @Column(name = "cents_cost_per")
     private int centsCostPer;
 
+    @Column(name = "is_pizza_ingredient")
+    private boolean isPizzaTopping;
+
     @OneToMany(mappedBy = "ingredient", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<MenuItemIngredient> menuItemIngredients;
+
+    @OneToMany(mappedBy = "ingredient", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<CustomPizzaIngredient> customPizzaIngredients;
 
     public Ingredient() {}
 
@@ -76,12 +82,28 @@ public class Ingredient {
         this.centsCostPer = centsCostPer;
     }
 
+    public boolean getIsPizzaTopping() {
+        return isPizzaTopping;
+    }
+
+    public void setIsPizzaTopping(boolean pizzaIngredient) {
+        isPizzaTopping = pizzaIngredient;
+    }
+
     public List<MenuItemIngredient> getMenuItemIngredients() {
         return menuItemIngredients;
     }
 
     public void setMenuItemIngredients(List<MenuItemIngredient> menuItemIngredients) {
         this.menuItemIngredients = menuItemIngredients;
+    }
+
+    public List<CustomPizzaIngredient> getCustomPizzaIngredients() {
+        return customPizzaIngredients;
+    }
+
+    public void setCustomPizzaIngredients(List<CustomPizzaIngredient> customPizzaIngredients) {
+        this.customPizzaIngredients = customPizzaIngredients;
     }
 
     @Override
