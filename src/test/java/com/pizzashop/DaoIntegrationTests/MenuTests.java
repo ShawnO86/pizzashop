@@ -1,13 +1,12 @@
 package com.pizzashop.DaoIntegrationTests;
 
 import com.pizzashop.config.SecConfig;
+import com.pizzashop.controllers.ManagementController;
 import com.pizzashop.controllers.RegistrationController;
 import com.pizzashop.dao.IngredientDAO;
 import com.pizzashop.dao.MenuItemDAO;
-import com.pizzashop.dao.OrderDAO;
 import com.pizzashop.dao.UserDAO;
 import com.pizzashop.dto.MenuItemDTO;
-import com.pizzashop.dto.OrderDTO;
 import com.pizzashop.entities.*;
 import com.pizzashop.services.MenuItemService;
 import com.pizzashop.services.OrderService;
@@ -19,10 +18,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -33,15 +29,14 @@ import static org.junit.jupiter.api.Assertions.*;
         includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {
                 MenuItemDAO.class,
                 IngredientDAO.class,
-                OrderDAO.class,
-                UserDAO.class,
                 MenuItemService.class,
-                OrderService.class,
+                OrderService.class
         }),
         excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {
                 UserRegistrationService.class,
                 RegistrationController.class,
-                SecConfig.class
+                SecConfig.class,
+                ManagementController.class
         })
 )
 public class MenuTests {
@@ -49,15 +44,14 @@ public class MenuTests {
     @Autowired
     private MenuItemService menuItemService;
     @Autowired
-    private OrderService orderService;
-    @Autowired
-    private OrderDAO orderDAO;
-    @Autowired
     private MenuItemDAO menuItemDAO;
     @Autowired
     private IngredientDAO ingredientDAO;
     @Autowired
+    private OrderService orderService;
+    @Autowired
     private UserDAO userDAO;
+
 
     private static final Map<String, Integer> sodaSizes = new HashMap<>();
     static {
@@ -68,8 +62,6 @@ public class MenuTests {
 
     @BeforeEach
     void setUp() {
-//        order = new Order(user, LocalDateTime.now());
-
         // Creating dishes and quantities are done once upon dish creation outside of testing.
 
         //create breadsticks dish and it's ingredients
@@ -81,7 +73,7 @@ public class MenuTests {
         List<int[]> breadSticksIngredientsQuantities = new ArrayList<>();
         breadSticksIngredientsQuantities.add(new int[]{dough.getId(), 1});
         breadSticks.setIngredientIdAmounts(breadSticksIngredientsQuantities);
-
+        breadSticks.setIsAvailable(true);
         System.out.println("inserting test breadsticks...");
         menuItemService.saveMenuItem(breadSticks);
 
@@ -100,6 +92,7 @@ public class MenuTests {
         spaghettiIngredientsQuantities.add(new int[]{pasta.getId(), 1});
         spaghettiIngredientsQuantities.add(new int[]{groundBeef.getId(), 1});
         spaghetti.setIngredientIdAmounts(spaghettiIngredientsQuantities);
+        spaghetti.setIsAvailable(true);
 
         System.out.println("inserting test spaghetti...");
         menuItemService.saveMenuItem(spaghetti);
@@ -113,6 +106,7 @@ public class MenuTests {
         List<int[]> sodaIngredientsQuantities = new ArrayList<>();
         sodaIngredientsQuantities.add(new int[]{soda.getId(), sodaSizes.get("Lg")});
         lgSoda.setIngredientIdAmounts(sodaIngredientsQuantities);
+        lgSoda.setIsAvailable(true);
 
         System.out.println("inserting test soda...");
         menuItemService.saveMenuItem(lgSoda);
@@ -126,7 +120,11 @@ public class MenuTests {
         // look at menu items and mapped ingredients
         for (MenuItem menuItem : menuItems) {
             System.out.println("Menu Item Name: " + menuItem.getDishName());
-            System.out.println("Category: " + menuItem.getMenuCategory() + "\nprice: " + menuItem.getCostCents() + "\nIngredients:");
+            System.out.println("Category: " + menuItem.getMenuCategory() +
+                    "\ncost: " + menuItem.getCostCents() +
+                    "\nprice:" + menuItem.getPriceCents() +
+                    "\nAmount Available: " + menuItem.getAmountAvailable() +
+                    "\nIngredients:");
             for (MenuItemIngredient menuItemIngredient : menuItem.getMenuItemIngredients()) {
                 Ingredient ingredient = menuItemIngredient.getIngredient();
                 System.out.println(ingredient.getIngredientName() + " -- quantity: " + menuItemIngredient.getQuantityUsed());
@@ -137,12 +135,16 @@ public class MenuTests {
     }
 
     @Test
-    public void createOrderTest() {
-        User user = new User();
+    public void submitOrderForFulfillmentTest() {
+        User user;
+        UserDetail userDetail;
+        Role role;
+        user = new User();
         user.setUsername("TestName");
         user.setPassword("TestPassword");
         user.setActive(true);
-        UserDetail userDetail = new UserDetail();
+
+        userDetail = new UserDetail();
         userDetail.setFirstName("TestFirstName");
         userDetail.setLastName("TestLastName");
         userDetail.setEmail("TestEmail");
@@ -151,19 +153,28 @@ public class MenuTests {
         userDetail.setCity("TestCity");
         userDetail.setState("TestState");
         user.setUserDetail(userDetail);
-        Role role = new Role(RoleEnum.ROLE_CUSTOMER);
-        user.addRole(role);
 
-        System.out.println("inserting test user...");
+        role = new Role(RoleEnum.ROLE_CUSTOMER);
+        user.addRole(role);
         userDAO.save(user);
 
-        System.out.println("finding test menu...");
-        List<MenuItem> menuItems = menuItemDAO.findAll();
+        List<Integer> menuItemsIds = new ArrayList<>(List.of(1, 2, 3));
+        String[] menuItemsNames = new String[]{"Bread sticks", "Spaghetti Bolognese", "Lg Soda"};
 
-        System.out.println("menu items before order: " + menuItems.toString());
-        OrderDTO orderDTO = new OrderDTO();
+        List<MenuItem> menuItemsBefore = menuItemDAO.findAll();
 
+        System.out.println("menuItems BEFORE ---> " + menuItemsBefore);
 
+        List<List<String>> orderResponse = orderService.submitOrderForFulfillment(menuItemsIds, menuItemsNames, new int[]{1, 1, 1}, "TestName");
 
+        System.out.println(orderResponse);
+
+        List<MenuItem> menuItemsAfter = menuItemDAO.findAll();
+
+        System.out.println("menuItems AFTER ---> " + menuItemsAfter);
+
+        assertEquals(3, orderResponse.size());
+        assertEquals("Success!", orderResponse.getFirst().getFirst());
     }
+
 }

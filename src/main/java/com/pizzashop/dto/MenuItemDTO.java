@@ -18,7 +18,7 @@ public class MenuItemDTO {
     @NotNull(message = "required")
     private MenuCategoryEnum menuCategory;
 
-    private Boolean isAvailable;
+    private boolean isAvailable;
 
     private List<int[]> ingredientIdAmounts;
 
@@ -54,11 +54,11 @@ public class MenuItemDTO {
         this.menuCategory = menuCategory;
     }
 
-    public Boolean getIsAvailable() {
+    public boolean getIsAvailable() {
         return isAvailable;
     }
 
-    public void setIsAvailable(Boolean isAvailable) {
+    public void setIsAvailable(boolean isAvailable) {
         this.isAvailable = isAvailable;
     }
 

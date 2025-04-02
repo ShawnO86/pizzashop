@@ -74,7 +74,7 @@ public class MenuItemServiceImpl implements MenuItemService {
         ingredientDAO.update(ingredient);
 
         if (oldCost != ingredientDTO.getCentsCostPer()) {
-            updateSingleIngredientInAllUsedMenuItemsCost(ingredient, oldCost);
+            updateAllMenuItemsCostByIngredient(ingredient, oldCost);
         }
 
         if (oldStock != ingredientDTO.getCurrentStock()) {
@@ -138,6 +138,7 @@ public class MenuItemServiceImpl implements MenuItemService {
         menuItem.setDishName(menuItemDTO.getDishName());
         menuItem.setDescription(menuItemDTO.getDescription());
         menuItem.setMenuCategory(menuItemDTO.getMenuCategory());
+        menuItem.setIsAvailable(menuItemDTO.getIsAvailable());
 
         List<int[]> newIngredientQuantityArray = menuItemDTO.getIngredientIdAmounts();
 
@@ -170,7 +171,7 @@ public class MenuItemServiceImpl implements MenuItemService {
 
     //updates cost of menuItem if used ingredient cost has been changed and amount available if stock changed.
     @Transactional
-    protected void updateSingleIngredientInAllUsedMenuItemsCost(Ingredient ingredient, int oldCost) {
+    protected void updateAllMenuItemsCostByIngredient(Ingredient ingredient, int oldCost) {
         List<MenuItemIngredient> menuItemIngredients = ingredient.getMenuItemIngredients();
 
         for (MenuItemIngredient menuItemIngredient : menuItemIngredients) {
@@ -217,7 +218,7 @@ public class MenuItemServiceImpl implements MenuItemService {
 
     @Override
     public int updateMenuItemAmountAvailable(MenuItem menuItem) {
-        int lowestInventoryUsed = Integer.MAX_VALUE;
+        int lowestInventoryAvailable = Integer.MAX_VALUE;
         List<MenuItemIngredient> menuItemIngredients = menuItem.getMenuItemIngredients();
 
         for (MenuItemIngredient menuItemIngredient : menuItemIngredients) {
@@ -225,14 +226,16 @@ public class MenuItemServiceImpl implements MenuItemService {
 
             int qtyUsed = menuItemIngredient.getQuantityUsed();
             int currentStock = currentIngredient.getCurrentStock();
-            int amountAvailable = currentStock / qtyUsed;
 
-            if (amountAvailable < lowestInventoryUsed) {
-                lowestInventoryUsed = amountAvailable;
+            int futureStock = currentStock / qtyUsed;
+
+            // setting the lowest amount of inventory available for this ingredient
+            if (futureStock < lowestInventoryAvailable) {
+                lowestInventoryAvailable = futureStock;
             }
         }
 
-        return lowestInventoryUsed;
+        return lowestInventoryAvailable;
     }
 
 }

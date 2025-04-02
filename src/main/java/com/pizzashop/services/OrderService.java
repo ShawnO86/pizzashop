@@ -1,8 +1,12 @@
 package com.pizzashop.services;
 
-import com.pizzashop.dto.OrderDTO;
+import com.pizzashop.entities.MenuItem;
+
+import java.util.List;
 
 public interface OrderService {
 
-    void submitOrderForFulfillment(OrderDTO orderDTO, String username);
+    List<List<String>> submitOrderForFulfillment(List<Integer> menuItems, String[] menuNames, int[] quantities, String username);
+
+    void updateInventoryIngredientQuantities(List<MenuItem> menuItems, int[] quantities);
 }

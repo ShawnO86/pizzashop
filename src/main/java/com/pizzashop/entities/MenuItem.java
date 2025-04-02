@@ -150,7 +150,7 @@ public class MenuItem {
                 "dishName='" + dishName + '\'' +
                 ", description='" + description + '\'' +
                 ", priceCents=" + priceCents +
-                ", is available=" + isAvailable +
+                ", amount available=" + amountAvailable +
                 '}';
     }
 }

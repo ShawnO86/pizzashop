@@ -18,15 +18,17 @@ public class OrderMenuItem {
     @JoinColumn(name = "menu_item_id")
     private MenuItem menuItem;
 
+    @ManyToOne
+    @JoinColumn(name = "custom_pizza_id")
+    private CustomPizza customPizza;
+
     @Column(name = "item_quantity")
     private int itemQuantity;
 
     public OrderMenuItem() {}
 
-    public OrderMenuItem(Order order, MenuItem menuItem, int itemQuantity) {
+    public OrderMenuItem(Order order) {
         this.order = order;
-        this.menuItem = menuItem;
-        this.itemQuantity = itemQuantity;
     }
 
     public int getId() {
@@ -53,6 +55,14 @@ public class OrderMenuItem {
         this.menuItem = menuItem;
     }
 
+    public CustomPizza getCustomPizza() {
+        return customPizza;
+    }
+
+    public void setCustomPizza(CustomPizza customPizza) {
+        this.customPizza = customPizza;
+    }
+
     public int getItemQuantity() {
         return itemQuantity;
     }
@@ -63,10 +73,20 @@ public class OrderMenuItem {
 
     @Override
     public String toString() {
-        return "OrderMenuItem{" +
-                "order=" + order +
-                ", menuItem=" + menuItem +
-                ", itemQuantity=" + itemQuantity +
-                '}';
+        if (menuItem != null) {
+            return "OrderMenuItem{" +
+                    "order=" + order +
+                    ", menuItem=" + menuItem +
+                    '}';
+        } else if (customPizza != null) {
+            return "OrderMenuItem{" +
+                    "order=" + order +
+                    ", customPizza=" + customPizza +
+                    '}';
+        } else {
+            return "OrderMenuItem{" +
+                    "order=" + order;
+        }
+
     }
 }

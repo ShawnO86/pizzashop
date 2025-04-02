@@ -12,7 +12,6 @@
 <main class="inline">
 
   <section id="menuItems-container">
-
     <div th:each="category : ${menuItemsByCategory}">
       <h3 th:text="${category.key}"></h3>
 
@@ -22,41 +21,55 @@
           <p th:text="${menuItem.description}"></p>
           <p th:text="${'$' + menuItem.priceCents / 100 + '.' + menuItem.priceCents % 100}"></p>
         </div>
-        <form>
-          <label>Qty:
-            <input type="number" placeholder="Qty" value="1" min="1">
-          </label>
-        </form>
-        <button class="addMenuItem-btn" th:name="${menuItem.id + ' ' + menuItem.dishName}">Add To Order</button>
+        <input type="number" placeholder="Qty" min="1" th:max="${menuItem.amountAvailable}">
+        <button class="addMenuItem-btn" th:data-item-name="${menuItem.dishName}"
+                th:data-item-id="${menuItem.id}" th:data-item-price="${menuItem.priceCents}"
+                th:data-item-max="${menuItem.amountAvailable}">Add To Order</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- todo: set up js to show/hide "cart" on click of some button  -->
+  <section class="form-container stay-top">
+    <div th:if="${orderError}" class="error form-info">
+      <i th:text="${orderError}"></i><br>
+      <div th:if="${notFound}">
+
+      </div>
+      <div th:if="${lowStock}">
+        <i>You have too many of the following items: </i><br>
+        <i>Please reduce to or below the qty listed.</i>
+        <ul>
+          <li th:each="item : ${lowStock}" th:text="${item}"></li>
+        </ul>
       </div>
     </div>
 
-</section>
+      <form action="#" th:action="@{/order/processOrder}" method="POST">
 
+        <div id="menuAmount-container">
 
-<section class="form-container stay-top">
-<!--  set up js to show/hide "cart" on click of some button  -->
+          <div th:if="${menuItemsIdList != null && menuDishNamesList != null && menuItemsAmountsList != null}" th:each="item, iterStat : ${menuItemsIdList}">
+            <div class="inline cartItemContainer" th:data-cart-item-id="${item}">
+              <input type="hidden" th:value="${item}" name="menuItemsIdList">
+              <input type="hidden" th:value="${menuDishNamesList[iterStat.index]}" name="menuDishNamesList">
+              <p th:text="${menuDishNamesList[iterStat.index]}"></p>
+              <label>Qty
+                <input type="number" th:value="${menuItemsAmountsList[iterStat.index]}" min="1" name="menuItemsAmountsList">
+              </label>
+              <button th:value="${menuDishNamesList[iterStat.index]}" class="remove-item">Remove Item</button>
+            </div>
+          </div>
 
-    <form action="#" th:action="@{/order/processOrder}" th:object="${order}" method="POST">
+        </div>
 
-      <p th:if="${orderError}" class="error form-info">
-        <i th:text="${orderError}"></i>
-      </p>
+        <input type="submit" value="Submit Order"/>
 
-      <div id="menuAmount-container">
-        <input type="hidden" name="menuItemsNamesList">
-        <input type="hidden" name="menuItemsAmountsList">
-      </div>
-
-      <input type="submit" value="Submit Order"/>
-
-    </form>
-
-</section>
+      </form>
+  </section>
 
 </main>
 
 </body>
 <script src="/js/orderForm.js" type="text/javascript"></script>
-<script src="/js/errorMsgTimeout.js" type="text/javascript"></script>
 </html>

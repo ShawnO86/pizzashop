@@ -1,12 +1,24 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>Order Confirmation</title>
+  <title>Pizza Shop System</title>
+  <link rel="stylesheet" type="text/css" href="/styles/main.css">
 </head>
+
 <body>
 
 <header th:insert="~{header :: head}"></header>
+
+<main>
+  <section>
+    <h2>--  order receipt --</h2>
+    <ul th:each="item : ${receipt}">
+      <li th:text="${item}"></li>
+    </ul>
+    <p th:text="${total}"></p>
+  </section>
+</main>
 
 </body>
 </html>
