@@ -21,12 +21,16 @@ public class CustomPizzaIngredient {
     @Column(name = "quantity_used")
     private int quantityUsed;
 
+    @Transient
+    private boolean extra;
+
     public CustomPizzaIngredient() {}
 
-    public CustomPizzaIngredient(CustomPizza customPizza, Ingredient ingredient, int quantityUsed) {
+    public CustomPizzaIngredient(CustomPizza customPizza, Ingredient ingredient, boolean extra) {
         this.customPizza = customPizza;
         this.ingredient = ingredient;
-        this.quantityUsed = quantityUsed;
+        this.extra = extra;
+        this.setQuantityBySize(PizzaSizeEnum.SMALL);
     }
 
     public int getId() {
@@ -60,4 +64,36 @@ public class CustomPizzaIngredient {
     public void setQuantityUsed(int quantityUsed) {
         this.quantityUsed = quantityUsed;
     }
+
+    public boolean getExtra() {
+        return extra;
+    }
+
+    public void setExtra(boolean extra) {
+        this.extra = extra;
+        if (this.extra) {
+            this.quantityUsed = 4;
+        } else {
+            this.quantityUsed = 6;
+        }
+    }
+
+    public void setQuantityBySize(PizzaSizeEnum size) {
+        int additional = 0;
+        if (this.extra) {
+            additional = 2;
+        }
+        switch (size) {
+            case SMALL:
+                this.quantityUsed = 2 + additional;
+                break;
+            case MEDIUM:
+                this.quantityUsed = 4 + additional;
+                break;
+            case LARGE:
+                this.quantityUsed = 6 + additional;
+                break;
+        }
+    }
+
 }
