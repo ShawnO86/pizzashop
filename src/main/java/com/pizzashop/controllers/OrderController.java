@@ -43,18 +43,23 @@ public class OrderController {
 
 
     // ToDo: add new request params for custom pizzas with 'required = false'
-    //  -- should custom pizzas be nested arrays separating ingredients for each pizza?
+    //  -- custom pizzas will be nested Integer Lists to separate ingredients for each pizza.
     @PostMapping("/processOrder")
     public String processOrder(Model model,
                                @RequestParam(value = "menuItemsIdList", required = false) List<Integer> menuItemsIdList,
-                               @RequestParam(value = "menuDishNamesList", required = false) String[] menuDishNamesList,
+                               @RequestParam(value = "menuDishNamesList", required = false) String[] menuDishNamesArr,
                                @RequestParam(value = "menuItemsAmountsList", required = false) int[] menuItemsAmountsArr,
-                               @RequestParam(value = "pizzaIngredientsIdList", required = false) List<Integer[]> pizzaIngredientsIdList) {
+                               @RequestParam(value = "pizzaIngredientsIdList", required = false) List<List<Integer>> pizzaIngredientsIdList,
+                               @RequestParam(value = "pizzaItemAmountsList", required = false) int[] pizzaItemAmountsArr) {
 
+        // todo : pizzaIngredientLists will be mapped to pizzaItemAmountsArr not the nested ingredient ids
+
+        // todo : delete println when done.
         System.out.println("Menu Items ID: " + menuItemsIdList +
-                "\n Menu Dish Name: " + Arrays.toString(menuDishNamesList) +
+                "\n Menu Dish Name: " + Arrays.toString(menuDishNamesArr) +
                 "\n Menu Item Amounts: " + Arrays.toString(menuItemsAmountsArr) +
-                "\n Pizza Ingredients ID: " + pizzaIngredientsIdList);
+                "\n Pizza Ingredients ID: " + pizzaIngredientsIdList +
+                "\n Pizza Item Amounts: " + Arrays.toString(pizzaItemAmountsArr));
 
         // checks for difference in array's lengths, if there are no items added,
         // or item amounts over amount possible based on inventory
@@ -71,7 +76,7 @@ public class OrderController {
             Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             String username = ((UserDetails) principal).getUsername();
 
-            List<List<String>> orderResult = orderService.submitOrderForFulfillment(menuItemsIdList, menuDishNamesList, menuItemsAmountsArr, username);
+            List<List<String>> orderResult = orderService.submitOrderForFulfillment(menuItemsIdList, menuDishNamesArr, menuItemsAmountsArr, username);
             String resultText = orderResult.getFirst().getFirst();
 
             if (!resultText.equals("Success!")) {
@@ -90,7 +95,7 @@ public class OrderController {
                         model.addAttribute("orderError", resultText);
                         model.addAttribute("lowStock", toLowStock);
                         model.addAttribute("menuItemsIdList", menuItemsIdList);
-                        model.addAttribute("menuDishNamesList", menuDishNamesList);
+                        model.addAttribute("menuDishNamesList", menuDishNamesArr);
                         model.addAttribute("menuItemsAmountsList", menuItemsAmountsArr);
                         break;
                     default:
@@ -102,7 +107,8 @@ public class OrderController {
             } else {
                 model.addAttribute("heading", "Your order has been submitted!");
                 // todo : split receipt at '@' symbol for alignment?
-                //  -- split into String arrays (2 length), [0] = qty -- name, [1] = $cost ea. = total
+                //  -- split into String arrays (2 length), [0] = qty -- name, [1] = @ $cost ea. = total
+                // List<String[2]> receipt
                 List<String> receipt = orderResult.get(1);
                 String totalPrice = orderResult.get(2).getFirst();
                 model.addAttribute("receipt", receipt);
@@ -116,7 +122,7 @@ public class OrderController {
             model.addAttribute("orderError", errMsg);
             model.addAttribute("heading", "Hungry? Create an order!");
             model.addAttribute("menuItemsIdList", menuItemsIdList);
-            model.addAttribute("menuDishNamesList", menuDishNamesList);
+            model.addAttribute("menuDishNamesList", menuDishNamesArr);
             model.addAttribute("menuItemsAmountsList", menuItemsAmountsArr);
 
             return "ordering/orderForm";

@@ -89,7 +89,7 @@ public class Order {
         return orderMenuItems;
     }
 
-    public void setMenuItems(List<OrderMenuItem> orderMenuItems) {
+    public void setOrderMenuItems(List<OrderMenuItem> orderMenuItems) {
         this.orderMenuItems = orderMenuItems;
     }
 
