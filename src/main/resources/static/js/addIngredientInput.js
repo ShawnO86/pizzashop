@@ -3,17 +3,23 @@ document.addEventListener('DOMContentLoaded', ()=> {
     const addIngredientAmountButton = document.getElementById('addIngredient');
     let ingredientInputFieldAmount = 1;
 
-    addIngredientAmountButton.addEventListener('click', () => {
+    addIngredientAmountButton.addEventListener('click', (event) => {
+        event.preventDefault();
         // copies everything within 'ingredient-amount' div
         const newIngredientAmountDiv = ingredientAmountsContainer.querySelector('.ingredient-amount').cloneNode(true);
         const ingredientSelect = newIngredientAmountDiv.querySelector('select');
         const amountInput = newIngredientAmountDiv.querySelector('input[type="number"]');
 
         ingredientSelect.name = "ingredientIdAmountsKeys";
-        amountInput.name = "ingredientIdAmountsValues";
+
+        if (amountInput != null) {
+            amountInput.name = "ingredientIdAmountsValues";
+        }
+
 
         ingredientAmountsContainer.appendChild(newIngredientAmountDiv);
 
+        //to not allow removal of last input field.
         ingredientInputFieldAmount += 1;
     });
 

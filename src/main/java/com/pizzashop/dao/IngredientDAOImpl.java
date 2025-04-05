@@ -49,6 +49,12 @@ public class IngredientDAOImpl implements IngredientDAO {
     }
 
     @Override
+    public List<Ingredient> findAllPizzaToppings() {
+        TypedQuery<Ingredient> query = em.createQuery("FROM Ingredient WHERE isPizzaTopping = true", Ingredient.class);
+        return query.getResultList();
+    }
+
+    @Override
     @Transactional
     public void save(Ingredient ingredient) {
         em.persist(ingredient);
