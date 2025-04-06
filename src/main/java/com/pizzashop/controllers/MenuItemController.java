@@ -55,27 +55,24 @@ public class MenuItemController {
     }
 
     @GetMapping("/addMenuItem")
-    public String showAddMenuItemForm(Model model) {
-        model.addAttribute("menuItem", new MenuItemDTO());
-        model.addAttribute("categories", MenuCategoryEnum.values());
+    public String showAddMenuItemForm(Model model, @RequestParam(value = "menuItemId", required = false) Integer menuItemId) {
         model.addAttribute("ingredients", menuItemService.findAllIngredients());
-        model.addAttribute("heading", "Create A New Menu Item");
+        model.addAttribute("categories", MenuCategoryEnum.values());
+
+        if (menuItemId == null) {
+            model.addAttribute("heading", "Create A New Menu Item");
+            model.addAttribute("menuItem", new MenuItemDTO());
+            model.addAttribute("menuItemId", null);
+            model.addAttribute("menuItemRecipe", null);
+        } else {
+            MenuItem menuItem = menuItemService.findMenuItemById(menuItemId);
+            model.addAttribute("heading", "Update " + menuItem.getDishName());
+            model.addAttribute("menuItem", menuItem);
+            model.addAttribute("menuItemId", menuItemId);
+            model.addAttribute("menuItemRecipe", menuItemService.buildRecipeByMenuItem(menuItem));
+        }
 
         return "management/addMenuItem";
-    }
-
-    @GetMapping("/updateMenuItem")
-    public String showUpdateMenuItemForm(@RequestParam("menuItemId") int menuItemId, Model model) {
-        MenuItem menuItem = menuItemService.findMenuItemById(menuItemId);
-
-        model.addAttribute("menuItem", menuItem);
-        model.addAttribute("ingredients", menuItemService.findAllIngredients());
-        model.addAttribute("menuItemId", menuItemId);
-        model.addAttribute("categories", MenuCategoryEnum.values());
-        model.addAttribute("heading", "Update " + menuItem.getDishName());
-        model.addAttribute("menuItemRecipe", menuItemService.buildRecipeByMenuItem(menuItem));
-
-        return "management/updateMenuItem";
     }
 
     @GetMapping("/deleteMenuItem")
@@ -99,38 +96,8 @@ public class MenuItemController {
     }
 
     @PostMapping("/saveMenuItem")
-    public String saveMenuItem(@Valid @ModelAttribute("menuItem") MenuItemDTO menuItemDTO, BindingResult theBindingResult, Model model,
-                               @RequestParam("ingredientIdAmountsKeys") Integer[] ingredientIdAmountsKeys,
-                               @RequestParam("ingredientIdAmountsValues") Integer[] ingredientIdAmountValues) {
-
-        String errorMsg = "";
-
-        if (theBindingResult.hasErrors()) {
-            errorMsg = "You must correct the errors before proceeding";
-        } else if (menuItemService.findMenuItemByName(menuItemDTO.getDishName()) != null) {
-            errorMsg = "Menu item already exists with this name";
-        } else if (ingredientIdAmountsKeys.length == 0 || ingredientIdAmountValues.length == 0 || ingredientIdAmountsKeys.length != ingredientIdAmountValues.length) {
-            errorMsg = "Ingredients must have associated quantities";
-        }
-
-        if (errorMsg.isEmpty()) {
-            menuItemDTO.setIngredientIdAmounts(
-                    menuItemService.buildIngredientIdAmounts(ingredientIdAmountsKeys, ingredientIdAmountValues));
-            menuItemService.saveMenuItem(menuItemDTO);
-            return "redirect:/system/changeMenu/showMenuItems";
-        } else {
-            model.addAttribute("menuItemError", errorMsg);
-            model.addAttribute("menuItem", menuItemDTO);
-            model.addAttribute("ingredients", menuItemService.findAllIngredients());
-            model.addAttribute("categories", MenuCategoryEnum.values());
-            model.addAttribute("heading", "Create A New Menu Item");
-            return "management/addMenuItem";
-        }
-    }
-
-    @PostMapping("/updateMenuItem")
     public String updateMenuItem(@Valid @ModelAttribute("menuItem") MenuItemDTO menuItemDTO, BindingResult theBindingResult, Model model,
-                                 @RequestParam("menuItemId") int menuItemId,
+                                 @RequestParam(value = "menuItemId", required = false) Integer menuItemId,
                                  @RequestParam("ingredientIdAmountsKeys") Integer[] ingredientIdAmountsKeys,
                                  @RequestParam("ingredientIdAmountsValues") Integer[] ingredientIdAmountValues) {
 
@@ -140,24 +107,35 @@ public class MenuItemController {
             errorMsg = "You must correct the errors before proceeding";
         } else if (ingredientIdAmountsKeys.length == 0 || ingredientIdAmountValues.length == 0 || ingredientIdAmountsKeys.length != ingredientIdAmountValues.length) {
             errorMsg = "Ingredients must have associated quantities";
+        } else if (menuItemId == null && menuItemService.findMenuItemByName(menuItemDTO.getDishName()) != null) {
+            errorMsg = "Menu item already exists with this name";
         }
 
         if (errorMsg.isEmpty()) {
             menuItemDTO.setIngredientIdAmounts(
                     menuItemService.buildIngredientIdAmounts(ingredientIdAmountsKeys, ingredientIdAmountValues));
-
-            menuItemService.updateMenuItem(menuItemId, menuItemDTO);
+            if (menuItemId == null) {
+                menuItemService.saveMenuItem(menuItemDTO);
+            } else {
+                menuItemService.updateMenuItem(menuItemId, menuItemDTO);
+            }
             return "redirect:/system/changeMenu/showMenuItems";
         } else {
-            MenuItem menuItem = menuItemService.findMenuItemById(menuItemId);
-            List<String[]> menuItemRecipe = menuItemService.buildRecipeByMenuItem(menuItem);
             model.addAttribute("menuItemError", errorMsg);
-            model.addAttribute("menuItem", menuItemDTO);
             model.addAttribute("ingredients", menuItemService.findAllIngredients());
             model.addAttribute("categories", MenuCategoryEnum.values());
-            model.addAttribute("heading", "Update " + menuItem.getDishName());
-            model.addAttribute("menuItemRecipe", menuItemRecipe);
-            return "management/updateMenuItem";
+            model.addAttribute("menuItem", menuItemDTO);
+
+            if (menuItemId == null) {
+                model.addAttribute("heading", "Create A New Menu Item");
+            } else {
+                MenuItem menuItem = menuItemService.findMenuItemById(menuItemId);
+                List<String[]> menuItemRecipe = menuItemService.buildRecipeByMenuItem(menuItem);
+                model.addAttribute("heading", "Update " + menuItem.getDishName());
+                model.addAttribute("menuItemRecipe", menuItemRecipe);
+            }
+
+            return "management/addMenuItem";
         }
     }
 
