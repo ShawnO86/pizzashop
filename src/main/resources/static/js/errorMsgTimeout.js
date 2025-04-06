@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
     for (let i = 0; i < errorMessageElements.length; i++) {
         setTimeout(() => {
             errorMessageElements[i].style.display = "none";
-        }, 5000);
-    };
+        }, 6000);
+    }
 
 });

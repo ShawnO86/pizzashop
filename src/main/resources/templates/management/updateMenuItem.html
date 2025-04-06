@@ -11,25 +11,6 @@
 
 <main class="inline">
   <section class="form-container">
-    <h3>Current Recipe</h3>
-    <table>
-      <thead>
-      <tr>
-        <th>Ingredient Name</th>
-        <th>Quantity</th>
-      </tr>
-      </thead>
-
-      <tbody>
-      <tr th:each="ingredientArr : ${menuItemRecipe}">
-        <td th:text="${ingredientArr[0]}"></td>
-        <td th:text="${ingredientArr[1]}"></td>
-      </tr>
-      </tbody>
-    </table>
-  </section>
-
-  <section class="form-container">
     <h3 th:if="${menuItemRecipe}">Update Menu Item</h3>
     <form method="POST" th:action="@{/system/changeMenu/updateMenuItem}" th:object="${menuItem}">
 
@@ -61,15 +42,15 @@
       </label>
 
       <div id="ingredientAmountsContainer">
-        <div class="ingredient-amount">
+        <div class="ingredient-amount" th:each="ingredientArr : ${menuItemRecipe}">
           <label>Ingredient:
             <select name="ingredientIdAmountsKeys">
-              <option th:each="ingredient : ${ingredients}" th:value="${ingredient.id}" th:text="${ingredient.ingredientName + ' (' + ingredient.unitOfMeasure + ')'}"></option>
+              <option th:each="ingredient : ${ingredients}" th:value="${ingredient.id}" th:text="${ingredient.ingredientName + ' (' + ingredient.unitOfMeasure + ')'}" th:selected="${ingredient.ingredientName == ingredientArr[0]}"></option>
             </select>
           </label>
 
           <label>Amount:
-            <input type="number" name="ingredientIdAmountsValues" required/>
+            <input type="number" name="ingredientIdAmountsValues" th:value="${ingredientArr[1]}" required/>
           </label>
           <button type="button" class="remove-item">Remove</button>
         </div>

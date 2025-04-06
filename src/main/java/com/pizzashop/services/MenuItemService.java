@@ -5,6 +5,7 @@ import com.pizzashop.dto.MenuItemDTO;
 import com.pizzashop.entities.Ingredient;
 import com.pizzashop.entities.MenuItem;
 import com.pizzashop.entities.MenuItemIngredient;
+import com.pizzashop.entities.OrderMenuItem;
 
 import java.util.List;
 
@@ -31,7 +32,7 @@ public interface MenuItemService {
 
     void updateMenuItem(int menuItemId, MenuItemDTO menuItemDTO);
 
-    void deleteMenuItem(int menuItemId);
+    List<OrderMenuItem> deleteMenuItem(int menuItemId);
 
     List<String[]> buildRecipeByMenuItem(MenuItem menuItem);
 

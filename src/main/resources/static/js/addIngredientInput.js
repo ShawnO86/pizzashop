@@ -9,10 +9,11 @@ document.addEventListener('DOMContentLoaded', ()=> {
         const newIngredientAmountDiv = ingredientAmountsContainer.querySelector('.ingredient-amount').cloneNode(true);
         const ingredientSelect = newIngredientAmountDiv.querySelector('select');
         const amountInput = newIngredientAmountDiv.querySelector('input[type="number"]');
+        amountInput.value = 1;
 
         ingredientSelect.name = "ingredientIdAmountsKeys";
 
-        if (amountInput != null) {
+        if (amountInput) {
             amountInput.name = "ingredientIdAmountsValues";
         }
 

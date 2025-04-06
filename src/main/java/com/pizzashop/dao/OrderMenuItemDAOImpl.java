@@ -29,16 +29,4 @@ public class OrderMenuItemDAOImpl implements OrderMenuItemDAO {
         query.setParameter("menuItemId", menuItemId);
         return query.getResultList();
     }
-
-    @Override
-    public List<OrderMenuItem> findAllByOrderId(Integer orderId) {
-        TypedQuery<OrderMenuItem> query = em.createQuery("FROM OrderMenuItem m WHERE m.order.id = :orderId", OrderMenuItem.class);
-        query.setParameter("orderId", orderId);
-        return query.getResultList();
-    }
-
-    @Override
-    public OrderMenuItem findById(Integer id) {
-        return em.find(OrderMenuItem.class, id);
-    }
 }

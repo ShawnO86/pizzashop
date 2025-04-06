@@ -3,6 +3,7 @@ package com.pizzashop.controllers;
 import com.pizzashop.dto.MenuItemDTO;
 import com.pizzashop.entities.MenuCategoryEnum;
 import com.pizzashop.entities.MenuItem;
+import com.pizzashop.entities.OrderMenuItem;
 import com.pizzashop.services.MenuItemService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,8 +79,21 @@ public class MenuItemController {
     }
 
     @GetMapping("/deleteMenuItem")
-    public String deleteMenuItem(@RequestParam("menuItemId") int menuItemId) {
-        menuItemService.deleteMenuItem(menuItemId);
+    public String deleteMenuItem(@RequestParam("menuItemId") int menuItemId, Model model) {
+        List<OrderMenuItem> associatedOrderAmt =  menuItemService.deleteMenuItem(menuItemId);
+        int listSize = associatedOrderAmt.size();
+
+        if (listSize > 0) {
+            List<MenuItem> menuItems = menuItemService.findAllMenuItems();
+            MenuItem menuItem = associatedOrderAmt.getFirst().getMenuItem();
+
+            model.addAttribute("assocMenuItemsErr",
+                    "Cannot delete " + menuItem.getDishName() + " it is associated with " + listSize + " order(s)");
+            model.addAttribute("menuItems", menuItems);
+            model.addAttribute("heading", "All Menu Items");
+
+            return "management/showMenuItems";
+        }
 
         return "redirect:/system/changeMenu/showMenuItems";
     }

@@ -3,11 +3,13 @@ package com.pizzashop.services;
 import com.pizzashop.dao.IngredientDAO;
 import com.pizzashop.dao.MenuItemDAO;
 import com.pizzashop.dao.MenuItemIngredientDAO;
+import com.pizzashop.dao.OrderMenuItemDAO;
 import com.pizzashop.dto.IngredientDTO;
 import com.pizzashop.dto.MenuItemDTO;
 import com.pizzashop.entities.Ingredient;
 import com.pizzashop.entities.MenuItem;
 import com.pizzashop.entities.MenuItemIngredient;
+import com.pizzashop.entities.OrderMenuItem;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,15 +22,17 @@ public class MenuItemServiceImpl implements MenuItemService {
     private final MenuItemDAO menuItemDAO;
     private final IngredientDAO ingredientDAO;
     private final MenuItemIngredientDAO menuItemIngredientDAO;
+    private final OrderMenuItemDAO orderMenuItemDAO;
 
     private final int markupMultiFromCost = 3;
 
-
     @Autowired
-    public MenuItemServiceImpl(MenuItemDAO menuItemDAO, IngredientDAO ingredientDAO, MenuItemIngredientDAO menuItemIngredientDAO) {
+    public MenuItemServiceImpl(MenuItemDAO menuItemDAO, IngredientDAO ingredientDAO,
+                               MenuItemIngredientDAO menuItemIngredientDAO, OrderMenuItemDAO orderMenuItemDAO) {
         this.menuItemDAO = menuItemDAO;
         this.ingredientDAO = ingredientDAO;
         this.menuItemIngredientDAO = menuItemIngredientDAO;
+        this.orderMenuItemDAO = orderMenuItemDAO;
     }
 
     @Override
@@ -152,9 +156,13 @@ public class MenuItemServiceImpl implements MenuItemService {
 
     @Override
     @Transactional
-    public void deleteMenuItem(int menuItemId) {
-        menuItemIngredientDAO.deleteByMenuItemId(menuItemId);
-        menuItemDAO.deleteById(menuItemId);
+    public List<OrderMenuItem> deleteMenuItem(int menuItemId) {
+        List<OrderMenuItem> associatedOrders = orderMenuItemDAO.findAllByMenuItemId(menuItemId);
+        if (associatedOrders.isEmpty()) {
+            menuItemIngredientDAO.deleteByMenuItemId(menuItemId);
+            menuItemDAO.deleteById(menuItemId);
+        }
+        return associatedOrders;
     }
 
     private void mapIngredientsToMenuItem(MenuItem menuItem, List<int[]> ingredientsQuantities) {
@@ -201,8 +209,12 @@ public class MenuItemServiceImpl implements MenuItemService {
         List<String[]> menuItemRecipe = new ArrayList<>();
         List<MenuItemIngredient> ingredients = menuItem.getMenuItemIngredients();
         for (MenuItemIngredient menuItemIngredient : ingredients) {
-            String menuItemQuantityWithUnit = menuItemIngredient.getQuantityUsed() + " " + menuItemIngredient.getIngredient().getUnitOfMeasure();
-            menuItemRecipe.add(new String[]{menuItemIngredient.getIngredient().getIngredientName(), menuItemQuantityWithUnit});
+            menuItemRecipe.add(new String[]{
+                    menuItemIngredient.getIngredient().getIngredientName(),
+                    String.valueOf(menuItemIngredient.getQuantityUsed()),
+                    menuItemIngredient.getIngredient().getUnitOfMeasure()
+            });
+
         }
         return menuItemRecipe;
     }
