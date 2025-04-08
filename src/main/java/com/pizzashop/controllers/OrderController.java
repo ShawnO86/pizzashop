@@ -1,9 +1,11 @@
 package com.pizzashop.controllers;
 
+import com.pizzashop.dao.IngredientDAO;
 import com.pizzashop.dao.MenuItemDAO;
+import com.pizzashop.entities.Ingredient;
 import com.pizzashop.entities.MenuCategoryEnum;
 import com.pizzashop.entities.MenuItem;
-import com.pizzashop.services.MenuItemService;
+import com.pizzashop.entities.PizzaSizeEnum;
 import com.pizzashop.services.OrderService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,39 +22,41 @@ import java.util.*;
 public class OrderController {
 
     private final MenuItemDAO menuItemDAO;
+    private final IngredientDAO ingredientDAO;
     private final OrderService orderService;
-    private final MenuItemService menuItemService;
 
     @Autowired
-    public OrderController(MenuItemDAO menuItemDAO, OrderService orderService, MenuItemService menuItemService) {
+    public OrderController(MenuItemDAO menuItemDAO, IngredientDAO ingredientDAO, OrderService orderService) {
         this.menuItemDAO = menuItemDAO;
+        this.ingredientDAO = ingredientDAO;
         this.orderService = orderService;
-        this.menuItemService = menuItemService;
     }
-
 
     @GetMapping("/showMenu")
     public String showOrderForm(Model model) {
-        model.addAttribute("heading", "Hungry? Create an order!");
-
         Map<String, List<MenuItem>> menuItemsByCategory = seperateMenuItemsByCategory(menuItemDAO.findAllAvailable());
+        List<Ingredient> pizzaToppings = ingredientDAO.findAllPizzaToppings();
+        System.out.println();
+
+        model.addAttribute("heading", "Hungry? Create an order!");
         model.addAttribute("menuItemsByCategory", menuItemsByCategory);
+        model.addAttribute("pizzaSizes", PizzaSizeEnum.values());
+        model.addAttribute("pizzaToppings", pizzaToppings);
 
         return "ordering/orderForm";
     }
 
-
-    // ToDo: add new request params for custom pizzas with 'required = false'
-    //  -- custom pizzas will be nested Integer Lists to separate ingredients for each pizza.
     @PostMapping("/processOrder")
     public String processOrder(Model model,
                                @RequestParam(value = "menuItemsIdList", required = false) List<Integer> menuItemsIdList,
                                @RequestParam(value = "menuDishNamesList", required = false) String[] menuDishNamesArr,
                                @RequestParam(value = "menuItemsAmountsList", required = false) int[] menuItemsAmountsArr,
                                @RequestParam(value = "pizzaIngredientsIdList", required = false) List<List<Integer>> pizzaIngredientsIdList,
+                               @RequestParam(value = "pizzaNamesList", required = false) List<String> pizzaNamesList,
+                               @RequestParam(value = "pizzaItemSizeList", required = false) String[] pizzaItemSizeList,
                                @RequestParam(value = "pizzaItemAmountsList", required = false) int[] pizzaItemAmountsArr) {
 
-        // todo : pizzaIngredientLists will be mapped to pizzaItemAmountsArr not the nested ingredient ids
+        // todo : pizzaIngredients are added to 'cart' with checkboxes after processed by javascript.
 
         // todo : delete println when done.
         System.out.println("Menu Items ID: " + menuItemsIdList +
@@ -65,10 +69,9 @@ public class OrderController {
         // or item amounts over amount possible based on inventory
         String errMsg = "";
 
-        // todo : check if menuItems OR custom pizza lists are empty
-        if (menuItemsIdList == null || menuItemsAmountsArr == null) {
+        if (menuItemsIdList == null || pizzaIngredientsIdList == null) {
             errMsg = "No menu items added!";
-        } else if (menuItemsIdList.size() != menuItemsAmountsArr.length) {
+        } else if (menuItemsIdList.size() != menuItemsAmountsArr.length || pizzaIngredientsIdList.size() != pizzaItemAmountsArr.length) {
             errMsg = "Menu items and quantity mismatch!";
         }
 
@@ -77,6 +80,7 @@ public class OrderController {
             String username = ((UserDetails) principal).getUsername();
 
             List<List<String>> orderResult = orderService.submitOrderForFulfillment(menuItemsIdList, menuDishNamesArr, menuItemsAmountsArr, username);
+
             String resultText = orderResult.getFirst().getFirst();
 
             if (!resultText.equals("Success!")) {
@@ -94,9 +98,15 @@ public class OrderController {
                         List<String> toLowStock = orderResult.get(1);
                         model.addAttribute("orderError", resultText);
                         model.addAttribute("lowStock", toLowStock);
+
                         model.addAttribute("menuItemsIdList", menuItemsIdList);
                         model.addAttribute("menuDishNamesList", menuDishNamesArr);
                         model.addAttribute("menuItemsAmountsList", menuItemsAmountsArr);
+
+                        model.addAttribute("pizzaIngredientsIdList", pizzaIngredientsIdList);
+                        model.addAttribute("pizzaNamesList", pizzaNamesList);
+                        model.addAttribute("pizzaItemSizeList", pizzaItemSizeList);
+                        model.addAttribute("pizzaItemAmountsList", pizzaItemAmountsArr);
                         break;
                     default:
                         model.addAttribute("orderError", "There was an error.");
@@ -129,9 +139,8 @@ public class OrderController {
         }
     }
 
-
     private Map<String, List<MenuItem>> seperateMenuItemsByCategory(List<MenuItem> menuItems) {
-        Map<String, List<MenuItem>> menuItemsByCategory = new HashMap<>();
+        Map<String, List<MenuItem>> menuItemsByCategory = new LinkedHashMap<>();
 
         for (MenuCategoryEnum menuCategory : MenuCategoryEnum.values()) {
             menuItemsByCategory.put(menuCategory.name(), new ArrayList<>());

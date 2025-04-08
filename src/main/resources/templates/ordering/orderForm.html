@@ -12,75 +12,112 @@
 <main class="inline">
 
   <section id="menuItems-container">
+    <button>Build Your Own Pizza</button>
+    <script th:inline="javascript">
+      const pizzaPriceMap = {
+        'SMALL': [],
+        'MEDIUM': [],
+        'LARGE': []
+      }
+    </script>
     <div th:each="category : ${menuItemsByCategory}">
       <h3 th:text="${category.key}"></h3>
-      <div th:if="${category.key == 'PIZZA'}">
-        <button>Build Your Own Pizza</button>
-      </div>
 
       <div th:each="menuItem : ${category.value}">
         <div th:if="${menuItem.isAvailable}">
           <p th:text="${menuItem.dishName}"></p>
           <p th:text="${menuItem.description}"></p>
-          <p th:text="${'$' + menuItem.priceCents / 100 + '.' + menuItem.priceCents % 100}"></p>
+          <p th:text="${#numbers.formatCurrency(menuItem.priceCents / 100 + '.' + menuItem.priceCents % 100)}"></p>
         </div>
 
         <input type="number" placeholder="Qty" min="1" th:max="${menuItem.amountAvailable}" />
         <button class="addMenuItem-btn" th:data-item-name="${menuItem.dishName}"
                 th:data-item-id="${menuItem.id}" th:data-item-price="${menuItem.priceCents}"
                 th:data-item-max="${menuItem.amountAvailable}">Add To Order</button>
+
+        <div th:if="${category.key == 'PIZZA'}">
+          <script th:inline="javascript">
+            if (/*[[${menuItem.dishName == 'Small Cheese Pizza'}]]*/) {
+              pizzaPriceMap.SMALL.push(/*[[${menuItem.priceCents}]]*/, /*[[${menuItem.amountAvailable}]]*/);
+            }
+            if (/*[[${menuItem.dishName == 'Medium Cheese Pizza'}]]*/) {
+              pizzaPriceMap.MEDIUM.push(/*[[${menuItem.priceCents}]]*/, /*[[${menuItem.amountAvailable}]]*/);
+            }
+            if (/*[[${menuItem.dishName == 'Large Cheese Pizza'}]]*/) {
+              pizzaPriceMap.LARGE.push(/*[[${menuItem.priceCents}]]*/, /*[[${menuItem.amountAvailable}]]*/);
+            }
+          </script>
+        </div>
       </div>
     </div>
   </section>
 
-
   <!-- todo: figure out custom pizza form -->
-  <!-- todo: display cost for each ingredient -->
-  <!-- todo: setup display of pizza builder on click of a button -->
-  <section id="pizzaBuilder-container">
+  <!-- todo: setup display (show-hide) of pizza builder on click of a button -->
+  <section class="form-container" id="pizzaBuilder-container">
+    <h4>Name your custom pizza:</h4>
+    <input type="text" name="pizzaNamesList" placeholder="pizza name" />
 
-    <form action="#">
-      <label>Name your pizza:
-        <input type="text" placeholder="Pizza name" />
-      </label>
-      <label>Size:
-        <select>
-          <option th:each="size : ${T(com.pizzashop.entities.PizzaSizeEnum).values()}" th:value="${size}" th:text="${size}"></option>
-        </select>
-      </label>
-
-      <div id="ingredientAmountsContainer">
-        <div class="ingredient-amount">
-          <label>Toppings:
-            <select name="ingredientIdAmountsKeys">
-              <option th:each="ingredient : ${pizzaToppings}" th:value="${ingredient.id}" th:text="${ingredient.ingredientName}" th:data-ingredient-cost="${ingredient.centsCostPer}"></option>
-            </select>
+    <div class="pizza-size-container">
+      <h4>Size:</h4>
+      <div th:each="size : ${pizzaSizes}" class="space-between">
+          <input type="radio" name="pizzaItemSizeList" th:id="${size.name().toLowerCase() + '-radio'}" th:if="${size.name() == 'SMALL'}"
+                 th:data-pizza-size="${size.name()}" th:data-ingredient-amount="${size.ingredientAmount}" checked/>
+          <input type="radio" name="pizzaItemSizeList" th:id="${size.name().toLowerCase() + '-radio'}" th:if="${size.name() != 'SMALL'}"
+                 th:data-pizza-size="${size.name()}" th:data-ingredient-amount="${size.ingredientAmount}"/>
+          <label th:for="${size.name().toLowerCase() + '-radio'}" class="space-between">
+            <span th:text="${size.name().toLowerCase() + ' ' + size.description + ':'}"></span>
+            <span class="pizza-size-price"></span>
           </label>
-          <label>Add Extra?
-            <input type="checkbox">
-          </label>
-          <button type="button" class="remove-item">- Remove</button>
         </div>
-      </div>
-      <button type="button" id="addIngredient">+ Topping</button>
-      <div class="inline">
-        <input type="number" placeholder="Qty" min="1" />
-        <button class="addPizza-btn">Add To Order</button>
-      </div>
-    </form>
 
+    </div>
+
+    <div class="pizza-topping-container">
+      <h4>Toppings:</h4>
+      <div th:each="topping : ${pizzaToppings}" class="space-between">
+        <div th:if="${topping.ingredientName != 'Mozzarella'}">
+          <input type="checkbox" class="topping-checkbox" th:id="${topping.ingredientName + '-chkbox'}" th:value="${topping.id}">
+          <label th:text="${topping.ingredientName + ':'}" th:for="${topping.ingredientName + '-chkbox'}"></label>
+        </div>
+        <!-- todo : set prices from javascript by getting topping.centsCostPer -->
+        <!-- todo : prices will be set after size selection -->
+        <span class="ingredient-data" th:if="${topping.ingredientName != 'Mozzarella'}"
+              th:data-ingredient-price="${topping.getCentsPricePer()}" th:data-ingredient-name="${topping.ingredientName}">price</span>
+      </div>
+
+      <h4>Extra Toppings:</h4>
+      <div th:each="topping : ${pizzaToppings}" class="space-between">
+        <div>
+          <input type="checkbox" class="extra-topping-checkbox" th:id="${'extra-'+topping.ingredientName + '-chkbox'}" th:value="${topping.id}">
+          <label th:text="${topping.ingredientName + ':'}" th:for="${'extra-' + topping.ingredientName + '-chkbox'}"></label>
+        </div>
+        <!-- todo : set prices from javascript by getting topping.centsCostPer -->
+        <!-- todo : prices will be set after size selection -->
+        <span class="extra-ingredient-data" th:data-ingredient-price="${topping.getCentsPricePer()}" th:data-ingredient-name="${topping.ingredientName}">price</span>
+      </div>
+    </div>
+
+    <div class="space-between">
+      <input type="number" placeholder="Qty" min="1" max="100"/>
+      <button id="submit-pizza-btn">Add To Order</button>
+    </div>
   </section>
 
 
+
   <!-- todo: set up js to show/hide "cart" on click of some button  -->
-  <section class="form-container stay-top">
+  <section class="form-container stay-top" id="cart">
     <div th:if="${orderError}" class="error form-info">
       <i th:text="${orderError}"></i><br>
       <div th:if="${notFound}">
-
+        <i>The following items are no longer available:</i>
+        <ul>
+          <li th:each="item : ${notFound}" th:text="${item}"></li>
+        </ul>
       </div>
       <div th:if="${lowStock}">
-        <i>You have too many of the following items: </i><br>
+        <i>You have too many of the following items:</i><br>
         <i>Please reduce to or below the qty listed.</i>
         <ul>
           <li th:each="item : ${lowStock}" th:text="${item}"></li>
@@ -109,6 +146,7 @@
           <div th:if="${pizzaIngredientsIdList != null && pizzaItemAmountsList != null}" th:each="pizza, iterStat : ${pizzaIngredientsIdList}">
             <div class="inline cartItem-Container"></div>
           </div>
+
           <!-- todo : add pizza item from 'pizza builder' to 'menuAmount-container' -->
 
         </div>
@@ -120,6 +158,7 @@
 </main>
 
 </body>
-<script src="/js/orderForm.js" type="text/javascript"></script>
-<script src="/js/addIngredientInput.js" type="text/javascript"></script>
+
+<script th:src="@{/js/orderForm.js}" type="text/javascript"></script>
+<script th:src="@{/js/pizzaBuilder.js}" type="text/javascript" defer></script>
 </html>

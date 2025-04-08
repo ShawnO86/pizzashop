@@ -51,6 +51,8 @@ document.addEventListener('DOMContentLoaded', ()=> {
         }
     }
 
+    // todo: setup show/hide button for cart area, custom pizza form.
+
     function createOrderItemAmountSelector(menuItemName, menuItemId, menuItemPrice, orderInitQty, menuItemMaxQty) {
         const existingItem = document.querySelector(`[data-cart-item-id="${menuItemId}"]`);
         if (existingItem) {
@@ -59,7 +61,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
         }
 
         const itemContainer = document.createElement("div");
-        itemContainer.classList.add("inline", "cartItemContainer");
+        itemContainer.classList.add("inline", "cartItem-Container");
         itemContainer.dataset.cartItemId = menuItemId;
 
         const itemName = document.createElement("p");
@@ -102,6 +104,4 @@ document.addEventListener('DOMContentLoaded', ()=> {
 
         menuAmountContainer.appendChild(itemContainer);
     }
-
-    // todo: setup show/hide button for cart area
 });
