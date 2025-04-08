@@ -1,5 +1,6 @@
 package com.pizzashop.dto;
 
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -16,6 +17,11 @@ public class IngredientDTO {
     @NotNull(message = "required")
     @Min(value = 1, message = "minimum of 1")
     private Integer centsCostPer;
+
+    @NotNull(message = "required")
+    @Min(value = 1, message = "minimum of 1")
+    @Max(value = 10, message = "maximum of 10")
+    private Integer markupMulti;
 
     private boolean isPizzaTopping;
 
@@ -45,6 +51,14 @@ public class IngredientDTO {
         this.centsCostPer = centsCostPer;
     }
 
+    public Integer getMarkupMulti() {
+        return markupMulti;
+    }
+
+    public void setMarkupMulti(Integer markupMulti) {
+        this.markupMulti = markupMulti;
+    }
+
     public Boolean getIsPizzaTopping() {
         return isPizzaTopping;
     }
@@ -59,6 +73,7 @@ public class IngredientDTO {
                 "ingredientName='" + ingredientName + '\'' +
                 ", currentStock=" + currentStock +
                 ", centsCostPer=" + centsCostPer +
+                ", markup_multiplier=" + markupMulti +
                 ", isPizzaTopping=" + isPizzaTopping +
                 '}';
     }

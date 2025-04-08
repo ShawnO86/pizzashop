@@ -41,25 +41,20 @@ public class InventoryController {
         return "management/showInventory";
     }
 
-    //shows add inventory form
+    //shows add/update inventory form depending on ingredientId
     @GetMapping("/addInventory")
-    public String showAddInventoryForm(Model model) {
-        model.addAttribute("inventoryItem", new IngredientDTO());
-        model.addAttribute("header", "Add Inventory");
+    public String showAddInventoryForm(Model model, @RequestParam(value = "ingredientId", required = false) Integer ingredientId) {
+        if (ingredientId == null) {
+            model.addAttribute("inventoryItem", new IngredientDTO());
+            model.addAttribute("header", "Add Inventory");
+        } else {
+            Ingredient ingredient = menuItemService.findIngredientById(ingredientId);
+            model.addAttribute("inventoryItem", ingredient);
+            model.addAttribute("ingredientId", ingredientId);
+            model.addAttribute("header", "Update " + ingredient.getIngredientName());
+        }
 
         return "management/addInventory";
-    }
-
-    //shows update inventory form
-    @GetMapping("/updateInventory")
-    public String showUpdateInventoryForm(@RequestParam("ingredientId") int ingredientId, Model model) {
-        Ingredient ingredient = menuItemService.findIngredientById(ingredientId);
-
-        model.addAttribute("inventoryItem", ingredient);
-        model.addAttribute("ingredientId", ingredientId);
-        model.addAttribute("header", "Update " + ingredient.getIngredientName());
-
-        return "management/updateInventory";
     }
 
     @GetMapping("/deleteInventory")
@@ -81,41 +76,27 @@ public class InventoryController {
 
     @PostMapping("/saveInventory")
     public String saveInventory(@Valid @ModelAttribute("inventoryItem") IngredientDTO ingredientDTO,
-                                BindingResult theBindingResult, Model model) {
+                                BindingResult theBindingResult, Model model,
+                                @RequestParam(value = "ingredientId", required = false) Integer ingredientId) {
 
         String errorMessage = "";
 
         if (theBindingResult.hasErrors()) {
             errorMessage = "You must correct the errors before proceeding";
-        } else if (menuItemService.findIngredientByName(ingredientDTO.getIngredientName()) != null) {
+        } else if (ingredientId == null && menuItemService.findIngredientByName(ingredientDTO.getIngredientName()) != null) {
             errorMessage = "Ingredient already exists with this name";
         }
 
         if (errorMessage.isEmpty()) {
-            menuItemService.saveIngredient(ingredientDTO);
+            menuItemService.saveIngredient(ingredientDTO, ingredientId);
             return "redirect:/system/inventory/showInventory";
         } else {
             model.addAttribute("errorMessage", errorMessage);
             model.addAttribute("inventoryItem", ingredientDTO);
+            if (ingredientId != null) {
+                model.addAttribute("ingredientId", ingredientId);
+            }
             return "management/addInventory";
         }
-    }
-
-    @PostMapping("/saveUpdatedInventory")
-    public String updateInventory(@RequestParam("ingredientId") int ingredientId,
-                                  @Valid @ModelAttribute("inventoryItem") IngredientDTO ingredientDTO,
-                                  BindingResult theBindingResult, Model model) {
-
-        if (theBindingResult.hasErrors()) {
-            model.addAttribute("errorMessage", "You must correct the errors before proceeding");
-            model.addAttribute("inventoryItem", ingredientDTO);
-            model.addAttribute("ingredientId", ingredientId);
-
-            return "management/updateInventory";
-        }
-
-        menuItemService.updateIngredient(ingredientId, ingredientDTO);
-
-        return "redirect:/system/inventory/showInventory";
     }
 }

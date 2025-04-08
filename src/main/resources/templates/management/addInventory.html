@@ -17,6 +17,8 @@
         <i th:text="${errorMessage}"></i>
       </p>
 
+      <input type="hidden" name="ingredientId" th:if="${ingredientId}" th:value="${ingredientId}" />
+
       <label>Name:
         <input type="text" th:field="*{ingredientName}" placeholder="name">
         <span th:if="${#fields.hasErrors('ingredientName')}" th:errors="*{ingredientName}" class="error"></span>
@@ -30,6 +32,11 @@
       <label>Cost per oz in cents:
         <input type="number" th:field="*{centsCostPer}" placeholder="cost">
         <span th:if="${#fields.hasErrors('centsCostPer')}" th:errors="*{centsCostPer}" class="error"></span>
+      </label>
+
+      <label>Markup multiplier:
+        <input type="number" th:field="*{markupMulti}" placeholder="multiplier">
+        <span th:if="${#fields.hasErrors('markupMulti')}" th:errors="*{markupMulti}" class="error"></span>
       </label>
 
       <label>Pizza topping?:

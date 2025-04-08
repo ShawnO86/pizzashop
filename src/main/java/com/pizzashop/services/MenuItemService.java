@@ -16,7 +16,7 @@ public interface MenuItemService {
 
     List<Ingredient> findAllIngredients();
 
-    void saveIngredient(IngredientDTO ingredientDTO);
+    void saveIngredient(IngredientDTO ingredientDTO, Integer ingredientId);
 
     void updateIngredient(int ingredientId, IngredientDTO ingredientDTO);
 

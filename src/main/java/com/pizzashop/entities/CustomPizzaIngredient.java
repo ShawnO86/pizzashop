@@ -30,7 +30,7 @@ public class CustomPizzaIngredient {
         this.customPizza = customPizza;
         this.ingredient = ingredient;
         this.extra = extra;
-        this.setQuantityBySize(PizzaSizeEnum.SMALL);
+        this.setQuantityBySize(customPizza.getSize());
     }
 
     public int getId() {
@@ -71,29 +71,30 @@ public class CustomPizzaIngredient {
 
     public void setExtra(boolean extra) {
         this.extra = extra;
-        if (this.extra) {
-            this.quantityUsed = 4;
-        } else {
-            this.quantityUsed = 6;
-        }
     }
 
     public void setQuantityBySize(PizzaSizeEnum size) {
         int additional = 0;
-        if (this.extra) {
-            additional = 2;
-        }
+
         switch (size) {
-            case SMALL:
-                this.quantityUsed = 2 + additional;
+            case PizzaSizeEnum.SMALL:
+                if (this.extra) {
+                    additional = PizzaSizeEnum.SMALL.getIngredientAmount() / 2;
+                }
+                this.quantityUsed = PizzaSizeEnum.SMALL.getIngredientAmount() + additional;
                 break;
-            case MEDIUM:
-                this.quantityUsed = 4 + additional;
+            case PizzaSizeEnum.MEDIUM:
+                if (this.extra) {
+                    additional = PizzaSizeEnum.MEDIUM.getIngredientAmount() / 2;
+                }
+                this.quantityUsed = PizzaSizeEnum.MEDIUM.getIngredientAmount() + additional;
                 break;
-            case LARGE:
-                this.quantityUsed = 6 + additional;
+            case PizzaSizeEnum.LARGE:
+                if (this.extra) {
+                    additional = PizzaSizeEnum.LARGE.getIngredientAmount() / 2;
+                }
+                this.quantityUsed = PizzaSizeEnum.LARGE.getIngredientAmount() + additional;
                 break;
         }
     }
-
 }

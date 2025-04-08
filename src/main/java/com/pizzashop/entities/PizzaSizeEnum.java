@@ -1,20 +1,20 @@
 package com.pizzashop.entities;
 
 public enum PizzaSizeEnum {
-    SMALL(5.50, "8in. 6 slices"),
-    MEDIUM(9.00, "12in. 8 slices"),
-    LARGE(12.50, "16in. 10 slices");
+    SMALL(2, "8in. 6 slices"),
+    MEDIUM(4, "12in. 8 slices"),
+    LARGE(6,"16in. 10 slices");
 
-    private final double price;
+    private final int ingredientAmount;
     private final String description;
 
-    PizzaSizeEnum(double price, String description) {
-        this.price = price;
+    PizzaSizeEnum(int ingredientAmount, String description) {
+        this.ingredientAmount = ingredientAmount;
         this.description = description;
     }
 
-    public double getPrice() {
-        return price;
+    public int getIngredientAmount() {
+        return ingredientAmount;
     }
 
     public String getDescription() {
