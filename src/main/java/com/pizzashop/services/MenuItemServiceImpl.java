@@ -156,12 +156,14 @@ public class MenuItemServiceImpl implements MenuItemService {
     @Transactional
     public void updateMenuItem(int menuItemId, MenuItemDTO menuItemDTO) {
         MenuItem menuItem = menuItemDAO.findById(menuItemId);
+        if (menuItem.getDishName() != "Small Cheese Pizza" && menuItem.getDishName() != "Medium Cheese Pizza" && menuItem.getDishName()  != "Large Cheese Pizza") {
+            menuItem.setDishName(menuItemDTO.getDishName());
+            menuItem.setMenuCategory(menuItemDTO.getMenuCategory());
+        }
         menuItemIngredientDAO.deleteByMenuItemId(menuItemId);
 
         menuItem.setCostCents(0);
-        menuItem.setDishName(menuItemDTO.getDishName());
         menuItem.setDescription(menuItemDTO.getDescription());
-        menuItem.setMenuCategory(menuItemDTO.getMenuCategory());
         menuItem.setIsAvailable(menuItemDTO.getIsAvailable());
 
         List<int[]> newIngredientQuantityArray = menuItemDTO.getIngredientIdAmounts();

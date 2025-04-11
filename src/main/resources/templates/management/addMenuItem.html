@@ -22,22 +22,42 @@
 
       <input type="hidden" name="menuItemId" th:if="${menuItemId}" th:value="${menuItemId}" />
 
-      <label>Dish Name:
-        <input type="text" th:field="*{dishName}" placeholder="name">
-        <span th:if="${#fields.hasErrors('dishName')}" th:errors="*{dishName}" class="error"></span>
-      </label>
+      <div th:if="${menuItem.dishName != 'Small Cheese Pizza' && menuItem.dishName != 'Medium Cheese Pizza' && menuItem.dishName != 'Large Cheese Pizza'}">
+        <label>Dish Name:
+          <input type="text" th:field="*{dishName}" placeholder="name">
+          <span th:if="${#fields.hasErrors('dishName')}" th:errors="*{dishName}" class="error"></span>
+        </label>
+      </div>
+
+      <div th:if="${menuItem.dishName == 'Small Cheese Pizza' || menuItem.dishName == 'Medium Cheese Pizza' || menuItem.dishName == 'Large Cheese Pizza'}">
+        <label><span th:text="${menuItem.dishName + '''s name cannot be modified.'}"></span>
+          <input type="hidden" th:field="*{dishName}" th:value="*{dishName}">
+          <span th:if="${#fields.hasErrors('dishName')}" th:errors="*{dishName}" class="error"></span>
+        </label>
+      </div>
+
 
       <label>Description:
         <textarea th:field="*{description}" placeholder="description"></textarea>
         <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="error"></span>
       </label>
 
-      <label>Dish Category:
-        <select th:field="*{menuCategory}">
-          <option th:each="category : ${categories}" th:value="${category}" th:text="${category}"></option>
-        </select>
-        <span th:if="${#fields.hasErrors('menuCategory')}" th:errors="*{menuCategory}" class="error"></span>
-      </label>
+      <div th:if="${menuItem.dishName != 'Small Cheese Pizza' && menuItem.dishName != 'Medium Cheese Pizza' && menuItem.dishName != 'Large Cheese Pizza'}">
+        <label>Dish Category:
+          <select th:field="*{menuCategory}">
+            <option th:each="category : ${categories}" th:value="${category}" th:text="${category}"></option>
+          </select>
+          <span th:if="${#fields.hasErrors('menuCategory')}" th:errors="*{menuCategory}" class="error"></span>
+        </label>
+      </div>
+
+      <div th:if="${menuItem.dishName == 'Small Cheese Pizza' || menuItem.dishName == 'Medium Cheese Pizza' || menuItem.dishName == 'Large Cheese Pizza'}">
+        <label><span th:text="${menuItem.dishName + '''s category cannot be modified.'}"></span>
+          <input type="hidden" th:field="*{menuCategory}" th:value="*{menuCategory}">
+          <span th:if="${#fields.hasErrors('menuCategory')}" th:errors="*{menuCategory}" class="error"></span>
+        </label>
+      </div>
+
 
       <label>Currently Available:
         <input type="checkbox" th:field="*{isAvailable}">

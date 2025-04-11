@@ -25,7 +25,7 @@
 
       <div th:each="menuItem : ${category.value}">
         <div th:if="${menuItem.isAvailable}">
-          <p th:text="${menuItem.dishName}"></p>
+          <h4 th:text="${menuItem.dishName}"></h4>
           <p th:text="${menuItem.description}"></p>
           <p th:text="${#numbers.formatCurrency(menuItem.priceCents / 100 + '.' + menuItem.priceCents % 100)}"></p>
         </div>
@@ -37,14 +37,15 @@
 
         <div th:if="${category.key == 'PIZZA'}">
           <script th:inline="javascript">
-            if (/*[[${menuItem.dishName == 'Small Cheese Pizza'}]]*/) {
-              pizzaPriceMap.SMALL.push(/*[[${menuItem.priceCents}]]*/, /*[[${menuItem.amountAvailable}]]*/);
-            }
-            if (/*[[${menuItem.dishName == 'Medium Cheese Pizza'}]]*/) {
-              pizzaPriceMap.MEDIUM.push(/*[[${menuItem.priceCents}]]*/, /*[[${menuItem.amountAvailable}]]*/);
-            }
-            if (/*[[${menuItem.dishName == 'Large Cheese Pizza'}]]*/) {
-              pizzaPriceMap.LARGE.push(/*[[${menuItem.priceCents}]]*/, /*[[${menuItem.amountAvailable}]]*/);
+            switch (/*[[${menuItem.dishName}]]*/) {
+              case 'Small Cheese Pizza':
+                pizzaPriceMap.SMALL = {price: /*[[${menuItem.priceCents}]]*/,maxQty: /*[[${menuItem.amountAvailable}]]*/};
+                break;
+              case 'Medium Cheese Pizza':
+                pizzaPriceMap.MEDIUM = {price: /*[[${menuItem.priceCents}]]*/,maxQty: /*[[${menuItem.amountAvailable}]]*/};
+                break;
+              case 'Large Cheese Pizza':
+                pizzaPriceMap.LARGE = {price: /*[[${menuItem.priceCents}]]*/,maxQty: /*[[${menuItem.amountAvailable}]]*/};
             }
           </script>
         </div>
@@ -52,56 +53,59 @@
     </div>
   </section>
 
-  <!-- todo: figure out custom pizza form -->
-  <!-- todo: setup display (show-hide) of pizza builder on click of a button -->
-  <section class="form-container" id="pizzaBuilder-container">
-    <h4>Name your custom pizza:</h4>
-    <input type="text" name="pizzaNamesList" placeholder="pizza name" />
-
-    <div class="pizza-size-container">
-      <h4>Size:</h4>
-      <div th:each="size : ${pizzaSizes}" class="space-between">
-          <input type="radio" name="pizzaItemSizeList" th:id="${size.name().toLowerCase() + '-radio'}" th:if="${size.name() == 'SMALL'}"
-                 th:data-pizza-size="${size.name()}" th:data-ingredient-amount="${size.ingredientAmount}" checked/>
-          <input type="radio" name="pizzaItemSizeList" th:id="${size.name().toLowerCase() + '-radio'}" th:if="${size.name() != 'SMALL'}"
-                 th:data-pizza-size="${size.name()}" th:data-ingredient-amount="${size.ingredientAmount}"/>
-          <label th:for="${size.name().toLowerCase() + '-radio'}" class="space-between">
-            <span th:text="${size.name().toLowerCase() + ' ' + size.description + ':'}"></span>
-            <span class="pizza-size-price"></span>
-          </label>
-        </div>
-
+  <!-- todo: setup display (show-hide) of pizza builder on click of a button, set to overlay menu with higher z-index -->
+  <section class="form-container" id="pizza-builder-container">
+    <div>
+      <h3>Name your custom pizza:</h3>
+      <input type="text" name="pizzaNamesList" placeholder="pizza name" required/>
     </div>
 
-    <div class="pizza-topping-container">
+    <div id="pizza-size-container">
+      <h4>Size:</h4>
+      <div th:each="size : ${pizzaSizes}" class="space-between">
+        <div>
+          <input type="radio" name="pizzaSizeRadios" th:id="${size.name().toLowerCase() + '-radio'}" th:if="${size.name() == 'SMALL'}"
+                 th:data-pizza-size="${size.name()}" th:data-ingredient-amount="${size.ingredientAmount}" checked/>
+          <input type="radio" name="pizzaSizeRadios" th:id="${size.name().toLowerCase() + '-radio'}" th:if="${size.name() != 'SMALL'}"
+                 th:data-pizza-size="${size.name()}" th:data-ingredient-amount="${size.ingredientAmount}"/>
+          <label th:for="${size.name().toLowerCase() + '-radio'}">
+            <span th:text="${size.name().toLowerCase() + ' ' + size.description + ':'}"></span>
+          </label>
+        </div>
+        <span th:class="${'pizza-size-price ' + size.name()}"></span>
+      </div>
+    </div>
+
+    <div id="pizza-topping-container">
       <h4>Toppings:</h4>
-      <div th:each="topping : ${pizzaToppings}" class="space-between">
-        <div th:if="${topping.ingredientName != 'Mozzarella'}">
-          <input type="checkbox" class="topping-checkbox" th:id="${topping.ingredientName + '-chkbox'}" th:value="${topping.id}">
+      <div th:each="topping : ${pizzaToppings}" class="space-between" th:if="${topping.ingredientName != 'Mozzarella'}">
+        <div>
+          <input type="checkbox" class="topping-checkbox" th:id="${topping.ingredientName + '-chkbox'}" th:data-topping-id="${topping.id}"
+                 th:data-topping-name="${topping.ingredientName}" th:data-topping-price="${topping.getCentsPricePer()}" data-topping-type="regular">
           <label th:text="${topping.ingredientName + ':'}" th:for="${topping.ingredientName + '-chkbox'}"></label>
         </div>
-        <!-- todo : set prices from javascript by getting topping.centsCostPer -->
-        <!-- todo : prices will be set after size selection -->
-        <span class="ingredient-data" th:if="${topping.ingredientName != 'Mozzarella'}"
-              th:data-ingredient-price="${topping.getCentsPricePer()}" th:data-ingredient-name="${topping.ingredientName}">price</span>
+        <span class="ingredient-data" th:data-ingredient-price="${topping.getCentsPricePer()}"
+              th:data-ingredient-name="${topping.ingredientName}">price</span>
       </div>
 
       <h4>Extra Toppings:</h4>
       <div th:each="topping : ${pizzaToppings}" class="space-between">
         <div>
-          <input type="checkbox" class="extra-topping-checkbox" th:id="${'extra-'+topping.ingredientName + '-chkbox'}" th:value="${topping.id}">
+          <input type="checkbox" class="extra-topping-checkbox" th:id="${'extra-'+topping.ingredientName + '-chkbox'}" th:data-topping-id="${topping.id}"
+                 th:data-topping-name="${topping.ingredientName}" th:data-topping-price="${topping.getCentsPricePer()}" data-topping-type="extra">
           <label th:text="${topping.ingredientName + ':'}" th:for="${'extra-' + topping.ingredientName + '-chkbox'}"></label>
         </div>
-        <!-- todo : set prices from javascript by getting topping.centsCostPer -->
-        <!-- todo : prices will be set after size selection -->
-        <span class="extra-ingredient-data" th:data-ingredient-price="${topping.getCentsPricePer()}" th:data-ingredient-name="${topping.ingredientName}">price</span>
+        <span class="extra-ingredient-data" th:data-ingredient-price="${topping.getCentsPricePer()}"
+              th:data-ingredient-name="${topping.ingredientName}">price</span>
       </div>
     </div>
 
     <div class="space-between">
-      <input type="number" placeholder="Qty" min="1" max="100"/>
+      <input type="number" placeholder="Qty" min="1" max="100" id="pizza-qty-input"/>
       <button id="submit-pizza-btn">Add To Order</button>
     </div>
+
+    <h5 class="space-between"><span>Price:</span><span id="pizza-price"></span></h5>
   </section>
 
 
@@ -129,7 +133,7 @@
         <div id="menuAmount-container">
 
           <div th:if="${menuItemsIdList != null && menuDishNamesList != null && menuItemsAmountsList != null}" th:each="item, iterStat : ${menuItemsIdList}">
-
+            <!-- these only show if there was an error so the 'cart' data is not lost, same for custom pizzas -->
             <div class="inline cartItem-Container" th:data-cart-item-id="${item}">
               <input type="hidden" th:value="${item}" name="menuItemsIdList" />
               <input type="hidden" th:value="${menuDishNamesList[iterStat.index]}" name="menuDishNamesList" />
@@ -143,7 +147,7 @@
           </div>
 
           <!-- todo : set up display of pizza items for cart if there was an error similar to menu items, add lists to model -->
-          <div th:if="${pizzaIngredientsIdList != null && pizzaItemAmountsList != null}" th:each="pizza, iterStat : ${pizzaIngredientsIdList}">
+          <div th:if="${pizzaDTOList != null}" th:each="pizzaDTO, iterStat : ${pizzaDTOList}">
             <div class="inline cartItem-Container"></div>
           </div>
 

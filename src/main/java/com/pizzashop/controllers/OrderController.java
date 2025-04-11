@@ -2,6 +2,7 @@ package com.pizzashop.controllers;
 
 import com.pizzashop.dao.IngredientDAO;
 import com.pizzashop.dao.MenuItemDAO;
+import com.pizzashop.dto.CustomPizzaDTO;
 import com.pizzashop.entities.Ingredient;
 import com.pizzashop.entities.MenuCategoryEnum;
 import com.pizzashop.entities.MenuItem;
@@ -51,10 +52,7 @@ public class OrderController {
                                @RequestParam(value = "menuItemsIdList", required = false) List<Integer> menuItemsIdList,
                                @RequestParam(value = "menuDishNamesList", required = false) String[] menuDishNamesArr,
                                @RequestParam(value = "menuItemsAmountsList", required = false) int[] menuItemsAmountsArr,
-                               @RequestParam(value = "pizzaIngredientsIdList", required = false) List<List<Integer>> pizzaIngredientsIdList,
-                               @RequestParam(value = "pizzaNamesList", required = false) List<String> pizzaNamesList,
-                               @RequestParam(value = "pizzaItemSizeList", required = false) String[] pizzaItemSizeList,
-                               @RequestParam(value = "pizzaItemAmountsList", required = false) int[] pizzaItemAmountsArr) {
+                               @RequestParam(value = "pizzaDTOList", required = false)List<CustomPizzaDTO> customPizzaDTOs) {
 
         // todo : pizzaIngredients are added to 'cart' with checkboxes after processed by javascript.
 
@@ -62,16 +60,15 @@ public class OrderController {
         System.out.println("Menu Items ID: " + menuItemsIdList +
                 "\n Menu Dish Name: " + Arrays.toString(menuDishNamesArr) +
                 "\n Menu Item Amounts: " + Arrays.toString(menuItemsAmountsArr) +
-                "\n Pizza Ingredients ID: " + pizzaIngredientsIdList +
-                "\n Pizza Item Amounts: " + Arrays.toString(pizzaItemAmountsArr));
+                "\n Pizza DTOs: " + customPizzaDTOs);
 
         // checks for difference in array's lengths, if there are no items added,
         // or item amounts over amount possible based on inventory
         String errMsg = "";
 
-        if (menuItemsIdList == null || pizzaIngredientsIdList == null) {
+        if (menuItemsIdList == null || customPizzaDTOs == null) {
             errMsg = "No menu items added!";
-        } else if (menuItemsIdList.size() != menuItemsAmountsArr.length || pizzaIngredientsIdList.size() != pizzaItemAmountsArr.length) {
+        } else if (menuItemsIdList.size() != menuItemsAmountsArr.length) {
             errMsg = "Menu items and quantity mismatch!";
         }
 
@@ -85,8 +82,14 @@ public class OrderController {
 
             if (!resultText.equals("Success!")) {
                 Map<String, List<MenuItem>> menuItemsByCategory = seperateMenuItemsByCategory(menuItemDAO.findAllAvailable());
+                List<Ingredient> pizzaToppings = ingredientDAO.findAllPizzaToppings();
+
                 model.addAttribute("menuItemsByCategory", menuItemsByCategory);
                 model.addAttribute("heading", "Hungry? Create an order!");
+                model.addAttribute("pizzaSizes", PizzaSizeEnum.values());
+                model.addAttribute("pizzaToppings", pizzaToppings);
+
+                model.addAttribute("pizzaDTOList", customPizzaDTOs);
 
                 switch (resultText) {
                     case "Item mismatch!":
@@ -103,10 +106,6 @@ public class OrderController {
                         model.addAttribute("menuDishNamesList", menuDishNamesArr);
                         model.addAttribute("menuItemsAmountsList", menuItemsAmountsArr);
 
-                        model.addAttribute("pizzaIngredientsIdList", pizzaIngredientsIdList);
-                        model.addAttribute("pizzaNamesList", pizzaNamesList);
-                        model.addAttribute("pizzaItemSizeList", pizzaItemSizeList);
-                        model.addAttribute("pizzaItemAmountsList", pizzaItemAmountsArr);
                         break;
                     default:
                         model.addAttribute("orderError", "There was an error.");

@@ -16,12 +16,14 @@ public class OrderServiceImpl implements OrderService {
 
     private final IngredientDAO ingredientDAO;
     private final MenuItemDAO menuItemDAO;
+
     private final OrderDAO orderDAO;
     private final UserDAO userDAO;
     private final MenuItemService menuItemService;
 
     @Autowired
-    public OrderServiceImpl(IngredientDAO ingredientDAO, MenuItemDAO menuItemDAO, OrderDAO orderDAO, UserDAO userDAO, MenuItemService menuItemService) {
+    public OrderServiceImpl(IngredientDAO ingredientDAO, MenuItemDAO menuItemDAO,
+                            OrderDAO orderDAO, UserDAO userDAO, MenuItemService menuItemService) {
         this.ingredientDAO = ingredientDAO;
         this.menuItemDAO = menuItemDAO;
         this.orderDAO = orderDAO;
@@ -33,13 +35,15 @@ public class OrderServiceImpl implements OrderService {
     //  -- :
     @Override
     @Transactional
-    public List<List<String>> submitOrderForFulfillment(List<Integer> menuItemsIds, String[] menuItemsNames, int[] menuItemQuantities, String username) {
+    public List<List<String>> submitOrderForFulfillment(List<Integer> menuItemsIds, String[] menuItemsNames, int[] menuItemQuantities,
+                                                        String username) {
+
         List<List<String>> orderResult = new ArrayList<>();
 
         // do same for custom pizza items but for each pizza's ingredients
         List<MenuItem> menuItems = new ArrayList<>();
 
-        // if order has menu items
+        // if order has menu items => verify ids are found and have enough inventory
         if (!menuItemsIds.isEmpty()) {
             menuItems = menuItemDAO.findAllIn(menuItemsIds);
 
@@ -72,9 +76,13 @@ public class OrderServiceImpl implements OrderService {
             }
         }
 
-        // List<CustomPizza> customPizzas = new ArrayList<>();
-/*        if (customPizzaIngredientIds.size() >= 1) {
-            customPizzas = ingredientDAO ...
+        // todo : verify ingredient quantity available to make quantity of pizzas
+        List<CustomPizza> customPizzas = new ArrayList<>();
+/*        if (!pizzaIngredientsIds.isEmpty()) {
+            for (int i = 0; i < pizzaIngredientsIds.size(); i++) {
+                List<Ingredient> currentPizzaIngredients = ingredientDAO.findAllIn(ingredientIds);
+                int qty = pizzaQuantities[i];
+            }
         }*/
 
         // create order object with user attached
@@ -98,6 +106,10 @@ public class OrderServiceImpl implements OrderService {
             // will have to do this in the customPizzasOrders loop as well
             orderReceiptItems.add(
                     menuItemQuantities[i] + " -- " + menuItem.getDishName() + " @ " + menuItem.getPriceCents() + " ea. = " + (menuItem.getPriceCents() * menuItemQuantities[i]));
+        }
+
+        for (int i = 0; i < customPizzas.size(); i++) {
+
         }
 
         this.updateInventoryIngredientQuantities(newOrder.getOrderMenuItems(), menuItemQuantities);
@@ -140,7 +152,8 @@ public class OrderServiceImpl implements OrderService {
 
                 menuItem.setAmountAvailable(menuItemService.updateMenuItemAmountAvailable(menuItem));
 
-                if (menuItem.getAmountAvailable() < 1) {
+                if (menuItem.getAmountAvailable() < 1 &&
+                        menuItem.getDishName() != "Small Cheese Pizza" && menuItem.getDishName() != "Medium Cheese Pizza" && menuItem.getDishName()  != "Large Cheese Pizza") {
                     menuItem.setIsAvailable(false);
                 }
             }
