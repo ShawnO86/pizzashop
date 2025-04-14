@@ -79,19 +79,19 @@ public class CustomPizzaIngredient {
         switch (size) {
             case PizzaSizeEnum.SMALL:
                 if (this.extra) {
-                    additional = PizzaSizeEnum.SMALL.getIngredientAmount() / 2;
+                    additional = PizzaSizeEnum.SMALL.getExtraIngredientAmount();
                 }
                 this.quantityUsed = PizzaSizeEnum.SMALL.getIngredientAmount() + additional;
                 break;
             case PizzaSizeEnum.MEDIUM:
                 if (this.extra) {
-                    additional = PizzaSizeEnum.MEDIUM.getIngredientAmount() / 2;
+                    additional = PizzaSizeEnum.MEDIUM.getExtraIngredientAmount();
                 }
                 this.quantityUsed = PizzaSizeEnum.MEDIUM.getIngredientAmount() + additional;
                 break;
             case PizzaSizeEnum.LARGE:
                 if (this.extra) {
-                    additional = PizzaSizeEnum.LARGE.getIngredientAmount() / 2;
+                    additional = PizzaSizeEnum.LARGE.getExtraIngredientAmount();
                 }
                 this.quantityUsed = PizzaSizeEnum.LARGE.getIngredientAmount() + additional;
                 break;

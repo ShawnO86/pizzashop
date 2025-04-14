@@ -54,7 +54,7 @@ public class OrderController {
                                @RequestParam(value = "menuItemsAmountsList", required = false) int[] menuItemsAmountsArr,
                                @RequestParam(value = "pizzaDTOList", required = false)List<CustomPizzaDTO> customPizzaDTOs) {
 
-        // todo : pizzaIngredients are added to 'cart' with checkboxes after processed by javascript.
+        // todo : pizzaIngredients are added to pizzaDTOList[index] with checkboxes after processed by javascript.
 
         // todo : delete println when done.
         System.out.println("Menu Items ID: " + menuItemsIdList +
@@ -86,9 +86,11 @@ public class OrderController {
 
                 model.addAttribute("menuItemsByCategory", menuItemsByCategory);
                 model.addAttribute("heading", "Hungry? Create an order!");
+                model.addAttribute("menuItemsIdList", menuItemsIdList);
+                model.addAttribute("menuDishNamesList", menuDishNamesArr);
+                model.addAttribute("menuItemsAmountsList", menuItemsAmountsArr);
                 model.addAttribute("pizzaSizes", PizzaSizeEnum.values());
                 model.addAttribute("pizzaToppings", pizzaToppings);
-
                 model.addAttribute("pizzaDTOList", customPizzaDTOs);
 
                 switch (resultText) {
@@ -96,15 +98,12 @@ public class OrderController {
                         List<String> notFound = orderResult.get(1);
                         model.addAttribute("orderError", resultText + ". The following dishes were not found:");
                         model.addAttribute("notFound", notFound);
+
                         break;
                     case "Not enough inventory!":
                         List<String> toLowStock = orderResult.get(1);
                         model.addAttribute("orderError", resultText);
                         model.addAttribute("lowStock", toLowStock);
-
-                        model.addAttribute("menuItemsIdList", menuItemsIdList);
-                        model.addAttribute("menuDishNamesList", menuDishNamesArr);
-                        model.addAttribute("menuItemsAmountsList", menuItemsAmountsArr);
 
                         break;
                     default:
@@ -127,12 +126,15 @@ public class OrderController {
 
         } else {
             Map<String, List<MenuItem>> menuItemsByCategory = seperateMenuItemsByCategory(menuItemDAO.findAllAvailable());
+            List<Ingredient> pizzaToppings = ingredientDAO.findAllPizzaToppings();
             model.addAttribute("menuItemsByCategory", menuItemsByCategory);
             model.addAttribute("orderError", errMsg);
             model.addAttribute("heading", "Hungry? Create an order!");
             model.addAttribute("menuItemsIdList", menuItemsIdList);
             model.addAttribute("menuDishNamesList", menuDishNamesArr);
             model.addAttribute("menuItemsAmountsList", menuItemsAmountsArr);
+            model.addAttribute("pizzaSizes", PizzaSizeEnum.values());
+            model.addAttribute("pizzaToppings", pizzaToppings);
 
             return "ordering/orderForm";
         }

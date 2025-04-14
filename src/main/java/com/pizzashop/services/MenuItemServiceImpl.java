@@ -24,8 +24,6 @@ public class MenuItemServiceImpl implements MenuItemService {
     private final MenuItemIngredientDAO menuItemIngredientDAO;
     private final OrderMenuItemDAO orderMenuItemDAO;
 
-    private final int markupMultiFromCost = 3;
-
     @Autowired
     public MenuItemServiceImpl(MenuItemDAO menuItemDAO, IngredientDAO ingredientDAO,
                                MenuItemIngredientDAO menuItemIngredientDAO, OrderMenuItemDAO orderMenuItemDAO) {
@@ -67,6 +65,7 @@ public class MenuItemServiceImpl implements MenuItemService {
             ingredient = ingredientDAO.findById(ingredientId);
             int oldCost = ingredient.getCentsCostPer();
             int oldStock = ingredient.getCurrentStock();
+            int oldMulti = ingredient.getMarkupMulti();
             ingredient.setIngredientName(ingredientDTO.getIngredientName());
             ingredient.setCurrentStock(ingredientDTO.getCurrentStock());
             ingredient.setCentsCostPer(ingredientDTO.getCentsCostPer());
@@ -74,35 +73,12 @@ public class MenuItemServiceImpl implements MenuItemService {
             ingredient.setIsPizzaTopping(ingredientDTO.getIsPizzaTopping());
             ingredientDAO.update(ingredient);
 
-            if (oldCost != ingredientDTO.getCentsCostPer()) {
+            if (oldCost != ingredientDTO.getCentsCostPer() || oldMulti != ingredientDTO.getMarkupMulti()) {
                 updateAllMenuItemsCostPriceByIngredient(ingredient, oldCost);
             }
             if (oldStock != ingredientDTO.getCurrentStock()) {
                 updateAllMenuItemsAmountAvailableByIngredient(ingredient);
             }
-        }
-    }
-
-    @Override
-    @Transactional
-    public void updateIngredient(int ingredientId, IngredientDTO ingredientDTO) {
-        Ingredient ingredient = ingredientDAO.findById(ingredientId);
-        int oldCost = ingredient.getCentsCostPer();
-        int oldStock = ingredient.getCurrentStock();
-
-        ingredient.setIngredientName(ingredientDTO.getIngredientName());
-        ingredient.setCurrentStock(ingredientDTO.getCurrentStock());
-        ingredient.setCentsCostPer(ingredientDTO.getCentsCostPer());
-        ingredient.setIsPizzaTopping(ingredientDTO.getIsPizzaTopping());
-
-        ingredientDAO.update(ingredient);
-
-        if (oldCost != ingredientDTO.getCentsCostPer()) {
-            updateAllMenuItemsCostPriceByIngredient(ingredient, oldCost);
-        }
-
-        if (oldStock != ingredientDTO.getCurrentStock()) {
-            updateAllMenuItemsAmountAvailableByIngredient(ingredient);
         }
     }
 
@@ -146,7 +122,7 @@ public class MenuItemServiceImpl implements MenuItemService {
 
         mapIngredientsToMenuItem(menuItem, newIngredientQuantityArray);
 
-        menuItem.setPriceCents(menuItem.getCostCents() * markupMultiFromCost);
+        setSingleMenuItemCostPrice(menuItem);
         menuItem.setAmountAvailable(updateMenuItemAmountAvailable(menuItem));
 
         menuItemDAO.save(menuItem);
@@ -170,7 +146,7 @@ public class MenuItemServiceImpl implements MenuItemService {
 
         mapIngredientsToMenuItem(menuItem, newIngredientQuantityArray);
 
-        menuItem.setPriceCents(menuItem.getCostCents() * markupMultiFromCost);
+        setSingleMenuItemCostPrice(menuItem);
         menuItem.setAmountAvailable(updateMenuItemAmountAvailable(menuItem));
 
         menuItemDAO.update(menuItem);
@@ -217,6 +193,21 @@ public class MenuItemServiceImpl implements MenuItemService {
 
             menuItemDAO.update(currentMenuItem);
         }
+    }
+
+    @Transactional
+    protected void setSingleMenuItemCostPrice(MenuItem menuItem) {
+        List<MenuItemIngredient> menuItemIngredients = menuItem.getMenuItemIngredients();
+        int cost = 0;
+        int price = 0;
+
+        for (MenuItemIngredient menuItemIngredient : menuItemIngredients) {
+            Ingredient currentIngredient = menuItemIngredient.getIngredient();
+            cost += currentIngredient.getCentsCostPer() * menuItemIngredient.getQuantityUsed();
+            price += currentIngredient.getCentsPricePer() * menuItemIngredient.getQuantityUsed();
+        }
+        menuItem.setCostCents(cost);
+        menuItem.setPriceCents(price);
     }
 
     @Transactional

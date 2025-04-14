@@ -21,7 +21,7 @@ public class IngredientDTO {
     @NotNull(message = "required")
     @Min(value = 1, message = "minimum of 1")
     @Max(value = 10, message = "maximum of 10")
-    private Integer markupMulti;
+    private int markupMulti;
 
     private boolean isPizzaTopping;
 
@@ -51,11 +51,11 @@ public class IngredientDTO {
         this.centsCostPer = centsCostPer;
     }
 
-    public Integer getMarkupMulti() {
+    public int getMarkupMulti() {
         return markupMulti;
     }
 
-    public void setMarkupMulti(Integer markupMulti) {
+    public void setMarkupMulti(int markupMulti) {
         this.markupMulti = markupMulti;
     }
 

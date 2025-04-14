@@ -28,7 +28,7 @@ public class Ingredient {
     private boolean isPizzaTopping;
 
     @Column(name = "markup_multi")
-    private Integer markupMulti;
+    private int markupMulti;
 
     @OneToMany(mappedBy = "ingredient", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<MenuItemIngredient> menuItemIngredients;
@@ -36,15 +36,13 @@ public class Ingredient {
     @OneToMany(mappedBy = "ingredient", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<CustomPizzaIngredient> customPizzaIngredients;
 
-    @Transient
-    private int centsPricePer;
-
     public Ingredient() {}
 
-    public Ingredient(String ingredientName, int currentStock, int centsCostPer, Integer markupMulti) {
+    public Ingredient(String ingredientName, int currentStock, int centsCostPer, int markupMulti) {
         this.ingredientName = ingredientName;
         this.currentStock = currentStock;
         this.centsCostPer = centsCostPer;
+        this.markupMulti = markupMulti;
         this.unitOfMeasure = "ounces";
     }
 
@@ -96,11 +94,11 @@ public class Ingredient {
         isPizzaTopping = pizzaIngredient;
     }
 
-    public Integer getMarkupMulti() {
+    public int getMarkupMulti() {
         return markupMulti;
     }
 
-    public void setMarkupMulti(Integer markupMulti) {
+    public void setMarkupMulti(int markupMulti) {
         this.markupMulti = markupMulti;
     }
 

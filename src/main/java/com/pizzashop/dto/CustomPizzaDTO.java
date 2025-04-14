@@ -7,8 +7,10 @@ import java.util.List;
 public class CustomPizzaDTO {
 
     private String pizzaName;
-    private List<Integer> toppings;
-    private List<Integer> extraToppings;
+    private List<Integer> toppingIds;
+    private List<String> toppingNames;
+    private List<Integer> extraToppingIds;
+    private List<String> extraToppingNames;
     private PizzaSizeEnum pizzaSize;
     private int quantity;
 
@@ -20,17 +22,29 @@ public class CustomPizzaDTO {
     public void setPizzaName(String pizzaName) {
         this.pizzaName = pizzaName;
     }
-    public List<Integer> getToppings() {
-        return toppings;
+    public List<Integer> getToppingIds() {
+        return toppingIds;
     }
-    public void setToppings(List<Integer> toppings) {
-        this.toppings = toppings;
+    public void setToppingIds(List<Integer> toppingIds) {
+        this.toppingIds = toppingIds;
     }
-    public List<Integer> getExtraToppings() {
-        return extraToppings;
+    public List<String> getToppingNames() {
+        return toppingNames;
     }
-    public void setExtraToppings(List<Integer> extraToppings) {
-        this.extraToppings = extraToppings;
+    public void setToppingNames(List<String> toppingNames) {
+        this.toppingNames = toppingNames;
+    }
+    public List<Integer> getExtraToppingIds() {
+        return extraToppingIds;
+    }
+    public void setExtraToppingIds(List<Integer> extraToppingIds) {
+        this.extraToppingIds = extraToppingIds;
+    }
+    public List<String> getExtraToppingNames() {
+        return extraToppingNames;
+    }
+    public void setExtraToppingNames(List<String> extraToppingNames) {
+        this.extraToppingNames = extraToppingNames;
     }
     public PizzaSizeEnum getPizzaSize() {
         return pizzaSize;
@@ -49,8 +63,10 @@ public class CustomPizzaDTO {
     public String toString() {
         return "CustomPizzaDTO{" +
                 "pizzaName='" + pizzaName + '\n' +
-                "toppings=" + toppings + '\n' +
-                "extraToppings=" + extraToppings + '\n' +
+                "toppings=" + toppingIds + '\n' +
+                ", toppingNames=" + toppingNames + '\n' +
+                "extraToppings=" + extraToppingIds + '\n' +
+                ", extraToppingNames=" + extraToppingNames + '\n' +
                 "pizzaSize=" + pizzaSize +
                 ", quantity=" + quantity +
                 '}';

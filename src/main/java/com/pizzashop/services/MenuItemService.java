@@ -18,8 +18,6 @@ public interface MenuItemService {
 
     void saveIngredient(IngredientDTO ingredientDTO, Integer ingredientId);
 
-    void updateIngredient(int ingredientId, IngredientDTO ingredientDTO);
-
     List<MenuItemIngredient> deleteIngredient(int id);
 
     List<MenuItem> findAllMenuItems();
