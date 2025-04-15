@@ -1,7 +1,9 @@
 document.addEventListener('DOMContentLoaded', ()=> {
     const ingredientAmountsContainer = document.getElementById('ingredientAmountsContainer');
     const addIngredientAmountButton = document.getElementById('addIngredient');
-    let ingredientInputFieldAmount = 1;
+
+    const initialIngredientAmountDivs = ingredientAmountsContainer.querySelectorAll('.ingredient-amount');
+    let ingredientInputFieldAmount = initialIngredientAmountDivs == null ? 1 : initialIngredientAmountDivs.length;
 
     addIngredientAmountButton.addEventListener('click', (event) => {
         event.preventDefault();
@@ -16,7 +18,6 @@ document.addEventListener('DOMContentLoaded', ()=> {
         if (amountInput) {
             amountInput.name = "ingredientIdAmountsValues";
         }
-
 
         ingredientAmountsContainer.appendChild(newIngredientAmountDiv);
 

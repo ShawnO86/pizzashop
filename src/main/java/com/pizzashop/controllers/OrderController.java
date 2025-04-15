@@ -66,10 +66,12 @@ public class OrderController {
         // or item amounts over amount possible based on inventory
         String errMsg = "";
 
-        if (menuItemsIdList == null || customPizzaDTOs == null) {
+        if (menuItemsIdList == null && customPizzaDTOs == null) {
             errMsg = "No menu items added!";
-        } else if (menuItemsIdList.size() != menuItemsAmountsArr.length) {
-            errMsg = "Menu items and quantity mismatch!";
+        } else if (menuItemsIdList != null) {
+            if (menuItemsIdList.size() != menuItemsAmountsArr.length) {
+                errMsg = "Menu items and quantity mismatch!";
+            }
         }
 
         if (errMsg.isEmpty()) {

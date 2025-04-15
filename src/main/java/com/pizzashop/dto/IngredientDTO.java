@@ -20,8 +20,8 @@ public class IngredientDTO {
 
     @NotNull(message = "required")
     @Min(value = 1, message = "minimum of 1")
-    @Max(value = 10, message = "maximum of 10")
-    private int markupMulti;
+    @Max(value = 9, message = "maximum of 9")
+    private int markupMulti = 1;
 
     private boolean isPizzaTopping;
 

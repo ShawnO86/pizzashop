@@ -36,6 +36,9 @@ public class MenuItem {
     @Column(name = "amount_available")
     private int amountAvailable;
 
+    @Column(name = "markup_multi")
+    private int markupMultiplier;
+
     @OneToMany(mappedBy = "menuItem", fetch = FetchType.LAZY,
             cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private List<OrderMenuItem> orderMenuItems;
@@ -43,7 +46,6 @@ public class MenuItem {
     @OneToMany(mappedBy = "menuItem",
             cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
     private List<MenuItemIngredient> menuItemIngredients;
-
 
     public MenuItem() {}
 
@@ -135,6 +137,14 @@ public class MenuItem {
         if (this.amountAvailable < 1) {
             this.isAvailable = false;
         }
+    }
+
+    public int getMarkupMultiplier() {
+        return markupMultiplier;
+    }
+
+    public void setMarkupMultiplier(int markupMulti) {
+        this.markupMultiplier = markupMulti;
     }
 
     public void addIngredient(MenuItemIngredient menuItemIngredient) {

@@ -30,12 +30,11 @@
       </div>
 
       <div th:if="${menuItem.dishName == 'Small Cheese Pizza' || menuItem.dishName == 'Medium Cheese Pizza' || menuItem.dishName == 'Large Cheese Pizza'}">
-        <label><span th:text="${menuItem.dishName + '''s name cannot be modified.'}"></span>
+        <label><span th:text="${menuItem.dishName + '''s name cannot be modified, it is used in pizza builder.'}"></span>
           <input type="hidden" th:field="*{dishName}" th:value="*{dishName}">
           <span th:if="${#fields.hasErrors('dishName')}" th:errors="*{dishName}" class="error"></span>
         </label>
       </div>
-
 
       <label>Description:
         <textarea th:field="*{description}" placeholder="description"></textarea>
@@ -58,6 +57,9 @@
         </label>
       </div>
 
+      <label>Markup Multiplier:
+        <input type="number" th:field="*{markupMultiplier}" th:value="*{markupMultiplier}" min="1" max="9">
+      </label>
 
       <label>Currently Available:
         <input type="checkbox" th:field="*{isAvailable}">
@@ -73,7 +75,7 @@
             </label>
 
             <label>Amount:
-              <input type="number" name="ingredientIdAmountsValues" th:value="${ingredientArr[1]}" required/>
+              <input type="number" name="ingredientIdAmountsValues" th:value="${ingredientArr[1]}" min="1" required/>
             </label>
             <button type="button" class="remove-item">Remove</button>
           </div>
@@ -86,8 +88,9 @@
           </label>
 
           <label>Amount:
-            <input type="number" name="ingredientIdAmountsValues" required/>
+            <input type="number" name="ingredientIdAmountsValues" min="1" required/>
           </label>
+
           <button type="button" class="remove-item">Remove</button>
         </div>
 

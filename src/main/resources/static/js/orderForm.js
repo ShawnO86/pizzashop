@@ -52,6 +52,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
     }
 
     // todo: setup show/hide button for cart area, custom pizza form.
+    //  --: change itemContainer to an HTML template literal to append to menuAmountContainer?
 
     function createOrderItemAmountSelector(menuItemName, menuItemId, menuItemPrice, orderInitQty, menuItemMaxQty) {
         const existingItem = document.querySelector(`[data-cart-item-id="${menuItemId}"]`);
@@ -61,46 +62,17 @@ document.addEventListener('DOMContentLoaded', ()=> {
         }
 
         const itemContainer = document.createElement("div");
-        itemContainer.classList.add("inline", "cartItem-Container");
-        itemContainer.dataset.cartItemId = menuItemId;
 
-        const itemName = document.createElement("p");
-
-        const itemIdHiddenInput = document.createElement("input");
-        itemIdHiddenInput.setAttribute("type", "hidden");
-        itemIdHiddenInput.setAttribute("value", menuItemId);
-        itemIdHiddenInput.name = "menuItemsIdList";
-
-        const itemDishNameHiddenInput = document.createElement("input");
-        itemDishNameHiddenInput.setAttribute("type", "hidden");
-        itemDishNameHiddenInput.setAttribute("value", menuItemName);
-        itemDishNameHiddenInput.name = "menuDishNamesList";
-
-        const itemAmount = document.createElement("input");
-        itemAmount.setAttribute("type", "number");
-        itemAmount.setAttribute("value", orderInitQty);
-        itemAmount.setAttribute("min", "1");
-        itemAmount.setAttribute("max", menuItemMaxQty);
-        itemAmount.name = "menuItemsAmountsList";
-        itemAmount.required = true;
-
-        const itemAmountLabel = document.createElement("label");
-        itemAmountLabel.innerText = "Qty"
-
-        const removeItemBtn = document.createElement("button");
-        removeItemBtn.innerText = "Remove Item";
-        removeItemBtn.value = menuItemName;
-        removeItemBtn.classList.add("remove-item");
-
-        itemContainer.appendChild(itemIdHiddenInput);
-        itemContainer.appendChild(itemDishNameHiddenInput);
-        itemContainer.appendChild(itemName);
-        itemContainer.appendChild(itemAmountLabel);
-        itemContainer.appendChild(removeItemBtn);
-        itemAmountLabel.appendChild(itemAmount);
-
-        const itemContent = document.createTextNode(menuItemName);
-        itemName.appendChild(itemContent);
+        itemContainer.innerHTML = `
+        <div class="inline cartItem-Container" data-cart-item-id="${menuItemId}">
+            <input type="hidden" value="${menuItemId}" name="menuItemsIdList" />
+            <input type="hidden" value="${menuItemName}" name="menuDishNamesList" />
+            <p>${menuItemName}</p>
+            <label>Qty:
+                <input type="number" value="${orderInitQty}" min="1" max="${menuItemMaxQty}" name="menuItemsAmountsList" required/>
+            </label>
+            <button class="remove-item">Remove Item</button>
+        </div>`;
 
         menuAmountContainer.appendChild(itemContainer);
     }

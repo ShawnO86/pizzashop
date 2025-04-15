@@ -1,6 +1,8 @@
 package com.pizzashop.dto;
 
 import com.pizzashop.entities.MenuCategoryEnum;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
@@ -18,7 +20,12 @@ public class MenuItemDTO {
     @NotNull(message = "required")
     private MenuCategoryEnum menuCategory;
 
-    private boolean isAvailable;
+    @NotNull(message = "required")
+    @Min(value = 1, message = "minimum multiplier of 1")
+    @Max(value = 9, message = "maximum multiplier of 9")
+    private int markupMultiplier = 2;
+
+    private boolean isAvailable = true;
 
     private List<int[]> ingredientIdAmounts;
 
@@ -54,6 +61,14 @@ public class MenuItemDTO {
         this.menuCategory = menuCategory;
     }
 
+    public int getMarkupMultiplier() {
+        return markupMultiplier;
+    }
+
+    public void setMarkupMultiplier(int markupMultiplier) {
+        this.markupMultiplier = markupMultiplier;
+    }
+
     public boolean getIsAvailable() {
         return isAvailable;
     }
@@ -76,6 +91,8 @@ public class MenuItemDTO {
                 "dishName='" + dishName + '\'' +
                 ", description='" + description + '\'' +
                 ", menuCategory=" + menuCategory +
+                ", markupMultiplier=" + markupMultiplier +
+                ", isAvailable=" + isAvailable +
                 '}';
     }
 }

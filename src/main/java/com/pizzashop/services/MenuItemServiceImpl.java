@@ -119,10 +119,11 @@ public class MenuItemServiceImpl implements MenuItemService {
         );
 
         List<int[]> newIngredientQuantityArray = menuItemDTO.getIngredientIdAmounts();
-
         mapIngredientsToMenuItem(menuItem, newIngredientQuantityArray);
 
+        menuItem.setMarkupMultiplier(menuItemDTO.getMarkupMultiplier());
         setSingleMenuItemCostPrice(menuItem);
+
         menuItem.setAmountAvailable(updateMenuItemAmountAvailable(menuItem));
 
         menuItemDAO.save(menuItem);
@@ -136,8 +137,9 @@ public class MenuItemServiceImpl implements MenuItemService {
             menuItem.setDishName(menuItemDTO.getDishName());
             menuItem.setMenuCategory(menuItemDTO.getMenuCategory());
         }
-        menuItemIngredientDAO.deleteByMenuItemId(menuItemId);
 
+        menuItemIngredientDAO.deleteByMenuItemId(menuItemId);
+        menuItem.setMarkupMultiplier(menuItemDTO.getMarkupMultiplier());
         menuItem.setCostCents(0);
         menuItem.setDescription(menuItemDTO.getDescription());
         menuItem.setIsAvailable(menuItemDTO.getIsAvailable());
@@ -188,8 +190,9 @@ public class MenuItemServiceImpl implements MenuItemService {
             MenuItem currentMenuItem = menuItemIngredient.getMenuItem();
 
             int newCost = ( currentMenuItem.getCostCents() - ( oldCost * menuItemIngredient.getQuantityUsed() ) + ( ingredient.getCentsCostPer() * menuItemIngredient.getQuantityUsed() ) );
+
             currentMenuItem.setCostCents(newCost);
-            currentMenuItem.setPriceCents(newCost * ingredient.getMarkupMulti());
+            currentMenuItem.setPriceCents(newCost * currentMenuItem.getMarkupMultiplier());
 
             menuItemDAO.update(currentMenuItem);
         }
@@ -199,15 +202,13 @@ public class MenuItemServiceImpl implements MenuItemService {
     protected void setSingleMenuItemCostPrice(MenuItem menuItem) {
         List<MenuItemIngredient> menuItemIngredients = menuItem.getMenuItemIngredients();
         int cost = 0;
-        int price = 0;
 
         for (MenuItemIngredient menuItemIngredient : menuItemIngredients) {
             Ingredient currentIngredient = menuItemIngredient.getIngredient();
             cost += currentIngredient.getCentsCostPer() * menuItemIngredient.getQuantityUsed();
-            price += currentIngredient.getCentsPricePer() * menuItemIngredient.getQuantityUsed();
         }
         menuItem.setCostCents(cost);
-        menuItem.setPriceCents(price);
+        menuItem.setPriceCents(cost * menuItem.getMarkupMultiplier());
     }
 
     @Transactional
