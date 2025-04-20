@@ -58,17 +58,4 @@ public class CustomPizzaDTO {
     public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
-
-    @Override
-    public String toString() {
-        return "CustomPizzaDTO{" +
-                "pizzaName='" + pizzaName + '\n' +
-                "toppings=" + toppingIds + '\n' +
-                ", toppingNames=" + toppingNames + '\n' +
-                "extraToppings=" + extraToppingIds + '\n' +
-                ", extraToppingNames=" + extraToppingNames + '\n' +
-                "pizzaSize=" + pizzaSize +
-                ", quantity=" + quantity +
-                '}';
-    }
 }
