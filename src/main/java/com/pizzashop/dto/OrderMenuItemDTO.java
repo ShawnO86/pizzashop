@@ -7,12 +7,6 @@ public class OrderMenuItemDTO {
 
     public OrderMenuItemDTO() {}
 
-    public OrderMenuItemDTO(Integer menuItemID, String menuItemName, int menuItemAmount) {
-        this.menuItemID = menuItemID;
-        this.menuItemName = menuItemName;
-        this.menuItemAmount = menuItemAmount;
-    }
-
     public Integer getMenuItemID() {
         return menuItemID;
     }
@@ -31,7 +25,4 @@ public class OrderMenuItemDTO {
     public void setMenuItemAmount(int menuItemAmount) {
         this.menuItemAmount = menuItemAmount;
     }
-
-
-
 }

@@ -2,15 +2,14 @@ package com.pizzashop.dto;
 
 import com.pizzashop.entities.PizzaSizeEnum;
 
-import java.util.List;
+import java.util.Map;
 
 public class CustomPizzaDTO {
 
     private String pizzaName;
-    private List<Integer> toppingIds;
-    private List<String> toppingNames;
-    private List<Integer> extraToppingIds;
-    private List<String> extraToppingNames;
+    // name, id
+    private Map<String, Integer> toppings;
+    private Map<String, Integer> extraToppings;
     private PizzaSizeEnum pizzaSize;
     private int quantity;
 
@@ -22,29 +21,17 @@ public class CustomPizzaDTO {
     public void setPizzaName(String pizzaName) {
         this.pizzaName = pizzaName;
     }
-    public List<Integer> getToppingIds() {
-        return toppingIds;
+    public Map<String, Integer> getToppings() {
+        return toppings;
     }
-    public void setToppingIds(List<Integer> toppingIds) {
-        this.toppingIds = toppingIds;
+    public void setToppings(Map<String, Integer> toppings) {
+        this.toppings = toppings;
     }
-    public List<String> getToppingNames() {
-        return toppingNames;
+    public Map<String, Integer> getExtraToppings() {
+        return extraToppings;
     }
-    public void setToppingNames(List<String> toppingNames) {
-        this.toppingNames = toppingNames;
-    }
-    public List<Integer> getExtraToppingIds() {
-        return extraToppingIds;
-    }
-    public void setExtraToppingIds(List<Integer> extraToppingIds) {
-        this.extraToppingIds = extraToppingIds;
-    }
-    public List<String> getExtraToppingNames() {
-        return extraToppingNames;
-    }
-    public void setExtraToppingNames(List<String> extraToppingNames) {
-        this.extraToppingNames = extraToppingNames;
+    public void setExtraToppings(Map<String, Integer> extraToppings) {
+        this.extraToppings = extraToppings;
     }
     public PizzaSizeEnum getPizzaSize() {
         return pizzaSize;

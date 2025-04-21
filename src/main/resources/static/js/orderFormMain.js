@@ -1,47 +1,91 @@
 
 // todo : import needed functions here to build a JSON payload and send to Spring.
 
-import {handleAddMenuItem, handleRemoveMenuItem} from "./addMenuItems.js";
+import {handleAddMenuItem, handleRemoveMenuItem, createOrderItemAmountSelector} from "./addMenuItems.js";
 
 document.addEventListener('DOMContentLoaded', ()=> {
     const menuItemsContainer = document.getElementById("menuItems-container");
     const menuAmountContainer = document.getElementById("menuAmount-container");
     const pizzaBuilderContainer = document.getElementById("pizza-builder-container");
 
+/*  structure of cart objects for display and setting qty =>
+    menuItems: {
+        "id": {"name": "name", "qty": 0, "maxQty": 400},
+        "id": {"name": "name", "qty": 0, "maxQty": 400},
+        "id": {"name": "name", "qty": 0, "maxQty": 400}
+    };
 
-    // todo : separate order building object and JSON to be sent for easy setting qty?
-    //  -- : add/remove to menuItemDTOList array from listeners or use different listener for 'submit order' btn?
-    //  -- : need to get quantities after cart is submitted but before backend processing.
-
-/*  structure of cart obj =>
-    const cart = {
-        "menuItems": {
-            "name": {
-                "id": 0,
-                "qty": 0
-            }
-        },
-        "customPizzas": {
-            "name": {
-                "quantity" : 1,
-                "pizzaSize": "SMALL",
-                "price-per" : pizzaPriceMap["SMALL"].price,
-                "total-price" : pizzaPriceMap["SMALL"].price,
-                "size-data" : {"size" : "SMALL", "price" : pizzaPriceMap["SMALL"].price},
-                "toppings" : {},
-                "extra-toppings" : {}
-            }
+    customPizzas: {
+        "name": {
+            "quantity" : 1,
+            "pizzaSize": "SMALL",
+            "price-per" : pizzaPriceMap["SMALL"].price,
+            "total-price" : pizzaPriceMap["SMALL"].price,
+            "size-data" : {"size" : "SMALL", "price" : pizzaPriceMap["SMALL"].price},
+            "toppings" : {
+                "name": {id: 0, price: 0.00},
+                "name": {id: 0, price: 0.00}
+                },
+            "extra-toppings" : {
+                "name": {id: 0, price: 0.00},
+                "name": {id: 0, price: 0.00}
+                }
         }
-    }*/
-    const cart = {
-        "menuItems": {},
-        "customPizzas": {}
-    }
+    };
 
-    const order = {
-        "menuItemDTOList": [],
-        "customPizzaDTOList": []
+    structure of order object for processing =>
+    order = {
+        "menuItemDTOList": [
+            {"menuItemID": 1, "menuItemName": "name", "menuItemAmount": 0},
+            {"menuItemID": 2, "menuItemName": "name", "menuItemAmount": 0},
+            {"menuItemID": 3, "menuItemName": "name", "menuItemAmount": 0}
+        ],
+        "customPizzaDTOList": [
+            {
+            "pizzaName": name,
+            "toppings": {
+                {toppingName: "name", toppingId: 1},
+                {toppingName: "name", toppingId: 1},
+                {toppingName: "name", toppingId: 1}
+                },
+            "extraToppings": {
+                {toppingName: "name", toppingId: 1},
+                {toppingName: "name", toppingId: 1},
+                {toppingName: "name", toppingId: 1}
+                },
+            "pizzaSize": SIZE,
+            "quantity": 1
+            },
+            {
+            "pizzaName": name,
+            "toppings": {
+                {toppingName: "name", toppingId: 1},
+                {toppingName: "name", toppingId: 1},
+                {toppingName: "name", toppingId: 1}
+                },
+            "extraToppings": {
+                {toppingName: "name", toppingId: 1},
+                {toppingName: "name", toppingId: 1},
+                {toppingName: "name", toppingId: 1}
+                },
+            "pizzaSize": SIZE,
+            "quantity": 1
+            }
+        ]
     }
+    */
+
+    let menuItems = {};
+    let customPizzas = {};
+
+    // populate cart if exist in session
+    populateCartUI();
+    console.log("menuItems:");
+    console.log(menuItems);
+    console.log("customPizzas:");
+    console.log(customPizzas);
+
+    const order = {"menuItemDTOList": [], "customPizzaDTOList": []};
 
     let errorMessageElement = document.querySelector(".error");
     if (errorMessageElement) {
@@ -62,24 +106,75 @@ document.addEventListener('DOMContentLoaded', ()=> {
         }
     }
 
+    function saveCartObjectsToSession() {
+        if (menuItems) {
+            sessionStorage.setItem("menuItems", JSON.stringify(menuItems));
+        }
+        if (customPizzas) {
+            sessionStorage.setItem("customPizzas", JSON.stringify(customPizzas));
+        }
+    }
+
+    function getCartObjectsFromSession() {
+        const sessionMenuItems = sessionStorage.getItem("menuItems");
+        const sessionCustomPizzas = sessionStorage.getItem("customPizzas");
+        if (sessionMenuItems) {
+            menuItems = JSON.parse(sessionMenuItems);
+        }
+        if (sessionCustomPizzas) {
+            customPizzas = JSON.parse(sessionCustomPizzas);
+        }
+    }
+
+    function populateCartUI() {
+        getCartObjectsFromSession();
+        if (menuItems) {
+            for (let menuItemId in menuItems) {
+                const currentItem = menuItems[menuItemId];
+                createOrderItemAmountSelector(currentItem.name, menuItemId, currentItem.price, currentItem.qty, currentItem.maxQty, menuAmountContainer);
+            }
+        }
+    }
+
     menuItemsContainer.addEventListener("click", (event) => {
-
-        handleAddMenuItem(event, menuAmountContainer);
-
-        //order.menuItemDTOList.push();
-
-        console.log(menuAmountContainer);
+        if (event.target.classList.contains("addMenuItem-btn")) {
+            const menuItem = handleAddMenuItem(event, menuAmountContainer);
+            if (menuItem) {
+                menuItems[menuItem.menuItemId] = {
+                    "name": menuItem.menuItemName, "qty": menuItem.orderInitQty, "maxQty": menuItem.menuItemMaxQty, "price": menuItem.menuItemPrice
+                };
+                saveCartObjectsToSession();
+            }
+            console.log(menuItems);
+        }
     });
 
     menuAmountContainer.addEventListener("click", (event) => {
-        const delId = handleRemoveMenuItem(event);
-
-/*        for (let i = 0; i < order["menuItemDTOList"].length; i++) {
-            if (order.menuItemDTOList[i].menuItemID === delId) {
-                order.menuItemDTOList.splice(i, 1);
+        const cartItemContainer = event.target.closest('.cartItem-container');
+        console.log(event.target.type)
+        if (cartItemContainer) {
+            const id = cartItemContainer.dataset.itemId;
+            if (event.target.classList.contains("remove-item")) {
+                handleRemoveMenuItem(event);
+                delete menuItems[id];
+            } else if (event.target.type == "number") {
+                menuItems[id].qty = event.target.value;
             }
-        }*/
-        console.log(order);
-    });
+            saveCartObjectsToSession();
+            return;
+        }
 
+        if (event.target.type == "submit") {
+            //  todo : build order object
+            console.log("submitting cart...");
+
+            for (let menuItemId in menuItems) {
+                order.menuItemDTOList.push({
+                    "menuItemID": menuItemId, "menuItemName": menuItems[menuItemId].name, "menuItemAmount": menuItems[menuItemId].qty
+                });
+            }
+            // same for custom pizzas...
+        }
+
+    });
 });
