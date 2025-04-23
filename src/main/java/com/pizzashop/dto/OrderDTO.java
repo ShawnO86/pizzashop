@@ -3,21 +3,22 @@ package com.pizzashop.dto;
 import java.util.List;
 
 public class OrderDTO {
-    private List<OrderMenuItemDTO> menuItemDTOList;
-    private List<CustomPizzaDTO> customPizzaDTOList;
+    // todo : figure out constraints for nested DTO?
+    private List<OrderMenuItemDTO> menuItemList;
+    private List<CustomPizzaDTO> customPizzaList;
 
     public OrderDTO() {}
 
-    public List<OrderMenuItemDTO> getMenuItemDTOList() {
-        return menuItemDTOList;
+    public List<OrderMenuItemDTO> getMenuItemList() {
+        return menuItemList;
     }
-    public void setMenuItemDTOList(List<OrderMenuItemDTO> menuItemDTOList) {
-        this.menuItemDTOList = menuItemDTOList;
+    public void setMenuItemList(List<OrderMenuItemDTO> menuItemList) {
+        this.menuItemList = menuItemList;
     }
-    public List<CustomPizzaDTO> getCustomPizzaDTOList() {
-        return customPizzaDTOList;
+    public List<CustomPizzaDTO> getCustomPizzaList() {
+        return customPizzaList;
     }
-    public void setCustomPizzaDTOList(List<CustomPizzaDTO> customPizzaDTOList) {
-        this.customPizzaDTOList = customPizzaDTOList;
+    public void setCustomPizzaList(List<CustomPizzaDTO> customPizzaList) {
+        this.customPizzaList = customPizzaList;
     }
 }

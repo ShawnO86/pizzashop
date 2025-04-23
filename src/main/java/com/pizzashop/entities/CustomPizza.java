@@ -13,6 +13,9 @@ public class CustomPizza {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @Column(name = "name")
+    private String name;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "size")
     private PizzaSizeEnum size;
@@ -26,17 +29,20 @@ public class CustomPizza {
 
     public CustomPizza() {}
 
-    public CustomPizza(PizzaSizeEnum size, int priceCents) {
-        this.size = size;
-        this.priceCents = priceCents;
-    }
-
     public int getId() {
         return id;
     }
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public PizzaSizeEnum getSize() {
