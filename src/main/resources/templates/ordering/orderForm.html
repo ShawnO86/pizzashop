@@ -12,7 +12,7 @@
 <main class="inline">
 
   <section id="menuItems-container">
-    <button>Build Your Own Pizza</button>
+    <button id="open-pizza-builder-btn">Build Your Own Pizza</button>
     <script th:inline="javascript">
       const pizzaPriceMap = {
         'SMALL': [],
@@ -54,7 +54,7 @@
   </section>
 
   <!-- todo: setup display (show-hide) of pizza builder on click of a button, set to overlay menu with higher z-index -->
-  <section class="form-container" id="pizza-builder-container">
+  <section class="form-container hide-area" id="pizza-builder-container">
     <div>
       <h3>Build your custom pizza:</h3>
       <label class="space-between"><strong>Name:</strong>
@@ -84,7 +84,7 @@
       <h4>Toppings:</h4>
       <div th:each="topping : ${pizzaToppings}" class="space-between" th:if="${topping.ingredientName != 'Mozzarella'}">
         <div>
-          <input type="checkbox" class="topping-checkbox" th:id="${topping.ingredientName + '-chkbox'}" th:data-topping-id="${topping.id}"
+          <input type="checkbox" name="toppingCheckboxes" th:id="${topping.ingredientName + '-chkbox'}" th:data-topping-id="${topping.id}"
                  th:data-topping-name="${topping.ingredientName}" th:data-topping-price="${topping.getCentsPricePer()}" data-topping-type="regular">
           <label th:text="${topping.ingredientName + ':'}" th:for="${topping.ingredientName + '-chkbox'}"></label>
         </div>
@@ -98,7 +98,7 @@
 
       <div th:each="topping : ${pizzaToppings}" class="space-between">
         <div>
-          <input type="checkbox" class="extra-topping-checkbox" th:id="${'extra-'+topping.ingredientName + '-chkbox'}" th:data-topping-id="${topping.id}"
+          <input type="checkbox" name="extraToppingCheckboxes" th:id="${'extra-'+topping.ingredientName + '-chkbox'}" th:data-topping-id="${topping.id}"
                  th:data-topping-name="${topping.ingredientName}" th:data-topping-price="${topping.getCentsPricePer()}" data-topping-type="extra">
           <label th:text="${topping.ingredientName + ':'}" th:for="${'extra-' + topping.ingredientName + '-chkbox'}"></label>
         </div>
@@ -111,7 +111,8 @@
       <label>Qty:
         <input type="number" min="1" id="pizza-qty-input" value="1"/>
       </label>
-      <button type="submit" class="addMenuItem-btn" id="pizza-submit-btn">Add To Order</button>
+      <button type="submit" class="addMenuItem-btn" id="pizza-cancel-btn">Cancel</button>
+      <button type="submit" class="addMenuItem-btn" id="pizza-submit-btn" data-add-type="add">Add To Order</button>
     </div>
 
     <strong><sub class="space-between"><span>Per Pizza:</span><span id="pizza-price-per"></span></sub></strong>
@@ -141,7 +142,6 @@
 
       <input type="submit" id="cart-submit-btn" value="Send Order"/>
     </div>
-
 
 
   </section>

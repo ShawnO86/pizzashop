@@ -9,7 +9,8 @@ import {
 import {
     displayAsCurrency,
     handlePizzaBuilderEvents,
-    createOrderItemAmountSelectorPizza
+    createOrderItemAmountSelectorPizza,
+    populateBuilderForm
 } from "./pizzaBuilder.js";
 
 document.addEventListener('DOMContentLoaded', ()=> {
@@ -17,81 +18,10 @@ document.addEventListener('DOMContentLoaded', ()=> {
     const menuAmountContainer = document.getElementById("menuAmount-container");
     const pizzaBuilderContainer = document.getElementById("pizza-builder-container");
 
-/*  structure of cart objects for display and setting qty =>
-    menuItems: {
-        "id": {"name": "name", "qty": 0, "maxQty": 400, "price": 0.00},
-        "id": {"name": "name", "qty": 0, "maxQty": 400, "price": 0.00},
-        "id": {"name": "name", "qty": 0, "maxQty": 400, "price": 0.00}
-    };
-
-    customPizzas: {
-        "name": {
-            "pizzaName": "name",
-            "quantity" : 1,
-            "price-per" : pizzaPriceMap["SMALL"].price,
-            "total-price" : pizzaPriceMap["SMALL"].price,
-            "size-data" : {"size" : "SMALL", "price" : pizzaPriceMap["SMALL"].price},
-            "toppings" : {
-                {id: 0, name: ""},
-                {id: 0, name: ""}
-                },
-            "extra-toppings" : {
-                {id: 0, name: ""},
-                {id: 0, name: ""}
-                }
-        }
-    };
-
-    structure of order object for processing,
-    receipt page will also use this object for display? =>
-    order = {
-        "menuItemDTOList": [
-            {"menuItemID": 1, "menuItemName": "name", "menuItemAmount": 0},
-            {"menuItemID": 2, "menuItemName": "name", "menuItemAmount": 0},
-            {"menuItemID": 3, "menuItemName": "name", "menuItemAmount": 0}
-        ],
-        "customPizzaDTOList": [
-            {
-            "pizzaName": name,
-            "toppings": {
-                {toppingName: "name", toppingId: 1},
-                {toppingName: "name", toppingId: 1},
-                {toppingName: "name", toppingId: 1}
-                },
-            "extraToppings": {
-                {toppingName: "name", toppingId: 1},
-                {toppingName: "name", toppingId: 1},
-                {toppingName: "name", toppingId: 1}
-                },
-            "pizzaSize": SIZE,
-            "pricePer": 0.00,
-            "quantity": 1,
-            "totalPrice": 0.00
-            },
-            {
-            "pizzaName": name,
-            "toppings": {
-                {toppingName: "name", toppingId: 1},
-                {toppingName: "name", toppingId: 1},
-                {toppingName: "name", toppingId: 1}
-                },
-            "extraToppings": {
-                {toppingName: "name", toppingId: 1},
-                {toppingName: "name", toppingId: 1},
-                {toppingName: "name", toppingId: 1}
-                },
-            "pizzaSize": SIZE,
-            "pricePer": 0.00,
-            "quantity": 1,
-            "totalPrice": 0.00
-            }
-        ]
-    }
-    */
-
     let menuItems = {};
     let customPizzas = {};
     let pizzaCount = 0;
+    let editingPizza = {};
 
     // populate cart if exist in session
     populateCartUI();
@@ -148,6 +78,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
     }
 
     function populateCartUI() {
+       // const
         // build cart item displays
         getCartObjectsFromSession();
         if (menuItems) {
@@ -156,6 +87,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
                 createOrderItemAmountSelectorMenu(currentItem.name, menuItemId, currentItem.price, currentItem.qty, currentItem.maxQty, menuAmountContainer);
             }
         }
+
         if (customPizzas) {
             for (let pizzaName in customPizzas) {
                 const currentPizza = customPizzas[pizzaName];
@@ -164,7 +96,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
         }
     }
 
-    // for adding new menu items
+    // for adding cart items
     menuItemsContainer.addEventListener("click", (event) => {
         if (event.target.classList.contains("addMenuItem-btn")) {
             const menuItem = handleAddMenuItem(event, menuAmountContainer);
@@ -175,33 +107,56 @@ document.addEventListener('DOMContentLoaded', ()=> {
                 saveCartObjectsToSession();
             }
             console.log(menuItems);
+
+        } else if (event.target.id === "open-pizza-builder-btn") {
+            console.log("open pizza builder..");
+            if (pizzaBuilderContainer.classList.contains("hide-area")) {
+                populateBuilderForm();
+                pizzaBuilderContainer.classList.remove("hide-area");
+            }
         }
     });
 
     // for adding new pizza items
     pizzaBuilderContainer.addEventListener("click", (event) => {
+        if (event.target.id === "pizza-cancel-btn") {
+            pizzaBuilderContainer.classList.add("hide-area");
+            if (editingPizza.hasOwnProperty("toppings")) {
+                createOrderItemAmountSelectorPizza(editingPizza, menuAmountContainer);
+                customPizzas[editingPizza.pizzaName] = editingPizza;
+                editingPizza = {};
+            }
+        }
+
         // radio, checkbox, input events of pizza builder
         const customPizzaData = handlePizzaBuilderEvents(event);
         // for adding pizza to order/cart
         if (customPizzaData) {
-            if (customPizzaData.pizzaName in customPizzas) {
+            // check if edited or not. -- if editing, remove customPizzaData.pizzaName from customPizzas to overwrite without duplicate keys
+            if (customPizzaData[0]) {
+                console.log("editing pizza:");
+                console.log(editingPizza);
+                delete customPizzas[editingPizza.pizzaName];
+            }
+
+            if (customPizzaData[1].pizzaName in customPizzas) {
                 alert("Pizza name already in use. Use another name for this pizza.");
                 return;
             }
 
             pizzaCount += 1;
-            if (customPizzaData.pizzaName === "") {
-                customPizzaData.pizzaName = "Unnamed Pizza " + pizzaCount;
+            if (customPizzaData[1].pizzaName === "") {
+                customPizzaData[1].pizzaName = "Unnamed Pizza " + pizzaCount;
             }
 
             const customPizza = {
-                "pizzaName": customPizzaData.pizzaName,
-                "quantity": customPizzaData.quantity,
-                "price-per": customPizzaData["price-per"],
-                "total-price": customPizzaData["total-price"],
-                "size-data": {...customPizzaData["size-data"]}, // Creates a copy of the objects so it's not referenced from others.
-                "toppings": {...customPizzaData.toppings},
-                "extra-toppings": {...customPizzaData["extra-toppings"]}
+                "pizzaName": customPizzaData[1].pizzaName,
+                "quantity": customPizzaData[1].quantity,
+                "price-per": customPizzaData[1]["price-per"],
+                "total-price": customPizzaData[1]["total-price"],
+                "size-data": {...customPizzaData[1]["size-data"]}, // Creates a copy of the nested objects as well so it's not referenced from others.
+                "toppings": {...customPizzaData[1].toppings},
+                "extra-toppings": {...customPizzaData[1]["extra-toppings"]}
             };
 
             createOrderItemAmountSelectorPizza(customPizza, menuAmountContainer);
@@ -210,6 +165,8 @@ document.addEventListener('DOMContentLoaded', ()=> {
             saveCartObjectsToSession();
             console.log("customPizzas:");
             console.log(customPizzas);
+            pizzaBuilderContainer.classList.add("hide-area");
+            editingPizza = {};
         }
     });
 
@@ -221,12 +178,25 @@ document.addEventListener('DOMContentLoaded', ()=> {
             console.log(event.target.type)
             if (event.target.classList.contains("remove-item")) {
                 handleRemoveItem(event);
+
                 if (type === "menu item") {
                     delete menuItems[cartItemContainer.dataset.itemId];
                 } else {
                     delete customPizzas[cartItemContainer.dataset.itemName];
                 }
+
                 saveCartObjectsToSession();
+
+            }  else if (event.target.classList.contains("edit-item")) {
+                console.log("edit item:");
+                console.log(customPizzas[cartItemContainer.dataset.itemName]);
+                editingPizza = customPizzas[cartItemContainer.dataset.itemName];
+                handleRemoveItem(event);
+
+                pizzaBuilderContainer.classList.remove("hide-area");
+                populateBuilderForm(customPizzas[cartItemContainer.dataset.itemName]);
+                delete customPizzas[cartItemContainer.dataset.itemName];
+
             } else if (event.target.type === "number") {
                 let qty, price;
                 if (type === "menu item") {
@@ -237,15 +207,15 @@ document.addEventListener('DOMContentLoaded', ()=> {
                     customPizzas[cartItemContainer.dataset.itemName].quantity = parseInt(event.target.value);
                     qty = customPizzas[cartItemContainer.dataset.itemName].quantity;
                     price = customPizzas[cartItemContainer.dataset.itemName]["price-per"];
+                    customPizzas[cartItemContainer.dataset.itemName]["total-price"] = price * qty;
                 }
 
                 cartItemContainer.querySelector(".cart-item-price").innerText = `${qty} x ${displayAsCurrency(price, false)}`;
                 saveCartObjectsToSession();
-            }
-            return;
-        }
 
-        if (event.target.type === "submit") {
+            }
+
+        } else if (event.target.type === "submit") {
             const order = {"menuItemList": [], "customPizzaList": []};
             console.log("submitting cart...");
 
@@ -260,17 +230,18 @@ document.addEventListener('DOMContentLoaded', ()=> {
                 for (let topping in customPizzas[pizzaName].toppings) {
                     toppings[topping] = customPizzas[pizzaName].toppings[topping].id;
                 }
+
                 const extraToppings = {};
                 for (let topping in customPizzas[pizzaName]["extra-toppings"]) {
                     extraToppings[topping] = customPizzas[pizzaName]["extra-toppings"][topping].id;
                 }
-
                 order.customPizzaList.push({
                     "pizzaName" : pizzaName,
                     "toppings": toppings,
                     "extraToppings": extraToppings,
                     "pizzaSize": customPizzas[pizzaName]["size-data"].size,
-                    "quantity": customPizzas[pizzaName].quantity
+                    "quantity": customPizzas[pizzaName].quantity,
+                    "pricePerPizza": customPizzas[pizzaName]["price-per"]
                 });
             }
 
