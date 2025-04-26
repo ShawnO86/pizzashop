@@ -1,6 +1,3 @@
-
-// todo : import needed functions here to build a JSON payload and send to Spring.
-
 import {
     handleAddMenuItem,
     handleRemoveItem,
@@ -96,6 +93,24 @@ document.addEventListener('DOMContentLoaded', ()=> {
         }
     }
 
+    function disableEditBtns() {
+        const editBtns = menuAmountContainer.querySelectorAll(".edit-item");
+        const builderBtn = document.getElementById("open-pizza-builder-btn");
+        editBtns.forEach(el =>{
+            el.disabled = true;
+        })
+        builderBtn.disabled = true;
+    }
+
+    function enableEditBtns() {
+        const editBtns = menuAmountContainer.querySelectorAll(".edit-item");
+        const builderBtn = document.getElementById("open-pizza-builder-btn");
+        editBtns.forEach(el =>{
+            el.disabled = false;
+        })
+        builderBtn.disabled = false;
+    }
+
     // for adding cart items
     menuItemsContainer.addEventListener("click", (event) => {
         if (event.target.classList.contains("addMenuItem-btn")) {
@@ -110,10 +125,9 @@ document.addEventListener('DOMContentLoaded', ()=> {
 
         } else if (event.target.id === "open-pizza-builder-btn") {
             console.log("open pizza builder..");
-            if (pizzaBuilderContainer.classList.contains("hide-area")) {
-                populateBuilderForm();
-                pizzaBuilderContainer.classList.remove("hide-area");
-            }
+            populateBuilderForm();
+            pizzaBuilderContainer.classList.remove("hide-area");
+            disableEditBtns();
         }
     });
 
@@ -121,6 +135,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
     pizzaBuilderContainer.addEventListener("click", (event) => {
         if (event.target.id === "pizza-cancel-btn") {
             pizzaBuilderContainer.classList.add("hide-area");
+            enableEditBtns();
             if (editingPizza.hasOwnProperty("toppings")) {
                 createOrderItemAmountSelectorPizza(editingPizza, menuAmountContainer);
                 customPizzas[editingPizza.pizzaName] = editingPizza;
@@ -140,7 +155,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
             }
 
             if (customPizzaData[1].pizzaName in customPizzas) {
-                alert("Pizza name already in use. Use another name for this pizza.");
+                alert("Pizza name already in use. Please use another name.");
                 return;
             }
 
@@ -167,6 +182,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
             console.log(customPizzas);
             pizzaBuilderContainer.classList.add("hide-area");
             editingPizza = {};
+            enableEditBtns();
         }
     });
 
@@ -175,7 +191,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
         const cartItemContainer = event.target.closest('.cartItem-container');
         if (cartItemContainer) {
             const type = cartItemContainer.dataset.itemType;
-            console.log(event.target.type)
+
             if (event.target.classList.contains("remove-item")) {
                 handleRemoveItem(event);
 
@@ -195,6 +211,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
 
                 pizzaBuilderContainer.classList.remove("hide-area");
                 populateBuilderForm(customPizzas[cartItemContainer.dataset.itemName]);
+                disableEditBtns();
                 delete customPizzas[cartItemContainer.dataset.itemName];
 
             } else if (event.target.type === "number") {
