@@ -9,8 +9,11 @@ public class CustomPizzaDTO {
     private SizeDTO pizzaSize;
     private int quantity;
     private int pricePerPizza;
+    private int totalPizzaPrice;
 
-    public CustomPizzaDTO() {}
+    public CustomPizzaDTO() {
+
+    }
 
     public String getPizzaName() {
         return pizzaName;
@@ -48,6 +51,12 @@ public class CustomPizzaDTO {
     public void setPricePerPizza(int pricePerPizza) {
         this.pricePerPizza = pricePerPizza;
     }
+    public int getTotalPizzaPrice() {
+        return totalPizzaPrice;
+    }
+    public void setTotalPizzaPrice(int totalPizzaPrice) {
+        this.totalPizzaPrice = totalPizzaPrice;
+    }
 
     @Override
     public String toString() {
@@ -58,6 +67,7 @@ public class CustomPizzaDTO {
                 ", pizzaSize=" + pizzaSize +
                 ", quantity=" + quantity +
                 ", pricePerPizza=" + pricePerPizza +
+                ", totalPizzaPrice=" + totalPizzaPrice +
                 '}';
     }
 }

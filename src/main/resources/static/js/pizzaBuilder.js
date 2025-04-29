@@ -164,7 +164,6 @@ export function handlePizzaBuilderEvents(event) {
                     updatePizzaPricePer();
                     isPriceChanged = true;
                 }
-
                 break;
             case "checkbox":
                 const toppingName = target.dataset.toppingName;
@@ -189,16 +188,13 @@ export function handlePizzaBuilderEvents(event) {
 
                 updatePizzaPricePer();
                 isPriceChanged = true;
-
                 break;
             case "number":
-                //changes pizza obj qty
                 if (qtyInput.value !== pizza.quantity) {
                     pizza["quantity"] = qtyInput.value;
                     pizza["total-price"] = pizza["quantity"] * pizza["price-per"];
                     isPriceChanged = true;
                 }
-
                 break;
             case "submit":
                 if (target.dataset.addType === "add") {
@@ -306,6 +302,7 @@ export function createOrderItemAmountSelectorPizza(pizzaObject, container) {
             <input type="hidden" name="customPizzaList[${pizzaIndex}].pizzaSize.price" value="${pizzaObject["size-data"].price}">
             <input type="hidden" name="customPizzaList[${pizzaIndex}].quantity" value="${pizzaObject.quantity}">
             <input type="hidden" name="customPizzaList[${pizzaIndex}].pricePerPizza" value="${pizzaObject["price-per"]}">
+            <input type="hidden" name="customPizzaList[${pizzaIndex}].totalPizzaPrice" value="${pizzaObject["total-price"]}">
             ${toppingHTML}
             ${extraToppingHTML}
             `;

@@ -34,6 +34,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
             cartErrorElement.remove();
             cartErrorElement = null;
         }, 5000);
+
         parseThymeleafItems();
     } else {
         // populate cart if exist in session
@@ -49,11 +50,14 @@ document.addEventListener('DOMContentLoaded', ()=> {
 
     function updateCartTotal() {
         cartTotal = 0;
-        // todo : total pizza objects in price ...
-        //const cartItemContainers = document.querySelectorAll(".cartItem-container");
+
         for (const menuItemId in menuItems) {
             cartTotal += menuItems[menuItemId].price * menuItems[menuItemId].qty;
         }
+        for (const pizzaName in customPizzas) {
+            cartTotal += customPizzas[pizzaName]["total-price"] * customPizzas[pizzaName]["quantity"];
+        }
+
         cartTotalElement.innerText = displayAsCurrency(cartTotal, false);
         cartTotalInputElement.value = cartTotal;
     }
@@ -113,6 +117,14 @@ document.addEventListener('DOMContentLoaded', ()=> {
             customPizzas = {};
             for (const pizzaItem of orderDTO.pizzaItems) {
                 console.log("menuItem", pizzaItem)
+                customPizzas[pizzaItem["pizzaName"]] = {
+                    "extra-toppings": {...pizzaItem["extraToppings"]},
+                    "toppings": {...pizzaItem["toppings"]},
+                    "size-data": {...pizzaItem["pizzaSize"]},
+                    "quantity": pizzaItem["quantity"],
+                    "price-per": pizzaItem["pricePerPizza"],
+                    "total-price": pizzaItem["totalPizzaPrice"]
+                }
             }
             savePizzaObjectsToSession();
         }
