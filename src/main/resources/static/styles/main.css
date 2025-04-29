@@ -17,6 +17,12 @@
     gap: 1rem;
 }
 
+.space-between {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
 .stay-top {
     position: fixed;
     top: 10rem;
@@ -26,33 +32,55 @@
 .form-container {
     border: 1px solid #c6d3e6;
     color: #333333;
-    width: fit-content;
     min-height: 20rem;
+    padding: 0 1rem 1rem 1rem;
 }
 
 .form-info {
     width: 100%;
     text-align: center;
-    background-color: var(--bg);
     border-top: 1px solid #343434;
     border-bottom: 1px solid #343434;
     padding: 0.25rem 0;
 }
+
+.cartItem-container {
+    border: 1px solid black;
+    width: 100%;
+}
+
+.thymeleaf-items {
+    width: 100%;
+}
+
+.hide-area {
+    display: none;
+}
+
+#pizza-size-container .space-between,
+#pizza-topping-container .space-between {
+    gap: 2rem;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px dotted black;
+}
+
 form {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
     gap: 0.5rem 0;
-    padding: 0 1rem 1rem 1rem;
 }
+
 input[type=submit] {
     padding: 0 1rem;
     cursor: pointer;
 }
+
 table {
     border-collapse: collapse;
 
 }
+
 th, td {
     border: 1px dashed #c6d3e6;
     text-align: center;

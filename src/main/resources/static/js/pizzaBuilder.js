@@ -30,14 +30,15 @@ pizzaTotalDisplay.innerText = displayAsCurrency(pizza["total-price"]);
 qtyInput.setAttribute("max", pizzaPriceMap['SMALL'].maxQty);
 
 export function displayAsCurrency(amount, isTopping) {
-    amount = amount.toString();
-    const dollar = amount.slice(0, -2) === "" ? "0" : amount.slice(0, -2);
-    const cents = amount.slice(-2);
+    const dollar = Math.floor(amount / 100);
+    const cents = amount % 100;
+    const formattedCents = cents < 10 ? "0" + cents : cents;
+    let formattedAsCurrency = "$" + dollar + "." + formattedCents;
 
     if (isTopping) {
-        return "+ $" + dollar + "." + cents;
+        formattedAsCurrency = "+ " + formattedAsCurrency;
     }
-    return "$" + dollar + "." + cents;
+    return formattedAsCurrency;
 }
 
 function setSizePriceSelector() {
@@ -102,95 +103,7 @@ function handleRadioChange(pizzaSize) {
     setToppingPriceDisplay(ingredientAmt, extraIngredientPriceElements, true);
 }
 
-
-export function handlePizzaBuilderEvents(event) {
-    const target = event.target;
-    let isPriceChanged = false;
-    console.log(target.id);
-    if (target.matches('input[type="radio"], input[type="checkbox"], input[type="number"], button[type="submit"]')) {
-        switch (target.type) {
-            case "radio":
-                const pizzaSize = target.dataset.pizzaSize;
-
-                if (pizza["size-data"].size !== pizzaSize) {
-                    handleRadioChange(pizzaSize);
-
-                    pizza["size-data"] = {"size" : pizzaSize, "price" : pizzaPriceMap[pizzaSize].price}
-
-                    updatePizzaPricePer();
-                    isPriceChanged = true;
-                }
-
-                break;
-            case "checkbox":
-                const toppingName = target.dataset.toppingName;
-                const toppingPrice = target.dataset.toppingPrice;
-                const toppingId = target.dataset.toppingId;
-                const toppingType = target.dataset.toppingType;
-
-                //adds pizza ingredient name: {price,id} to pizza object for display
-                if (target.checked) {
-                    if (toppingType === "regular") {
-                        pizza["toppings"][toppingName] = {"price" : toppingPrice, "id" : toppingId}
-                    } else {
-                        pizza["extra-toppings"][toppingName] = {"price" : toppingPrice, "id" : toppingId}
-                    }
-                } else {
-                    if (toppingType === "regular") {
-                        delete pizza["toppings"][toppingName];
-                    } else {
-                        delete pizza["extra-toppings"][toppingName];
-                    }
-                }
-
-                updatePizzaPricePer();
-                isPriceChanged = true;
-
-                break;
-            case "number":
-                //changes pizza obj qty
-                if (qtyInput.value !== pizza.quantity) {
-                    pizza["quantity"] = qtyInput.value;
-                    pizza["total-price"] = pizza["quantity"] * pizza["price-per"];
-                    isPriceChanged = true;
-                }
-
-                break;
-            case "submit":
-                if (target.dataset.addType === "add") {
-                    pizza.pizzaName = pizzaNameInput.value;
-                    return [false, pizza];
-                } else if (target.dataset.addType === "update") {
-                    pizza.pizzaName = pizzaNameInput.value;
-                    return [true, pizza];
-                }
-        }
-    }
-
-    if (isPriceChanged) {
-        updateFormPrice();
-    }
-}
-
-// no pizza object param will reset form
-export function populateBuilderForm(pizzaObject = {}) {
-    const pizzaToppingCheckboxes = toppingSelectionContainer.querySelectorAll(
-        'input[type="checkbox"][name="toppingCheckboxes"]');
-    const pizzaExtraToppingCheckboxes = toppingSelectionContainer.querySelectorAll(
-        'input[type="checkbox"][name="extraToppingCheckboxes"]');
-
-    pizzaObject = setPizzaObject(pizzaObject);
-
-    pizzaNameInput.value = pizzaObject["pizzaName"];
-
-    checkSizeRadio(pizzaObject["size-data"].size);
-    checkToppingBoxes(pizzaObject["toppings"], pizzaToppingCheckboxes);
-    checkToppingBoxes(pizzaObject["extra-toppings"], pizzaExtraToppingCheckboxes);
-    qtyInput.value = pizzaObject.quantity;
-    updateFormPrice();
-}
-
-function updateFormPrice() {
+function updateFormPriceDisplay() {
     pizzaSubTotalDisplay.innerText = displayAsCurrency(pizza["price-per"]);
     pizzaTotalDisplay.innerText = displayAsCurrency(pizza["total-price"]);
     pizzaQtyDisplay.innerText = pizza["quantity"] + "x";
@@ -234,18 +147,131 @@ function setPizzaObject(pizzaObject) {
     return pizza;
 }
 
+export function handlePizzaBuilderEvents(event) {
+    const target = event.target;
+    let isPriceChanged = false;
+    console.log(target.id);
+    if (target.matches('input[type="radio"], input[type="checkbox"], input[type="number"], button[type="submit"]')) {
+        switch (target.type) {
+            case "radio":
+                const pizzaSize = target.dataset.pizzaSize;
+
+                if (pizza["size-data"].size !== pizzaSize) {
+                    handleRadioChange(pizzaSize);
+
+                    pizza["size-data"] = {"size" : pizzaSize, "price" : pizzaPriceMap[pizzaSize].price};
+
+                    updatePizzaPricePer();
+                    isPriceChanged = true;
+                }
+
+                break;
+            case "checkbox":
+                const toppingName = target.dataset.toppingName;
+                const toppingPrice = target.dataset.toppingPrice;
+                const toppingId = target.dataset.toppingId;
+                const toppingType = target.dataset.toppingType;
+
+                //adds pizza ingredient name: {price,id} to pizza object for display
+                if (target.checked) {
+                    if (toppingType === "regular") {
+                        pizza["toppings"][toppingName] = {"price" : toppingPrice, "id" : toppingId};
+                    } else {
+                        pizza["extra-toppings"][toppingName] = {"price" : toppingPrice, "id" : toppingId};
+                    }
+                } else {
+                    if (toppingType === "regular") {
+                        delete pizza["toppings"][toppingName];
+                    } else {
+                        delete pizza["extra-toppings"][toppingName];
+                    }
+                }
+
+                updatePizzaPricePer();
+                isPriceChanged = true;
+
+                break;
+            case "number":
+                //changes pizza obj qty
+                if (qtyInput.value !== pizza.quantity) {
+                    pizza["quantity"] = qtyInput.value;
+                    pizza["total-price"] = pizza["quantity"] * pizza["price-per"];
+                    isPriceChanged = true;
+                }
+
+                break;
+            case "submit":
+                if (target.dataset.addType === "add") {
+                    pizza.pizzaName = pizzaNameInput.value;
+                    return [false, pizza];
+                } else if (target.dataset.addType === "update") {
+                    pizza.pizzaName = pizzaNameInput.value;
+                    return [true, pizza];
+                }
+        }
+    }
+
+    if (isPriceChanged) {
+        updateFormPriceDisplay();
+    }
+}
+
+// no pizza object param will reset form
+export function populateBuilderForm(pizzaObject = {}) {
+    const pizzaToppingCheckboxes = toppingSelectionContainer.querySelectorAll(
+        'input[type="checkbox"][name="toppingCheckboxes"]');
+    const pizzaExtraToppingCheckboxes = toppingSelectionContainer.querySelectorAll(
+        'input[type="checkbox"][name="extraToppingCheckboxes"]');
+
+    pizzaObject = setPizzaObject(pizzaObject);
+
+    pizzaNameInput.value = pizzaObject["pizzaName"];
+
+    checkSizeRadio(pizzaObject["size-data"].size);
+    checkToppingBoxes(pizzaObject["toppings"], pizzaToppingCheckboxes);
+    checkToppingBoxes(pizzaObject["extra-toppings"], pizzaExtraToppingCheckboxes);
+    qtyInput.value = pizzaObject.quantity;
+    updateFormPriceDisplay();
+}
+
+function createOrderItemToppingHTML(pizzaIndex, toppings, toppingType) {
+    const toppingStr = toppingType === "extra" ? "extraToppings" : "toppings";
+    let toppingsHTML = "";
+    let toppingIndex = 0;
+    for (const toppingName in toppings) {
+        toppingsHTML += `
+            <input type="hidden" name="customPizzaList[${pizzaIndex}].${toppingStr}[${toppingIndex}].name" value="${toppingName}">
+            <input type="hidden" name="customPizzaList[${pizzaIndex}].${toppingStr}[${toppingIndex}].id" value="${toppings[toppingName].id}">
+        `;
+        toppingIndex++;
+    }
+    return toppingsHTML;
+}
+
 export function createOrderItemAmountSelectorPizza(pizzaObject, container) {
     const itemContainer = document.createElement("div");
-
     itemContainer.classList.add("cartItem-container");
     itemContainer.setAttribute("data-item-name", pizzaObject.pizzaName);
     itemContainer.setAttribute("data-item-type", "pizza item");
     itemContainer.setAttribute("data-item-price", pizzaObject["price-per"]);
 
-    const toppingJoinString = Object.keys(pizzaObject.toppings);
+    const pizzaIndex = document.querySelectorAll(".cartItem-container[data-item-type='pizza item']").length;
+    const toppingJoinArr = Object.keys(pizzaObject.toppings);
     const extraToppingArr = Object.keys(pizzaObject["extra-toppings"]);
     let extraToppingJoinString = [];
     let lightToppingJoinString = [];
+    let toppingHTML = "";
+    let extraToppingHTML = "";
+
+    if (toppingJoinArr.length > 0) {
+        console.log("normal topping")
+        toppingHTML = createOrderItemToppingHTML(pizzaIndex, pizzaObject.toppings, "normal");
+    }
+
+    if (extraToppingArr.length > 0) {
+        console.log("extra topping")
+        extraToppingHTML = createOrderItemToppingHTML(pizzaIndex, pizzaObject["extra-toppings"], "extra");
+    }
 
     for (let i = 0; i < extraToppingArr.length; i++) {
         if (extraToppingArr[i] in pizzaObject.toppings || extraToppingArr[i] === "Mozzarella") {
@@ -255,10 +281,7 @@ export function createOrderItemAmountSelectorPizza(pizzaObject, container) {
         }
     }
 
-    // todo : updating pizza display
-
-    const toppingAmount = toppingJoinString.length + lightToppingJoinString.length;
-
+    const toppingAmount = toppingJoinArr.length + lightToppingJoinString.length;
     let titleCasedSize = pizzaObject["size-data"].size.toLowerCase();
     titleCasedSize = titleCasedSize.charAt(0).toUpperCase() + titleCasedSize.slice(1);
 
@@ -268,8 +291,8 @@ export function createOrderItemAmountSelectorPizza(pizzaObject, container) {
                 <span class="cart-item-price">${pizzaObject.quantity} x ${displayAsCurrency(pizzaObject["price-per"], false)}</span>
             </h5>
             <div>
-            <small><strong>${titleCasedSize} ${toppingAmount} ${toppingAmount <= 1 ? `topping` : `toppings`}</strong></small><br>
-            ${toppingJoinString.length > 0 ? `<small><strong>Toppings:</strong> ${toppingJoinString.join(", \n")}</small><br>` : ""}
+            <small><strong>${titleCasedSize} ${toppingAmount} Topping:</strong></small><br>
+            ${toppingJoinArr.length > 0 ? `<small><strong>Normal:</strong> ${toppingJoinArr.join(", \n")}</small><br>` : ""}
             ${lightToppingJoinString.length > 0 ? `<small><strong>Light:</strong> ${lightToppingJoinString.join(", ")}</small><br>` : ""}
             ${extraToppingJoinString.length > 0 ? `<small><strong>Extra:</strong> ${extraToppingJoinString.join(", ")}</small><br>` : ""}
             </div>
@@ -277,7 +300,15 @@ export function createOrderItemAmountSelectorPizza(pizzaObject, container) {
             <label>Qty:
                 <input type="number" value="${pizzaObject.quantity}" min="1" max="${pizzaPriceMap[pizzaObject["size-data"].size].maxQty}" required/>
             </label>
-            <button class="remove-item">Remove Item</button>`;
+            <button class="remove-item">Remove Item</button>
+            <input type="hidden" name="customPizzaList[${pizzaIndex}].pizzaName" value="${pizzaObject.pizzaName}">
+            <input type="hidden" name="customPizzaList[${pizzaIndex}].pizzaSize.size" value="${pizzaObject["size-data"].size}">
+            <input type="hidden" name="customPizzaList[${pizzaIndex}].pizzaSize.price" value="${pizzaObject["size-data"].price}">
+            <input type="hidden" name="customPizzaList[${pizzaIndex}].quantity" value="${pizzaObject.quantity}">
+            <input type="hidden" name="customPizzaList[${pizzaIndex}].pricePerPizza" value="${pizzaObject["price-per"]}">
+            ${toppingHTML}
+            ${extraToppingHTML}
+            `;
 
     container.appendChild(itemContainer);
 }

@@ -2,6 +2,8 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
   <title>Pizza Shop System</title>
   <link rel="stylesheet" type="text/css" href="/styles/main.css">
 </head>
@@ -19,6 +21,10 @@
         'MEDIUM': [],
         'LARGE': []
       }
+      const orderDTO = {
+        'menuItems': /*[[${order.menuItemList}]]*/,
+        'pizzaItems': /*[[${order.customPizzaList}]]*/,
+      };
     </script>
     <div th:each="category : ${menuItemsByCategory}">
       <h3 th:text="${category.key}"></h3>
@@ -119,30 +125,29 @@
     <strong><sub class="space-between"><span id="pizza-qty-display"></span><span id="pizza-price-total"></span></sub></strong>
   </section>
 
-  <section class="form-container stay-top" id="cart">
-    <div th:if="${orderError}" class="error form-info">
-      <i th:text="${orderError}"></i><br>
-      <div th:if="${notFound}">
-        <i>The following items are no longer available:</i>
-        <ul>
-          <li th:each="item : ${notFound}" th:text="${item}"></li>
-        </ul>
-      </div>
-      <div th:if="${lowStock}">
-        <i>You have too many of the following items:</i><br>
-        <i>Please reduce to or below the qty listed.</i>
-        <ul>
-          <li th:each="item : ${lowStock}" th:text="${item}"></li>
-        </ul>
-      </div>
+  <section class="stay-top" id="cart">
+
+    <div id="cart-container" class="form-container">
+
+      <form id="menuAmount-container" th:action="@{/order/processOrder}" method="post" th:object="${order}">
+        <div th:if="${cartError}" class="error" id="cart-error">
+          <i th:text="${cartError}"></i>
+        </div>
+
+        <div id="menuItems-display">
+
+        </div>
+
+        <div id="customPizzas-display">
+
+        </div>
+
+        <h4 class="space-between"><span>Order Total:</span> <span id="order-total">0.00</span></h4>
+        <input type="hidden" id="order-total-input" th:field="*{totalPrice}" th:name="*{totalPrice}" value="0"/>
+        <input type="submit" id="cart-submit-btn" value="Submit Order"/>
+      </form>
+
     </div>
-
-    <div id="menuAmount-container">
-      <!-- todo : set up display of menu and pizza items for cart from session if there was an error -->
-
-      <input type="submit" id="cart-submit-btn" value="Send Order"/>
-    </div>
-
 
   </section>
 

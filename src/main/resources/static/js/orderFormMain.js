@@ -14,45 +14,64 @@ document.addEventListener('DOMContentLoaded', ()=> {
     const menuItemsContainer = document.getElementById("menuItems-container");
     const menuAmountContainer = document.getElementById("menuAmount-container");
     const pizzaBuilderContainer = document.getElementById("pizza-builder-container");
+    const menuItemsDisplay = document.getElementById("menuItems-display");
+    const customPizzasDisplay = document.getElementById("customPizzas-display");
+    const cartTotalElement = document.getElementById("order-total");
+    const cartTotalInputElement = document.getElementById("order-total-input");
+
+    let cartErrorElement = document.getElementById("cart-error");
 
     let menuItems = {};
     let customPizzas = {};
-    let pizzaCount = 0;
     let editingPizza = {};
+    let pizzaCount = 0;
+    let cartTotal = 0;
 
-    // populate cart if exist in session
-    populateCartUI();
+// populate cart objects in session with orderDTO if returned with error,
+// cart objects will be overwritten with orderDTO if it's there.
+    if (cartErrorElement) {
+        setTimeout(() => {
+            cartErrorElement.remove();
+            cartErrorElement = null;
+        }, 5000);
+        parseThymeleafItems();
+    } else {
+        // populate cart if exist in session
+        console.log("outside of parse thymeleaf:", orderDTO);
+        populateCartUI();
+        updateCartTotal();
+    }
+
     console.log("menuItems:");
     console.log(menuItems);
     console.log("customPizzas:");
     console.log(customPizzas);
 
-    let errorMessageElement = document.querySelector(".error");
-    if (errorMessageElement) {
-        const errMsg = errorMessageElement.children.item(0).innerText;
-        if (errMsg === "No menu items added!" || errMsg === "Menu items and quantity mismatch!" || errMsg === "There was an error.") {
-            setTimeout(() => {
-                errorMessageElement.remove();
-                errorMessageElement = null;
-            }, 5000);
-
-        } else if (errMsg === "Item mismatch!" || errMsg === "Not enough inventory!"){
-            const cartItemContainers = document.querySelectorAll(".cartItemContainer");
-            cartItemContainers.forEach((el) => {
-                setTimeout(() => {
-                    el.remove();
-                }, 5000);
-            });
+    function updateCartTotal() {
+        cartTotal = 0;
+        // todo : total pizza objects in price ...
+        //const cartItemContainers = document.querySelectorAll(".cartItem-container");
+        for (const menuItemId in menuItems) {
+            cartTotal += menuItems[menuItemId].price * menuItems[menuItemId].qty;
         }
+        cartTotalElement.innerText = displayAsCurrency(cartTotal, false);
+        cartTotalInputElement.value = cartTotal;
     }
 
-    function saveCartObjectsToSession() {
+    function saveMenuObjectsToSession() {
         if (menuItems) {
+            console.log("save menu items...");
             sessionStorage.setItem("menuItems", JSON.stringify(menuItems));
         }
+        updateCartTotal();
+    }
+
+    function savePizzaObjectsToSession() {
         if (customPizzas) {
+            console.log("save pizza items...");
             sessionStorage.setItem("customPizzas", JSON.stringify(customPizzas));
         }
+        updateCartTotal();
     }
 
     function getCartObjectsFromSession() {
@@ -72,23 +91,52 @@ document.addEventListener('DOMContentLoaded', ()=> {
                 }
             }
         }
+        updateCartTotal();
+    }
+
+    function parseThymeleafItems() {
+        console.log("parse thymeleaf: ", orderDTO);
+        if (orderDTO.menuItems) {
+            menuItems = {};
+            for (const menuItem of orderDTO.menuItems) {
+                console.log("menuItem", menuItem, "\n", menuItem["menuItemID"])
+                menuItems[menuItem["menuItemID"]] = {
+                    "maxQty": menuItem["maxQty"],
+                    "name": menuItem["menuItemName"],
+                    "price": menuItem["pricePerItem"],
+                    "qty": menuItem["menuItemAmount"]
+                }
+            }
+            saveMenuObjectsToSession();
+        }
+        if (orderDTO.pizzaItems) {
+            customPizzas = {};
+            for (const pizzaItem of orderDTO.pizzaItems) {
+                console.log("menuItem", pizzaItem)
+            }
+            savePizzaObjectsToSession();
+        }
+        populateCartUI();
+        updateCartTotal();
     }
 
     function populateCartUI() {
-       // const
         // build cart item displays
+        menuItemsDisplay.innerHTML = "";
+        customPizzasDisplay.innerHTML = "";
+
         getCartObjectsFromSession();
         if (menuItems) {
             for (let menuItemId in menuItems) {
                 const currentItem = menuItems[menuItemId];
-                createOrderItemAmountSelectorMenu(currentItem.name, menuItemId, currentItem.price, currentItem.qty, currentItem.maxQty, menuAmountContainer);
+                createOrderItemAmountSelectorMenu(currentItem.name, menuItemId, currentItem.price, currentItem.qty, currentItem.maxQty, menuItemsDisplay);
             }
         }
 
         if (customPizzas) {
             for (let pizzaName in customPizzas) {
                 const currentPizza = customPizzas[pizzaName];
-                createOrderItemAmountSelectorPizza(currentPizza, menuAmountContainer);
+                createOrderItemAmountSelectorPizza(currentPizza, customPizzasDisplay);
             }
         }
     }
@@ -114,12 +162,12 @@ document.addEventListener('DOMContentLoaded', ()=> {
     // for adding cart items
     menuItemsContainer.addEventListener("click", (event) => {
         if (event.target.classList.contains("addMenuItem-btn")) {
-            const menuItem = handleAddMenuItem(event, menuAmountContainer);
+            const menuItem = handleAddMenuItem(event, menuItemsDisplay);
             if (menuItem) {
                 menuItems[menuItem.menuItemId] = {
                     "name": menuItem.menuItemName, "qty": menuItem.orderInitQty, "maxQty": menuItem.menuItemMaxQty, "price": menuItem.menuItemPrice
                 };
-                saveCartObjectsToSession();
+                saveMenuObjectsToSession();
             }
             console.log(menuItems);
 
@@ -137,7 +185,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
             pizzaBuilderContainer.classList.add("hide-area");
             enableEditBtns();
             if (editingPizza.hasOwnProperty("toppings")) {
-                createOrderItemAmountSelectorPizza(editingPizza, menuAmountContainer);
+                createOrderItemAmountSelectorPizza(editingPizza, customPizzasDisplay);
                 customPizzas[editingPizza.pizzaName] = editingPizza;
                 editingPizza = {};
             }
@@ -149,8 +197,6 @@ document.addEventListener('DOMContentLoaded', ()=> {
         if (customPizzaData) {
             // check if edited or not. -- if editing, remove customPizzaData.pizzaName from customPizzas to overwrite without duplicate keys
             if (customPizzaData[0]) {
-                console.log("editing pizza:");
-                console.log(editingPizza);
                 delete customPizzas[editingPizza.pizzaName];
             }
 
@@ -174,12 +220,11 @@ document.addEventListener('DOMContentLoaded', ()=> {
                 "extra-toppings": {...customPizzaData[1]["extra-toppings"]}
             };
 
-            createOrderItemAmountSelectorPizza(customPizza, menuAmountContainer);
+            createOrderItemAmountSelectorPizza(customPizza, customPizzasDisplay);
 
             customPizzas[customPizza.pizzaName] = customPizza;
-            saveCartObjectsToSession();
-            console.log("customPizzas:");
-            console.log(customPizzas);
+            savePizzaObjectsToSession();
+
             pizzaBuilderContainer.classList.add("hide-area");
             editingPizza = {};
             enableEditBtns();
@@ -193,19 +238,18 @@ document.addEventListener('DOMContentLoaded', ()=> {
             const type = cartItemContainer.dataset.itemType;
 
             if (event.target.classList.contains("remove-item")) {
-                handleRemoveItem(event);
+                 handleRemoveItem(event);
 
                 if (type === "menu item") {
                     delete menuItems[cartItemContainer.dataset.itemId];
+                    saveMenuObjectsToSession();
                 } else {
                     delete customPizzas[cartItemContainer.dataset.itemName];
+                    savePizzaObjectsToSession();
                 }
-
-                saveCartObjectsToSession();
+                populateCartUI();
 
             }  else if (event.target.classList.contains("edit-item")) {
-                console.log("edit item:");
-                console.log(customPizzas[cartItemContainer.dataset.itemName]);
                 editingPizza = customPizzas[cartItemContainer.dataset.itemName];
                 handleRemoveItem(event);
 
@@ -220,51 +264,19 @@ document.addEventListener('DOMContentLoaded', ()=> {
                     menuItems[cartItemContainer.dataset.itemId].qty = parseInt(event.target.value);
                     qty = menuItems[cartItemContainer.dataset.itemId].qty;
                     price = menuItems[cartItemContainer.dataset.itemId].price;
+                    saveMenuObjectsToSession();
                 } else {
                     customPizzas[cartItemContainer.dataset.itemName].quantity = parseInt(event.target.value);
                     qty = customPizzas[cartItemContainer.dataset.itemName].quantity;
                     price = customPizzas[cartItemContainer.dataset.itemName]["price-per"];
                     customPizzas[cartItemContainer.dataset.itemName]["total-price"] = price * qty;
+                    savePizzaObjectsToSession();
                 }
 
                 cartItemContainer.querySelector(".cart-item-price").innerText = `${qty} x ${displayAsCurrency(price, false)}`;
-                saveCartObjectsToSession();
-
             }
 
-        } else if (event.target.type === "submit") {
-            const order = {"menuItemList": [], "customPizzaList": []};
-            console.log("submitting cart...");
-
-            for (let menuItemId in menuItems) {
-                order.menuItemList.push({
-                    "menuItemID": menuItemId, "menuItemName": menuItems[menuItemId].name, "menuItemAmount": menuItems[menuItemId].qty
-                });
-            }
-
-            for (let pizzaName in customPizzas) {
-                const toppings = {};
-                for (let topping in customPizzas[pizzaName].toppings) {
-                    toppings[topping] = customPizzas[pizzaName].toppings[topping].id;
-                }
-
-                const extraToppings = {};
-                for (let topping in customPizzas[pizzaName]["extra-toppings"]) {
-                    extraToppings[topping] = customPizzas[pizzaName]["extra-toppings"][topping].id;
-                }
-                order.customPizzaList.push({
-                    "pizzaName" : pizzaName,
-                    "toppings": toppings,
-                    "extraToppings": extraToppings,
-                    "pizzaSize": customPizzas[pizzaName]["size-data"].size,
-                    "quantity": customPizzas[pizzaName].quantity,
-                    "pricePerPizza": customPizzas[pizzaName]["price-per"]
-                });
-            }
-
-            console.log(order);
         }
     });
-
 
 });

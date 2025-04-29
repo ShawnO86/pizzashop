@@ -4,6 +4,9 @@ public class OrderMenuItemDTO {
     private Integer menuItemID;
     private String menuItemName;
     private int menuItemAmount;
+    private int maxQty;
+    // todo: confirm price with database, this is mainly for display purposes
+    private int pricePerItem;
 
     public OrderMenuItemDTO() {}
 
@@ -24,5 +27,28 @@ public class OrderMenuItemDTO {
     }
     public void setMenuItemAmount(int menuItemAmount) {
         this.menuItemAmount = menuItemAmount;
+    }
+    public int getMaxQty() {
+        return maxQty;
+    }
+    public void setMaxQty(int maxQty) {
+        this.maxQty = maxQty;
+    }
+    public int getPricePerItem() {
+        return pricePerItem;
+    }
+    public void setPricePerItem(int pricePerItem) {
+        this.pricePerItem = pricePerItem;
+    }
+
+    @Override
+    public String toString() {
+        return "OrderMenuItemDTO{" +
+                "menuItemID=" + menuItemID +
+                ", menuItemName='" + menuItemName +
+                ", menuItemAmount=" + menuItemAmount +
+                ", maxQty=" + maxQty +
+                ", pricePerItem=" + pricePerItem +
+                '}';
     }
 }

@@ -3,9 +3,10 @@ package com.pizzashop.dto;
 import java.util.List;
 
 public class OrderDTO {
-    // todo : figure out constraints for nested DTO?
     private List<OrderMenuItemDTO> menuItemList;
     private List<CustomPizzaDTO> customPizzaList;
+
+    private int totalPrice;
 
     public OrderDTO() {}
 
@@ -20,5 +21,20 @@ public class OrderDTO {
     }
     public void setCustomPizzaList(List<CustomPizzaDTO> customPizzaList) {
         this.customPizzaList = customPizzaList;
+    }
+    public int getTotalPrice() {
+        return totalPrice;
+    }
+    public void setTotalPrice(int totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
+    @Override
+    public String toString() {
+        return "OrderDTO{" +
+                "menuItemList=" + menuItemList +
+                ", customPizzaList=" + customPizzaList +
+                ", totalPrice=" + totalPrice +
+                '}';
     }
 }

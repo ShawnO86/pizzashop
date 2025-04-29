@@ -1,17 +1,14 @@
 package com.pizzashop.dto;
 
-import com.pizzashop.entities.PizzaSizeEnum;
-
-import java.util.Map;
+import java.util.List;
 
 public class CustomPizzaDTO {
-
     private String pizzaName;
-    // name, id
-    private Map<String, Integer> toppings;
-    private Map<String, Integer> extraToppings;
-    private PizzaSizeEnum pizzaSize;
+    private List<ToppingDTO> toppings;
+    private List<ToppingDTO> extraToppings;
+    private SizeDTO pizzaSize;
     private int quantity;
+    private int pricePerPizza;
 
     public CustomPizzaDTO() {}
 
@@ -21,22 +18,22 @@ public class CustomPizzaDTO {
     public void setPizzaName(String pizzaName) {
         this.pizzaName = pizzaName;
     }
-    public Map<String, Integer> getToppings() {
+    public List<ToppingDTO> getToppings() {
         return toppings;
     }
-    public void setToppings(Map<String, Integer> toppings) {
+    public void setToppings(List<ToppingDTO> toppings) {
         this.toppings = toppings;
     }
-    public Map<String, Integer> getExtraToppings() {
+    public List<ToppingDTO> getExtraToppings() {
         return extraToppings;
     }
-    public void setExtraToppings(Map<String, Integer> extraToppings) {
+    public void setExtraToppings(List<ToppingDTO> extraToppings) {
         this.extraToppings = extraToppings;
     }
-    public PizzaSizeEnum getPizzaSize() {
+    public SizeDTO getPizzaSize() {
         return pizzaSize;
     }
-    public void setPizzaSize(PizzaSizeEnum pizzaSize) {
+    public void setPizzaSize(SizeDTO pizzaSize) {
         this.pizzaSize = pizzaSize;
     }
     public int getQuantity() {
@@ -44,5 +41,23 @@ public class CustomPizzaDTO {
     }
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+    public int getPricePerPizza() {
+        return pricePerPizza;
+    }
+    public void setPricePerPizza(int pricePerPizza) {
+        this.pricePerPizza = pricePerPizza;
+    }
+
+    @Override
+    public String toString() {
+        return "CustomPizzaDTO{" +
+                "pizzaName='" + pizzaName + '\'' +
+                ", toppings=" + toppings +
+                ", extraToppings=" + extraToppings +
+                ", pizzaSize=" + pizzaSize +
+                ", quantity=" + quantity +
+                ", pricePerPizza=" + pricePerPizza +
+                '}';
     }
 }
