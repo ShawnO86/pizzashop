@@ -11,7 +11,7 @@ const ingredientPriceElements = toppingSelectionContainer.querySelectorAll(".ing
 const extraIngredientPriceElements = toppingSelectionContainer.querySelectorAll(".extra-ingredient-data");
 
 let pizza = {
-    "pizzaName" : "",
+    "pizza-name" : "",
     "quantity" : 1,
     "price-per" : pizzaPriceMap["SMALL"].price,
     "total-price" : pizzaPriceMap["SMALL"].price,
@@ -127,7 +127,7 @@ function checkToppingBoxes(toppings, checkboxes) {
 
 function setPizzaObject(pizzaObject) {
     const defaultPizza = {
-        "pizzaName" : "",
+        "pizza-name" : "",
         "quantity" : 1,
         "price-per" : pizzaPriceMap["SMALL"].price,
         "total-price" : pizzaPriceMap["SMALL"].price,
@@ -198,10 +198,10 @@ export function handlePizzaBuilderEvents(event) {
                 break;
             case "submit":
                 if (target.dataset.addType === "add") {
-                    pizza.pizzaName = pizzaNameInput.value;
+                    pizza["pizza-name"] = pizzaNameInput.value;
                     return [false, pizza];
                 } else if (target.dataset.addType === "update") {
-                    pizza.pizzaName = pizzaNameInput.value;
+                    pizza["pizza-name"] = pizzaNameInput.value;
                     return [true, pizza];
                 }
         }
@@ -221,7 +221,7 @@ export function populateBuilderForm(pizzaObject = {}) {
 
     pizzaObject = setPizzaObject(pizzaObject);
 
-    pizzaNameInput.value = pizzaObject["pizzaName"];
+    pizzaNameInput.value = pizzaObject["pizza-name"];
 
     checkSizeRadio(pizzaObject["size-data"].size);
     checkToppingBoxes(pizzaObject["toppings"], pizzaToppingCheckboxes);
@@ -247,7 +247,7 @@ function createOrderItemToppingHTML(pizzaIndex, toppings, toppingType) {
 export function createOrderItemAmountSelectorPizza(pizzaObject, container) {
     const itemContainer = document.createElement("div");
     itemContainer.classList.add("cartItem-container");
-    itemContainer.setAttribute("data-item-name", pizzaObject.pizzaName);
+    itemContainer.setAttribute("data-item-name", pizzaObject["pizza-name"]);
     itemContainer.setAttribute("data-item-type", "pizza item");
     itemContainer.setAttribute("data-item-price", pizzaObject["price-per"]);
 
@@ -283,7 +283,7 @@ export function createOrderItemAmountSelectorPizza(pizzaObject, container) {
 
     itemContainer.innerHTML = `
             <h5 class="space-between">
-                <span>${pizzaObject.pizzaName}</span>
+                <span>${pizzaObject["pizza-name"]}</span>
                 <span class="cart-item-price">${pizzaObject.quantity} x ${displayAsCurrency(pizzaObject["price-per"], false)}</span>
             </h5>
             <div>
@@ -297,7 +297,7 @@ export function createOrderItemAmountSelectorPizza(pizzaObject, container) {
                 <input type="number" value="${pizzaObject.quantity}" min="1" max="${pizzaPriceMap[pizzaObject["size-data"].size].maxQty}" required/>
             </label>
             <button class="remove-item">Remove Item</button>
-            <input type="hidden" name="customPizzaList[${pizzaIndex}].pizzaName" value="${pizzaObject.pizzaName}">
+            <input type="hidden" name="customPizzaList[${pizzaIndex}].pizzaName" value="${pizzaObject["pizza-name"]}">
             <input type="hidden" name="customPizzaList[${pizzaIndex}].pizzaSize.size" value="${pizzaObject["size-data"].size}">
             <input type="hidden" name="customPizzaList[${pizzaIndex}].pizzaSize.price" value="${pizzaObject["size-data"].price}">
             <input type="hidden" name="customPizzaList[${pizzaIndex}].quantity" value="${pizzaObject.quantity}">

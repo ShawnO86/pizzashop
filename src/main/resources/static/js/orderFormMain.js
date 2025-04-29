@@ -20,7 +20,6 @@ document.addEventListener('DOMContentLoaded', ()=> {
     const cartTotalInputElement = document.getElementById("order-total-input");
 
     let cartErrorElement = document.getElementById("cart-error");
-
     let menuItems = {};
     let customPizzas = {};
     let editingPizza = {};
@@ -123,7 +122,8 @@ document.addEventListener('DOMContentLoaded', ()=> {
                     "size-data": {...pizzaItem["pizzaSize"]},
                     "quantity": pizzaItem["quantity"],
                     "price-per": pizzaItem["pricePerPizza"],
-                    "total-price": pizzaItem["totalPizzaPrice"]
+                    "total-price": pizzaItem["totalPizzaPrice"],
+                    "pizza-name": pizzaItem["pizzaName"]
                 }
             }
             savePizzaObjectsToSession();
@@ -198,7 +198,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
             enableEditBtns();
             if (editingPizza.hasOwnProperty("toppings")) {
                 createOrderItemAmountSelectorPizza(editingPizza, customPizzasDisplay);
-                customPizzas[editingPizza.pizzaName] = editingPizza;
+                customPizzas[editingPizza["pizza-name"]] = editingPizza;
                 editingPizza = {};
             }
         }
@@ -209,21 +209,21 @@ document.addEventListener('DOMContentLoaded', ()=> {
         if (customPizzaData) {
             // check if edited or not. -- if editing, remove customPizzaData.pizzaName from customPizzas to overwrite without duplicate keys
             if (customPizzaData[0]) {
-                delete customPizzas[editingPizza.pizzaName];
+                delete customPizzas[editingPizza["pizza-name"]];
             }
 
-            if (customPizzaData[1].pizzaName in customPizzas) {
+            if (customPizzaData[1]["pizza-name"] in customPizzas) {
                 alert("Pizza name already in use. Please use another name.");
                 return;
             }
 
             pizzaCount += 1;
-            if (customPizzaData[1].pizzaName === "") {
-                customPizzaData[1].pizzaName = "Unnamed Pizza " + pizzaCount;
+            if (customPizzaData[1]["pizza-name"] === "") {
+                customPizzaData[1]["pizza-name"] = "Unnamed Pizza " + pizzaCount;
             }
 
             const customPizza = {
-                "pizzaName": customPizzaData[1].pizzaName,
+                "pizza-name": customPizzaData[1]["pizza-name"],
                 "quantity": customPizzaData[1].quantity,
                 "price-per": customPizzaData[1]["price-per"],
                 "total-price": customPizzaData[1]["total-price"],
@@ -234,7 +234,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
 
             createOrderItemAmountSelectorPizza(customPizza, customPizzasDisplay);
 
-            customPizzas[customPizza.pizzaName] = customPizza;
+            customPizzas[customPizza["pizza-name"]] = customPizza;
             savePizzaObjectsToSession();
 
             pizzaBuilderContainer.classList.add("hide-area");
