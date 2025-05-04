@@ -9,7 +9,6 @@ import com.pizzashop.entities.MenuItem;
 import com.pizzashop.entities.PizzaSizeEnum;
 import com.pizzashop.services.OrderService;
 
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -43,7 +42,10 @@ public class OrderController {
         model.addAttribute("menuItemsByCategory", menuItemsByCategory);
         model.addAttribute("pizzaSizes", PizzaSizeEnum.values());
         model.addAttribute("pizzaToppings", pizzaToppings);
-        model.addAttribute("order", new OrderDTO());
+
+        if (!model.containsAttribute("order")) {
+            model.addAttribute("order", new OrderDTO());
+        }
 
         return "ordering/orderForm";
     }
@@ -51,7 +53,7 @@ public class OrderController {
     @PostMapping("/processOrder")
     public String processOrder(Model model, @ModelAttribute("order") OrderDTO orderDTO) {
 
-        // todo : validate orderDTO,
+        // todo : validate orderDTO, enough ingredients, price
         //  -- send to confirmation page with receipt and render valid orderDTO OR
         //  -- output errors in order form and send orderDTO back
 
@@ -60,40 +62,41 @@ public class OrderController {
         String errorMsg = "";
         if (orderDTO.getCustomPizzaList() == null && orderDTO.getMenuItemList() == null) {
             errorMsg = "Nothing in cart!";
-        } else if (orderDTO.getTotalPrice() == 630) {
-            errorMsg = "Total price is 630!";
-        }
+        } // check for other errors here with validation from OrderService...
+
+        List<String> validationResponse;
 
         if (!errorMsg.isEmpty()) {
-            Map<String, List<MenuItem>> menuItemsByCategory = separateMenuItemsByCategory(menuItemDAO.findAllAvailable());
-            List<Ingredient> pizzaToppings = ingredientDAO.findAllPizzaToppings();
-
             model.addAttribute("cartError", errorMsg);
-            model.addAttribute("heading", "Hungry? Create an order!");
-            model.addAttribute("menuItemsByCategory", menuItemsByCategory);
-            model.addAttribute("pizzaSizes", PizzaSizeEnum.values());
-            model.addAttribute("pizzaToppings", pizzaToppings);
             model.addAttribute("order", orderDTO);
-            return "ordering/orderForm";
+
+            return showOrderForm(model);
+        } else {
+            validationResponse = orderService.submitOrderForValidation(orderDTO);
         }
 
-            //for testing
-        Map<String, List<MenuItem>> menuItemsByCategory = separateMenuItemsByCategory(menuItemDAO.findAllAvailable());
-        List<Ingredient> pizzaToppings = ingredientDAO.findAllPizzaToppings();
-        //model.addAttribute("cartError", errorMsg);
-        model.addAttribute("heading", "Hungry? Create an order!");
-        model.addAttribute("menuItemsByCategory", menuItemsByCategory);
-        model.addAttribute("pizzaSizes", PizzaSizeEnum.values());
-        model.addAttribute("pizzaToppings", pizzaToppings);
-        //model.addAttribute("order", orderDTO);
-        return "ordering/orderForm";
+        if (!validationResponse.isEmpty()) {
+            model.addAttribute("validationErrors", validationResponse);
+            model.addAttribute("order", orderDTO);
+
+            return showOrderForm(model);
+        }
+
+        int orderId = 0;
+        //todo :  get orderId,
+        // send to ordering/order-confirmation with orderID,
 
 
-
-        //return "ordering/order-confirmation";
+        return "redirect:/order/confirmOrder?orderId=" + orderId;
 
     }
 
+    @GetMapping("/confirmOrder")
+    public String showConfirmation(Model model, @RequestParam("orderId") int orderId) {
+
+
+        return "ordering/order-confirmation";
+    }
 
 
     private Map<String, List<MenuItem>> separateMenuItemsByCategory(List<MenuItem> menuItems) {

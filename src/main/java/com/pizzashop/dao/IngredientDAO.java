@@ -13,6 +13,8 @@ public interface IngredientDAO {
 
     List<Ingredient> findAllPizzaToppings();
 
+    List<Ingredient> findAllIn(List<Integer> ingredients);
+
     void save(Ingredient ingredient);
 
     int deleteById(int id);

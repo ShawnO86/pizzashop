@@ -13,7 +13,7 @@ public interface MenuItemDAO {
 
     List<MenuItem> findAllAvailable();
 
-    List<MenuItem> findAllIn(List<Integer> ids);
+    List<MenuItem> findAllAvailableIn(List<Integer> ids);
 
     void save(MenuItem menuItem);
 

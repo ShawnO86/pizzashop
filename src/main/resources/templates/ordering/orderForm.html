@@ -2,8 +2,6 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <meta name="_csrf" th:content="${_csrf.token}"/>
-  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
   <title>Pizza Shop System</title>
   <link rel="stylesheet" type="text/css" href="/styles/main.css">
 </head>
@@ -59,7 +57,7 @@
     </div>
   </section>
 
-  <!-- todo: setup display (show-hide) of pizza builder on click of a button, set to overlay menu with higher z-index -->
+  <!-- todo: set to overlay menu with higher z-index -->
   <section class="form-container hide-area" id="pizza-builder-container">
     <div>
       <h3>Build your custom pizza:</h3>
@@ -74,10 +72,10 @@
         <div>
           <input type="radio" name="pizzaSizeRadios" th:id="${size.name().toLowerCase() + '-radio'}" th:if="${size.name() == 'SMALL'}"
                  th:data-pizza-size="${size.name()}" th:data-ingredient-amount="${size.ingredientAmount}"
-                 th:data-extra-ingredient-amount="${size.extraIngredientAmount}" checked/>
+                 th:data-extra-ingredient-amount="${size.extraIngredientAmount}" checked />
           <input type="radio" name="pizzaSizeRadios" th:id="${size.name().toLowerCase() + '-radio'}" th:if="${size.name() != 'SMALL'}"
                  th:data-pizza-size="${size.name()}" th:data-ingredient-amount="${size.ingredientAmount}"
-                 th:data-extra-ingredient-amount="${size.extraIngredientAmount}"/>
+                 th:data-extra-ingredient-amount="${size.extraIngredientAmount}" />
           <label th:for="${size.name().toLowerCase() + '-radio'}">
             <span th:text="${size.name().toLowerCase() + ' - (' + size.description + '):'}"></span>
           </label>
@@ -132,6 +130,10 @@
       <form id="menuAmount-container" th:action="@{/order/processOrder}" method="post" th:object="${order}">
         <div th:if="${cartError}" class="error" id="cart-error">
           <i th:text="${cartError}"></i>
+        </div>
+
+        <div th:if="${validationErrors}" class="error" id="validation-errors" th:each="error : ${validationErrors}">
+          <i th:text="${error}"></i>
         </div>
 
         <div id="menuItems-display">

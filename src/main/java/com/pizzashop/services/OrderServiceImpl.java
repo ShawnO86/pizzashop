@@ -1,203 +1,156 @@
 package com.pizzashop.services;
 
-import com.pizzashop.dao.*;
-import com.pizzashop.entities.*;
+import com.pizzashop.dao.IngredientDAO;
+import com.pizzashop.dao.MenuItemDAO;
+import com.pizzashop.dto.CustomPizzaDTO;
+import com.pizzashop.dto.OrderDTO;
+import com.pizzashop.dto.OrderMenuItemDTO;
 
-import jakarta.transaction.Transactional;
+import com.pizzashop.dto.ToppingDTO;
+import com.pizzashop.entities.Ingredient;
+import com.pizzashop.entities.MenuItem;
+
+import com.pizzashop.entities.PizzaSizeEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class OrderServiceImpl implements OrderService {
 
-    private final IngredientDAO ingredientDAO;
     private final MenuItemDAO menuItemDAO;
-
-    private final OrderDAO orderDAO;
-    private final UserDAO userDAO;
-    private final MenuItemService menuItemService;
+    private final IngredientDAO ingredientDAO;
 
     @Autowired
-    public OrderServiceImpl(IngredientDAO ingredientDAO, MenuItemDAO menuItemDAO,
-                            OrderDAO orderDAO, UserDAO userDAO, MenuItemService menuItemService) {
-        this.ingredientDAO = ingredientDAO;
+    public OrderServiceImpl(MenuItemDAO menuItemDAO, IngredientDAO ingredientDAO) {
         this.menuItemDAO = menuItemDAO;
-        this.orderDAO = orderDAO;
-        this.userDAO = userDAO;
-        this.menuItemService = menuItemService;
+        this.ingredientDAO = ingredientDAO;
     }
 
-    // todo : figure out how to set custom pizza items and quantities in order
-    //  -- :
+    // todo: check ingredients are available for all pizzas combined!
+    //  -- if no errors, reduce ingredients used in menuItems/customPizzas in order and update menuItems amt available "updateMenuItemAmountAvailable(MenuItem)"
+    //  -- ingredients reduced need to have menuItems updated.. "updateAllMenuItemsAmountAvailableByIngredient(Ingredient)"
+    //  -- validate prices for menuitems, custom pizzas, and total
+
     @Override
-    @Transactional
-    public List<List<String>> submitOrderForFulfillment(List<Integer> menuItemsIds, String[] menuItemsNames, int[] menuItemQuantities,
-                                                        String username) {
+    public List<String> submitOrderForValidation(OrderDTO order) {
+        List<String> availabilityErrors = new ArrayList<>();
 
-        List<List<String>> orderResult = new ArrayList<>();
+        availabilityErrors.addAll(validateMenuItems(order));
+        availabilityErrors.addAll(validatePizzaItems(order));
 
-        // do same for custom pizza items but for each pizza's ingredients
-        List<MenuItem> menuItems = new ArrayList<>();
-
-        // if order has menu items => verify ids are found and have enough inventory
-        if (!menuItemsIds.isEmpty()) {
-            menuItems = menuItemDAO.findAllIn(menuItemsIds);
-
-            // verify all menu item ids are found/available
-            // returns menuItemsNames not in menuItems list from DAO
-            if (menuItems.size() != menuItemsIds.size()) {
-                // orderResult(0)(0)
-                orderResult.add(List.of("Item mismatch!"));
-                // orderResult(1)(...)
-                orderResult.add(getMenuItemNamesNotAvailable(menuItems, menuItemsIds, menuItemsNames));
-                return orderResult;
-            }
-
-            // verify amounts available against quantities requested
-            // returns list of menuItem.dishName + menuItem.amountAvailable if not enough inventory
-            List<String> qtyNotInInventory = new ArrayList<>();
-            boolean anyOver = false;
-            for (int i = 0; i < menuItems.size(); i++) {
-                if (menuItems.get(i).getAmountAvailable() < menuItemQuantities[i]) {
-                    qtyNotInInventory.add(menuItems.get(i).getDishName() + " -- " + menuItems.get(i).getAmountAvailable());
-                    anyOver = true;
-                }
-            }
-            if (anyOver) {
-                // orderResult(0)(0)
-                orderResult.add(List.of("Not enough inventory!"));
-                // orderResult(1)(...)
-                orderResult.add(qtyNotInInventory);
-                return orderResult;
-            }
-        }
-
-        // todo : verify ingredient quantity available to make quantity of pizzas
-        List<CustomPizza> customPizzas = new ArrayList<>();
-/*        if (!pizzaIngredientsIds.isEmpty()) {
-            for (int i = 0; i < pizzaIngredientsIds.size(); i++) {
-                List<Ingredient> currentPizzaIngredients = ingredientDAO.findAllIn(ingredientIds);
-                int qty = pizzaQuantities[i];
-            }
-        }*/
-
-        // create order object with user attached
-        User user = userDAO.findByUsername(username);
-        Order newOrder = new Order(user, LocalDateTime.now());
-
-        List<String> orderReceiptItems = new ArrayList<>();
-
-        // todo : same for custom pizzas - add to orderReceiptItems(1)
-        //  -- use orderMenuItems to build receipt, calculate total price, and reduce inventory
-
-        for (int i = 0; i < menuItems.size(); i++) {
-            OrderMenuItem orderMenuItem = new OrderMenuItem(newOrder);
-            MenuItem menuItem = menuItems.get(i);
-
-            orderMenuItem.setMenuItem(menuItem);
-            orderMenuItem.setItemQuantity(menuItemQuantities[i]);
-
-            newOrder.addMenuItem(orderMenuItem);
-
-            // will have to do this in the customPizzasOrders loop as well
-            orderReceiptItems.add(
-                    menuItemQuantities[i] + " -- " + menuItem.getDishName() + " @ " + menuItem.getPriceCents() + " ea. = " + (menuItem.getPriceCents() * menuItemQuantities[i]));
-        }
-
-        for (int i = 0; i < customPizzas.size(); i++) {
-
-        }
-
-        this.updateInventoryIngredientQuantities(newOrder.getOrderMenuItems(), menuItemQuantities);
-
-        newOrder.setFinal_price_cents(this.calculateTotalOrderPrice(newOrder.getOrderMenuItems()));
-
-        newOrder.setIs_complete(false);
-
-        // orderResult(0)(0) result message
-        orderResult.add(List.of("Success!"));
-        // orderResult(1)(...) receipt
-        orderResult.add(orderReceiptItems);
-        // orderResult(2)(0) total price
-        orderResult.add(List.of(String.valueOf(newOrder.getFinal_price_cents())));
-
-        orderDAO.save(newOrder);
-
-        return orderResult;
+        return availabilityErrors;
     }
 
-    // reduce inventory used from menuItems in order and update available menuItems.
-    @Override
-    @Transactional
-    public void updateInventoryIngredientQuantities(List<OrderMenuItem> orderItems, int[] quantities) {
-        // todo : get either menuItemIngredient or customPizzaIngredient list for each item,
-        //  -- orderItems.get(0).get(i).menuItem or orderItems.get(1).get(i).customPizza
-        //  --
-
-        for (int i = 0; i < orderItems.size(); i++) {
-            if (orderItems.get(i).getMenuItem() != null) {
-                MenuItem menuItem = orderItems.get(i).getMenuItem();
-                List<MenuItemIngredient> ingredients = menuItem.getMenuItemIngredients();
-                for (MenuItemIngredient menuItemIngredient : ingredients) {
-                    Ingredient currentIngredient = menuItemIngredient.getIngredient();
-                    int currentStock = currentIngredient.getCurrentStock();
-                    int used = menuItemIngredient.getQuantityUsed() * quantities[i];
-                    currentIngredient.setCurrentStock(currentStock - used);
-                    ingredientDAO.update(currentIngredient);
-                }
-
-                menuItem.setAmountAvailable(menuItemService.updateMenuItemAmountAvailable(menuItem));
-
-                if (menuItem.getAmountAvailable() < 1 &&
-                        menuItem.getDishName() != "Small Cheese Pizza" && menuItem.getDishName() != "Medium Cheese Pizza" && menuItem.getDishName()  != "Large Cheese Pizza") {
-                    menuItem.setIsAvailable(false);
-                }
-            }
-
-            if (orderItems.get(i).getCustomPizza() != null) {
-                // todo : getCustomPizza(),
-                //  -- get list of CustomPizzaIngredient,
-                //  -- update each ingredient used based on quantityUsed
-            }
-
+    private List<String> validateMenuItems(OrderDTO order) {
+        List<String> availabilityErrors = new ArrayList<>();
+        List<OrderMenuItemDTO> orderMenuItemDTOs = new ArrayList<>(order.getMenuItemList());
+        if (orderMenuItemDTOs.isEmpty()) {
+            return availabilityErrors;
         }
-    }
-
-    private List<String> getMenuItemNamesNotAvailable(List<MenuItem> menuItems, List<Integer> menuItemsIds, String[] menuItemsNames) {
-        List<String> namesNotInMenu = new ArrayList<>();
-        for (int i = 0; i < menuItemsIds.size(); i++) {
-            boolean found = false;
-            for (MenuItem menuItem : menuItems) {
-                if (menuItem.getId().equals(menuItemsIds.get(i))) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                namesNotInMenu.add(menuItemsNames[i]);
+        // gets list of menuItemIds to use IN clause for single query and compare with database records
+        List<Integer> menuItemIds = new ArrayList<>();
+        for (OrderMenuItemDTO orderMenuItemDTO : orderMenuItemDTOs) {
+            menuItemIds.add(orderMenuItemDTO.getMenuItemID());
+        }
+        List<MenuItem> availableMenuItems = menuItemDAO.findAllAvailableIn(menuItemIds);
+        Map<Integer, MenuItem> menuItemIdMap = new HashMap<>();
+        for (MenuItem menuItem : availableMenuItems) {
+            menuItemIdMap.put(menuItem.getId(), menuItem);
+        }
+        // uses a map for quick lookup time of found available menu items from database
+        // adds error string and removes menuItem DTO element from end of list using reverse loop
+        // DTO will get reused without removed element if there is an error.
+        for (int i = orderMenuItemDTOs.size() - 1; i >= 0; i--) {
+            OrderMenuItemDTO currentMenuItemDTO = orderMenuItemDTOs.get(i);
+            MenuItem currentMenuItem = menuItemIdMap.get(currentMenuItemDTO.getMenuItemID());
+            if (currentMenuItem == null) {
+                availabilityErrors.add(currentMenuItemDTO.getMenuItemName() + " is not available at this time.");
+                orderMenuItemDTOs.remove(i);
+            } else if (currentMenuItem.getAmountAvailable() < currentMenuItemDTO.getMenuItemAmount()) {
+                availabilityErrors.add("Cannot add " + currentMenuItemDTO.getMenuItemAmount() + " " + currentMenuItemDTO.getMenuItemName() +
+                        ", only " + currentMenuItem.getAmountAvailable() + " currently available. Your cart is updated to reflect available quantity.");
+                currentMenuItemDTO.setMenuItemAmount(currentMenuItem.getAmountAvailable());
             }
         }
-        return namesNotInMenu;
+        order.setMenuItemList(orderMenuItemDTOs);
+        return availabilityErrors;
     }
 
-    private int calculateTotalOrderPrice(List<OrderMenuItem> orderItems) {
-        int totalPrice = 0;
+    private List<String> validatePizzaItems(OrderDTO order) {
+        List<String> availabilityErrors = new ArrayList<>();
+        // If need to modify must create new arraylist
+        List<CustomPizzaDTO> customPizzaDTOs = order.getCustomPizzaList();
+        if (customPizzaDTOs == null || customPizzaDTOs.isEmpty()) {
+            return availabilityErrors;
+        }
 
-        for (OrderMenuItem orderItem : orderItems) {
-            int quantity = orderItem.getItemQuantity();
+        availabilityErrors.addAll(validatePizzaIngredients(customPizzaDTOs));
+        return availabilityErrors;
+    }
 
-            if (orderItem.getMenuItem() != null) {
-                totalPrice += orderItem.getMenuItem().getPriceCents() * quantity;
-            } else if (orderItem.getCustomPizza() != null) {
-                totalPrice += orderItem.getCustomPizza().getPriceCents() * quantity;
+    private List<String> validatePizzaIngredients(List<CustomPizzaDTO> customPizzaDTOs) {
+        //counts ingredients used, adds to hashmap with id as key
+        //used for checking amounts with db.
+        Map<Integer, Integer> ingredientsCount = new HashMap<>();
+
+        List<ToppingDTO> toppings;
+        List<ToppingDTO> extraToppings;
+        PizzaSizeEnum size;
+
+        for (CustomPizzaDTO customPizzaDTO : customPizzaDTOs) {
+            toppings = customPizzaDTO.getToppings();
+            extraToppings = customPizzaDTO.getExtraToppings();
+            size = customPizzaDTO.getPizzaSize().getSize();
+            if (toppings != null && !toppings.isEmpty()) {
+                for (ToppingDTO topping : toppings) {
+                    ingredientsCount.put(topping.getId(), size.getIngredientAmount() * customPizzaDTO.getQuantity());
+                }
+            }
+            if (extraToppings != null && !extraToppings.isEmpty()) {
+                for (ToppingDTO topping : extraToppings) {
+                    ingredientsCount.put(topping.getId(), size.getExtraIngredientAmount() * customPizzaDTO.getQuantity());
+                }
             }
         }
 
-        return totalPrice;
+        return checkIngredientsWithDB(ingredientsCount);
     }
+
+    private List<String> checkIngredientsWithDB(Map<Integer, Integer> ingredientsCount) {
+        List<String> availabilityErrors = new ArrayList<>();
+        List<Integer> ingredientIds = new ArrayList<>(ingredientsCount.keySet());
+        List<Ingredient> toppingIngredients = ingredientDAO.findAllIn(ingredientIds);
+        //checks for smaller pizza available
+        for (Ingredient ingredient : toppingIngredients) {
+            if (ingredient.getCurrentStock() < ingredientsCount.get(ingredient.getId())) {
+                List<String> pizzasAvailable = new ArrayList<>();
+                String errorMessage = "Sorry, not enough " + ingredient.getIngredientName() + " in stock for this order";
+
+                for (int i = 0; i < PizzaSizeEnum.values().length; i++) {
+                    PizzaSizeEnum size = PizzaSizeEnum.values()[i];
+                    int pizzaAmt = ingredient.getCurrentStock() / size.getIngredientAmount();
+                    if (pizzaAmt > 0) {
+                        pizzasAvailable.add(pizzaAmt + " " + size.name().toLowerCase());
+                    }
+                }
+
+                if (!pizzasAvailable.isEmpty()) {
+                    if (pizzasAvailable.size() > 1) {
+                        pizzasAvailable.set(pizzasAvailable.size() - 1, "or " + pizzasAvailable.getLast());
+                    }
+                    errorMessage += ", we can make: " + String.join(", ", pizzasAvailable) + " pizza(s) with " + ingredient.getIngredientName() + ".";
+                } else {
+                    errorMessage += ", please choose another topping.";
+                }
+
+                availabilityErrors.add(errorMessage);
+            }
+        }
+
+        return availabilityErrors;
+    }
+
 
 }

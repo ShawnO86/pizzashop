@@ -133,7 +133,7 @@ public class MenuItemServiceImpl implements MenuItemService {
     @Transactional
     public void updateMenuItem(int menuItemId, MenuItemDTO menuItemDTO) {
         MenuItem menuItem = menuItemDAO.findById(menuItemId);
-        if (menuItem.getDishName() != "Small Cheese Pizza" && menuItem.getDishName() != "Medium Cheese Pizza" && menuItem.getDishName()  != "Large Cheese Pizza") {
+        if (!menuItem.getDishName().equals("Small Cheese Pizza") && !menuItem.getDishName().equals("Medium Cheese Pizza") && !menuItem.getDishName().equals("Large Cheese Pizza")) {
             menuItem.setDishName(menuItemDTO.getDishName());
             menuItem.setMenuCategory(menuItemDTO.getMenuCategory());
         }
@@ -255,10 +255,7 @@ public class MenuItemServiceImpl implements MenuItemService {
         for (MenuItemIngredient menuItemIngredient : menuItemIngredients) {
             Ingredient currentIngredient = menuItemIngredient.getIngredient();
 
-            int qtyUsed = menuItemIngredient.getQuantityUsed();
-            int currentStock = currentIngredient.getCurrentStock();
-
-            int futureStock = currentStock / qtyUsed;
+            int futureStock = currentIngredient.getCurrentStock() / menuItemIngredient.getQuantityUsed();
 
             // setting the lowest amount of inventory available for this ingredient
             if (futureStock < lowestInventoryAvailable) {
