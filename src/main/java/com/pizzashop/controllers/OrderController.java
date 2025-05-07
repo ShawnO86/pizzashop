@@ -59,36 +59,39 @@ public class OrderController {
 
         System.out.println("orderDTO --> \n" + orderDTO);
 
-        String errorMsg = "";
+        // {availabilityErrors, []}, {priceErrors, []}
+        Map<String, List<String>> validationResponse;
+
         if (orderDTO.getCustomPizzaList() == null && orderDTO.getMenuItemList() == null) {
-            errorMsg = "Nothing in cart!";
-        } // check for other errors here with validation from OrderService...
-
-        List<String> validationResponse;
-
-        if (!errorMsg.isEmpty()) {
-            model.addAttribute("cartError", errorMsg);
+            model.addAttribute("cartError", "Nothing in cart!");
             model.addAttribute("order", orderDTO);
-
             return showOrderForm(model);
         } else {
             validationResponse = orderService.submitOrderForValidation(orderDTO);
         }
 
-        if (!validationResponse.isEmpty()) {
-            model.addAttribute("validationErrors", validationResponse);
+        // todo : validate prices
+        if (!validationResponse.get("availabilityErrors").isEmpty() || !validationResponse.get("priceErrors").isEmpty()) {
+            if (!validationResponse.get("availabilityErrors").isEmpty()) {
+                model.addAttribute("availabilityErrors", validationResponse.get("availabilityErrors"));
+            }
+            if (!validationResponse.get("priceErrors").isEmpty()) {
+                model.addAttribute("priceErrors", validationResponse.get("priceErrors"));
+            }
+
             model.addAttribute("order", orderDTO);
 
             return showOrderForm(model);
         }
 
-        int orderId = 0;
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String username = ((UserDetails) principal).getUsername();
+        int orderId = orderService.submitOrder(orderDTO, username);
         //todo :  get orderId,
         // send to ordering/order-confirmation with orderID,
 
 
         return "redirect:/order/confirmOrder?orderId=" + orderId;
-
     }
 
     @GetMapping("/confirmOrder")

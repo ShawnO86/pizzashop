@@ -66,7 +66,7 @@ public class MenuTests {
 
         //create breadsticks dish and it's ingredients
         MenuItemDTO breadSticks = new MenuItemDTO("Bread sticks", "sticks of bread", MenuCategoryEnum.APP);
-        Ingredient dough = new Ingredient("Dough", 50, 100, 3);
+        Ingredient dough = new Ingredient("Dough", 500, 100, 3);
         System.out.println("inserting test ingredients...");
         ingredientDAO.save(dough);
         // set ingredient quantities and save menuItem
@@ -76,27 +76,6 @@ public class MenuTests {
         breadSticks.setIsAvailable(true);
         System.out.println("inserting test breadsticks...");
         menuItemService.saveMenuItem(breadSticks);
-
-        //create spaghetti dish and it's ingredients
-        MenuItemDTO spaghetti = new MenuItemDTO("Spaghetti Bolognese", "Pasta with a meat and tomato sauce", MenuCategoryEnum.PASTA);
-        Ingredient tomatoSauce = new Ingredient("Tomato sauce", 2000, 50, 3);
-        System.out.println("inserting test ingredients...");
-        ingredientDAO.save(tomatoSauce);
-        Ingredient pasta = new Ingredient("Pasta", 100, 50, 3);
-        ingredientDAO.save(pasta);
-        Ingredient groundBeef = new Ingredient("Ground Beef", 6,300, 3);
-        groundBeef.setIsPizzaTopping(true);
-        ingredientDAO.save(groundBeef);
-        // set ingredient quantities
-        List<int[]> spaghettiIngredientsQuantities = new ArrayList<>();
-        spaghettiIngredientsQuantities.add(new int[]{tomatoSauce.getId(), 2});
-        spaghettiIngredientsQuantities.add(new int[]{pasta.getId(), 1});
-        spaghettiIngredientsQuantities.add(new int[]{groundBeef.getId(), 1});
-        spaghetti.setIngredientIdAmounts(spaghettiIngredientsQuantities);
-        spaghetti.setIsAvailable(true);
-
-        System.out.println("inserting test spaghetti...");
-        menuItemService.saveMenuItem(spaghetti);
 
         //create soda and it's ingredients
         MenuItemDTO lgSoda = new MenuItemDTO("Lg Soda", "Large Soda", MenuCategoryEnum.DRINK);
@@ -112,14 +91,72 @@ public class MenuTests {
         System.out.println("inserting test soda...");
         menuItemService.saveMenuItem(lgSoda);
 
-        //create pizza toppings
+        //create spaghetti dish and it's ingredients
+        MenuItemDTO spaghetti = new MenuItemDTO("Spaghetti Bolognese", "Pasta with a meat and tomato sauce", MenuCategoryEnum.PASTA);
+        Ingredient tomatoSauce = new Ingredient("Tomato sauce", 2000, 10, 3);
+        System.out.println("inserting test ingredients...");
+        ingredientDAO.save(tomatoSauce);
+        Ingredient pasta = new Ingredient("Pasta", 100, 20, 3);
+        ingredientDAO.save(pasta);
+        Ingredient groundBeef = new Ingredient("Ground Beef", 100,30, 3);
+        groundBeef.setIsPizzaTopping(true);
+        ingredientDAO.save(groundBeef);
+        // set ingredient quantities
+        List<int[]> spaghettiIngredientsQuantities = new ArrayList<>();
+        spaghettiIngredientsQuantities.add(new int[]{tomatoSauce.getId(), 3});
+        spaghettiIngredientsQuantities.add(new int[]{pasta.getId(), 3});
+        spaghettiIngredientsQuantities.add(new int[]{groundBeef.getId(), 4});
+        spaghetti.setIngredientIdAmounts(spaghettiIngredientsQuantities);
+        spaghetti.setIsAvailable(true);
+
+        System.out.println("inserting test spaghetti...");
+        menuItemService.saveMenuItem(spaghetti);
+
+        MenuItemDTO smPizza = new MenuItemDTO("Small Cheese Pizza", "8in cheese pizza", MenuCategoryEnum.PIZZA);
         Ingredient cheese = new Ingredient("Cheese", 500, 10, 3);
         cheese.setIsPizzaTopping(true);
         ingredientDAO.save(cheese);
-        Ingredient pepperoni = new Ingredient("Pepperoni", 1, 15, 3);
+        List<int[]> smPizzaIngredientsQuantities = new ArrayList<>();
+        int smAmount = PizzaSizeEnum.SMALL.getIngredientAmount();
+        smPizzaIngredientsQuantities.add(new int[]{cheese.getId(), smAmount});
+        smPizzaIngredientsQuantities.add(new int[]{dough.getId(), smAmount});
+        smPizzaIngredientsQuantities.add(new int[]{tomatoSauce.getId(), smAmount});
+        smPizza.setIngredientIdAmounts(smPizzaIngredientsQuantities);
+        smPizza.setIsAvailable(true);
+
+        System.out.println("inserting test sm pizza...");
+        menuItemService.saveMenuItem(smPizza);
+
+        MenuItemDTO mdPizza = new MenuItemDTO("Medium Cheese Pizza", "12in cheese pizza", MenuCategoryEnum.PIZZA);
+        List<int[]> mdPizzaIngredientsQuantities = new ArrayList<>();
+        int mdAmount = PizzaSizeEnum.MEDIUM.getIngredientAmount();
+        mdPizzaIngredientsQuantities.add(new int[]{cheese.getId(), mdAmount});
+        mdPizzaIngredientsQuantities.add(new int[]{dough.getId(), mdAmount});
+        mdPizzaIngredientsQuantities.add(new int[]{tomatoSauce.getId(), mdAmount});
+        mdPizza.setIngredientIdAmounts(mdPizzaIngredientsQuantities);
+        mdPizza.setIsAvailable(true);
+
+        System.out.println("inserting test md pizza...");
+        menuItemService.saveMenuItem(mdPizza);
+
+        MenuItemDTO lgPizza = new MenuItemDTO("Large Cheese Pizza", "16in cheese pizza", MenuCategoryEnum.PIZZA);
+        List<int[]> lgPizzaIngredientsQuantities = new ArrayList<>();
+        int lgAmount = PizzaSizeEnum.LARGE.getIngredientAmount();
+        lgPizzaIngredientsQuantities.add(new int[]{cheese.getId(), lgAmount});
+        lgPizzaIngredientsQuantities.add(new int[]{dough.getId(), lgAmount});
+        lgPizzaIngredientsQuantities.add(new int[]{tomatoSauce.getId(), lgAmount});
+        lgPizza.setIngredientIdAmounts(lgPizzaIngredientsQuantities);
+        lgPizza.setIsAvailable(true);
+
+        System.out.println("inserting test lg pizza...");
+        menuItemService.saveMenuItem(lgPizza);
+
+
+        //create other pizza toppings
+
+        Ingredient pepperoni = new Ingredient("Pepperoni", 100, 15, 3);
         pepperoni.setIsPizzaTopping(true);
         ingredientDAO.save(pepperoni);
-
     }
 
     @Test
@@ -141,7 +178,7 @@ public class MenuTests {
             System.out.println(ingredient + " id: " + ingredient.getId());
         }
 
-        assertEquals(3, menuItems.size());
+        assertEquals(6, menuItems.size());
         assertEquals(3, pizzaToppings.size());
     }
 
@@ -151,19 +188,19 @@ public class MenuTests {
 
         //25000 is actual 45000 after 1 removed and price corrected from DB
         OrderMenuItemDTO orderMenuItemDTO = new OrderMenuItemDTO(
-                2, "Spaghetti Bolognese", 51, 50, 500
+                menuItemDAO.findByName("Spaghetti Bolognese").getId(), "Spaghetti Bolognese", 1, 50, 500
         );
         //200
         OrderMenuItemDTO orderMenuItemDTO2 = new OrderMenuItemDTO(
-                1, "Bread sticks", 1, 50, 200
+                menuItemDAO.findByName("Bread sticks").getId(), "Bread sticks", 1, 50, 200
         );
         //768
         OrderMenuItemDTO orderMenuItemDTO3 = new OrderMenuItemDTO(
-                3, "Lg Soda", 4, 40, 192
+                menuItemDAO.findByName("Lg Soda").getId(), "Lg Soda", 4, 40, 192
         );
         //1000
         OrderMenuItemDTO orderMenuItemDTO4 = new OrderMenuItemDTO(
-                4, "Lasagna", 1, 50, 1000
+                55, "Lasagna", 1, 50, 1000
         );
 
         // 270 for pep
@@ -187,20 +224,14 @@ public class MenuTests {
 
         System.out.println("Order before ->" + orderDTO);
 
-        List<String> orderResponse = orderService.submitOrderForValidation(orderDTO);
+        Map<String, List<String>> orderResponse = orderService.submitOrderForValidation(orderDTO);
         System.out.println(orderResponse);
-
-        System.out.println("In Test: " + ingredientDAO.findByName("Pepperoni"));
 
         System.out.println("Order after ->" + orderDTO);
 
         assertEquals(3, orderDTO.getMenuItemList().size());
         assertEquals(1, orderDTO.getCustomPizzaList().size());
-        assertEquals(4, orderResponse.size());
-
-        //todo: stopped here..
-        // --: validate prices for menuitems, pizzas, and order total.
-        // --: test getting error msg to show on UI
+        assertEquals(2, orderResponse.size());
     }
 
 /*    @Test

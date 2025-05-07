@@ -1,6 +1,6 @@
 package com.pizzashop.dto;
 
-public class OrderMenuItemDTO {
+public class OrderMenuItemDTO implements Comparable<OrderMenuItemDTO>{
     private Integer menuItemID;
     private String menuItemName;
     private int menuItemAmount;
@@ -9,6 +9,14 @@ public class OrderMenuItemDTO {
     private int pricePerItem;
 
     public OrderMenuItemDTO() {}
+
+    public OrderMenuItemDTO(Integer menuItemID, String menuItemName, int menuItemAmount, int maxQty, int pricePerItem) {
+        this.menuItemID = menuItemID;
+        this.menuItemName = menuItemName;
+        this.menuItemAmount = menuItemAmount;
+        this.maxQty = maxQty;
+        this.pricePerItem = pricePerItem;
+    }
 
     public Integer getMenuItemID() {
         return menuItemID;
@@ -41,6 +49,7 @@ public class OrderMenuItemDTO {
         this.pricePerItem = pricePerItem;
     }
 
+
     @Override
     public String toString() {
         return "OrderMenuItemDTO{" +
@@ -50,5 +59,10 @@ public class OrderMenuItemDTO {
                 ", maxQty=" + maxQty +
                 ", pricePerItem=" + pricePerItem +
                 '}';
+    }
+
+    @Override
+    public int compareTo(OrderMenuItemDTO other) {
+        return this.menuItemID.compareTo(other.getMenuItemID());
     }
 }
