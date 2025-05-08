@@ -128,11 +128,13 @@
     <div id="cart-container" class="form-container">
 
       <form id="menuAmount-container" th:action="@{/order/processOrder}" method="post" th:object="${order}">
-        <div th:if="${cartError}" class="error" id="cart-error">
-          <i th:text="${cartError}"></i>
+        <div th:if="${cartError}" class="error" id="cart-errors" th:each="error : ${cartError}">
+          <i th:text="${error}"></i>
         </div>
-
-        <div th:if="${validationErrors}" class="error" id="validation-errors" th:each="error : ${validationErrors}">
+        <div th:if="${availabilityErrors}" class="error" id="availability-errors" th:each="error : ${availabilityErrors}">
+          <i th:text="${error}"></i>
+        </div>
+        <div th:if="${priceErrors}" class="error" id="price-errors" th:each="error : ${priceErrors}">
           <i th:text="${error}"></i>
         </div>
 
@@ -146,7 +148,7 @@
 
         <h4 class="space-between"><span>Order Total:</span> <span id="order-total">0.00</span></h4>
         <input type="hidden" id="order-total-input" th:field="*{totalPrice}" th:name="*{totalPrice}" value="0"/>
-        <input type="submit" id="cart-submit-btn" value="Submit Order"/>
+        <input type="button" id="cart-submit-btn" value="Submit Order"/>
       </form>
 
     </div>

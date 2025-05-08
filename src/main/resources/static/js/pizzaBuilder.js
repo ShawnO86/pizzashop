@@ -147,6 +147,12 @@ function setPizzaObject(pizzaObject) {
     return pizza;
 }
 
+qtyInput.addEventListener("change", () => {
+    pizza["quantity"] = qtyInput.value;
+    pizza["total-price"] = pizza["quantity"] * pizza["price-per"];
+    updateFormPriceDisplay();
+})
+
 export function handlePizzaBuilderEvents(event) {
     const target = event.target;
     let isPriceChanged = false;
@@ -246,12 +252,14 @@ function createOrderItemToppingHTML(pizzaIndex, toppings, toppingType) {
 
 export function createOrderItemAmountSelectorPizza(pizzaObject, container) {
     const itemContainer = document.createElement("div");
+    const pizzaIndex = document.querySelectorAll(".cartItem-container[data-item-type='pizza item']").length;
+
     itemContainer.classList.add("cartItem-container");
     itemContainer.setAttribute("data-item-name", pizzaObject["pizza-name"]);
     itemContainer.setAttribute("data-item-type", "pizza item");
     itemContainer.setAttribute("data-item-price", pizzaObject["price-per"]);
+    itemContainer.setAttribute("data-item-index", `customPizzaList[${pizzaIndex}]`)
 
-    const pizzaIndex = document.querySelectorAll(".cartItem-container[data-item-type='pizza item']").length;
     const toppingJoinArr = Object.keys(pizzaObject.toppings);
     const extraToppingArr = Object.keys(pizzaObject["extra-toppings"]);
     let extraToppingJoinString = [];
@@ -292,17 +300,17 @@ export function createOrderItemAmountSelectorPizza(pizzaObject, container) {
             ${lightToppingJoinString.length > 0 ? `<small><strong>Light:</strong> ${lightToppingJoinString.join(", ")}</small><br>` : ""}
             ${extraToppingJoinString.length > 0 ? `<small><strong>Extra:</strong> ${extraToppingJoinString.join(", ")}</small><br>` : ""}
             </div>
-            <button class="edit-item">Edit</button><br>
+            <button type="button" class="edit-item">Edit</button><br>
             <label>Qty:
                 <input type="number" value="${pizzaObject.quantity}" min="1" max="${pizzaPriceMap[pizzaObject["size-data"].size].maxQty}" required/>
             </label>
-            <button class="remove-item">Remove Item</button>
-            <input type="hidden" name="customPizzaList[${pizzaIndex}].pizzaName" value="${pizzaObject["pizza-name"]}">
-            <input type="hidden" name="customPizzaList[${pizzaIndex}].pizzaSize.size" value="${pizzaObject["size-data"].size}">
-            <input type="hidden" name="customPizzaList[${pizzaIndex}].pizzaSize.price" value="${pizzaObject["size-data"].price}">
-            <input type="hidden" name="customPizzaList[${pizzaIndex}].quantity" value="${pizzaObject.quantity}">
-            <input type="hidden" name="customPizzaList[${pizzaIndex}].pricePerPizza" value="${pizzaObject["price-per"]}">
-            <input type="hidden" name="customPizzaList[${pizzaIndex}].totalPizzaPrice" value="${pizzaObject["total-price"]}">
+            <button type="button" class="remove-item">Remove Item</button>
+            <input type="hidden" name="customPizzaList[${pizzaIndex}].pizzaName" value="${pizzaObject["pizza-name"]}" />
+            <input type="hidden" name="customPizzaList[${pizzaIndex}].pizzaSize.size" value="${pizzaObject["size-data"].size}" />
+            <input type="hidden" name="customPizzaList[${pizzaIndex}].pizzaSize.price" value="${pizzaObject["size-data"].price}" />
+            <input type="hidden" name="customPizzaList[${pizzaIndex}].quantity" value="${pizzaObject.quantity}" />
+            <input type="hidden" name="customPizzaList[${pizzaIndex}].pricePerPizza" value="${pizzaObject["price-per"]}" />
+            <input type="hidden" name="customPizzaList[${pizzaIndex}].totalPizzaPrice" value="${pizzaObject["total-price"]}" />
             ${toppingHTML}
             ${extraToppingHTML}
             `;

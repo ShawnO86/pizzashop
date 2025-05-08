@@ -18,8 +18,9 @@ document.addEventListener('DOMContentLoaded', ()=> {
     const customPizzasDisplay = document.getElementById("customPizzas-display");
     const cartTotalElement = document.getElementById("order-total");
     const cartTotalInputElement = document.getElementById("order-total-input");
+    const formSubmitBtn = document.getElementById("cart-submit-btn");
 
-    let cartErrorElement = document.getElementById("cart-error");
+    let cartErrorElement = document.getElementById("cart-errors");
     let validationErrorElement = document.getElementById("validation-errors");
     let menuItems = {};
     let customPizzas = {};
@@ -37,7 +38,6 @@ document.addEventListener('DOMContentLoaded', ()=> {
         if (validationErrorElement) {
             removeErrorElement(validationErrorElement, 8000);
         }
-
         parseThymeleafItems();
     } else {
         // populate cart if exist in session
@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
             cartTotal += menuItems[menuItemId].price * menuItems[menuItemId].qty;
         }
         for (const pizzaName in customPizzas) {
-            cartTotal += customPizzas[pizzaName]["total-price"] * customPizzas[pizzaName]["quantity"];
+            cartTotal += customPizzas[pizzaName]["total-price"];
         }
 
         cartTotalElement.innerText = displayAsCurrency(cartTotal, false);
@@ -182,6 +182,26 @@ document.addEventListener('DOMContentLoaded', ()=> {
         builderBtn.disabled = false;
     }
 
+    function updateCartItemTotal(type, container, event) {
+        let qty, price;
+        if (type === "menu item") {
+            menuItems[container.dataset.itemId].qty = parseInt(event.target.value);
+            qty = menuItems[container.dataset.itemId].qty;
+            price = menuItems[container.dataset.itemId].price;
+            saveMenuObjectsToSession();
+        } else {
+            customPizzas[container.dataset.itemName].quantity = parseInt(event.target.value);
+            qty = customPizzas[container.dataset.itemName].quantity;
+            price = customPizzas[container.dataset.itemName]["price-per"];
+            customPizzas[container.dataset.itemName]["total-price"] = price * qty;
+            const hiddenQtyInput = container.querySelector(`[name="${container.dataset.itemIndex}.quantity"]`);
+            hiddenQtyInput.value = customPizzas[container.dataset.itemName].quantity;
+            savePizzaObjectsToSession();
+        }
+
+        container.querySelector(".cart-item-price").innerText = `${qty} x ${displayAsCurrency(price, false)}`;
+    }
+
     // for adding cart items
     menuItemsContainer.addEventListener("click", (event) => {
         if (event.target.classList.contains("addMenuItem-btn")) {
@@ -282,24 +302,24 @@ document.addEventListener('DOMContentLoaded', ()=> {
                 delete customPizzas[cartItemContainer.dataset.itemName];
 
             } else if (event.target.type === "number") {
-                let qty, price;
-                if (type === "menu item") {
-                    menuItems[cartItemContainer.dataset.itemId].qty = parseInt(event.target.value);
-                    qty = menuItems[cartItemContainer.dataset.itemId].qty;
-                    price = menuItems[cartItemContainer.dataset.itemId].price;
-                    saveMenuObjectsToSession();
-                } else {
-                    customPizzas[cartItemContainer.dataset.itemName].quantity = parseInt(event.target.value);
-                    qty = customPizzas[cartItemContainer.dataset.itemName].quantity;
-                    price = customPizzas[cartItemContainer.dataset.itemName]["price-per"];
-                    customPizzas[cartItemContainer.dataset.itemName]["total-price"] = price * qty;
-                    savePizzaObjectsToSession();
-                }
-
-                cartItemContainer.querySelector(".cart-item-price").innerText = `${qty} x ${displayAsCurrency(price, false)}`;
+                updateCartItemTotal(type, cartItemContainer, event);
             }
-
         }
+    });
+
+    menuAmountContainer.addEventListener('keydown', (event) => {
+        if (event.key === "Enter") {
+            if (event.target.type === "number") {
+                const cartItemContainer = event.target.closest('.cartItem-container');
+                const type = cartItemContainer.dataset.itemType;
+                updateCartItemTotal(type, cartItemContainer, event);
+            }
+            event.preventDefault(); // Prevent default Enter action in number inputs within the form (Submit)
+        }
+    });
+
+    formSubmitBtn.addEventListener("click", () => {
+        menuAmountContainer.submit();
     });
 
 });

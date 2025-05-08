@@ -10,7 +10,7 @@ export function handleAddMenuItem(event, menuAmountContainer) {
     const quantity = orderInitQty.value ? parseInt(orderInitQty.value, 10) : 1;
 
     if (quantity > orderItemMax) {
-        orderInitQty.value = 1;
+        orderInitQty.value = orderItemMax;
         alert("Cannot add " + quantity + " " + orderItemName + "! We only have enough inventory for " + orderItemMax + "!");
     } else {
         return createOrderItemAmountSelectorMenu(orderItemName, orderItemId, orderItemPrice, quantity, orderItemMax, menuAmountContainer);
@@ -31,12 +31,13 @@ export function createOrderItemAmountSelectorMenu(menuItemName, menuItemId, menu
         return;
     }
 
+    const menuItemIndex = document.querySelectorAll(".cartItem-container[data-item-type='menu item']").length;
+
     itemContainer.classList.add("cartItem-container");
     itemContainer.setAttribute("data-item-id", menuItemId);
     itemContainer.setAttribute("data-item-type", "menu item");
     itemContainer.setAttribute("data-item-price", menuItemPrice);
-
-    const menuItemIndex = document.querySelectorAll(".cartItem-container[data-item-type='menu item']").length;
+    itemContainer.setAttribute("data-item-index", `menuItemList[${menuItemIndex}]`);
 
     itemContainer.innerHTML = `
         <h5 class="space-between">
@@ -46,7 +47,7 @@ export function createOrderItemAmountSelectorMenu(menuItemName, menuItemId, menu
         <label>Qty:
             <input type="number" value="${orderInitQty}" min="1" max="${menuItemMaxQty}" name="menuItemList[${menuItemIndex}].menuItemAmount" required />
         </label>
-        <button class="remove-item">Remove Item</button>
+        <button type="button" class="remove-item">Remove Item</button>
         <input type="hidden" name="menuItemList[${menuItemIndex}].menuItemID" value="${menuItemId}" />
         <input type="hidden" name="menuItemList[${menuItemIndex}].menuItemName" value="${menuItemName}" />
         <input type="hidden" name="menuItemList[${menuItemIndex}].maxQty" value="${menuItemMaxQty}" />
