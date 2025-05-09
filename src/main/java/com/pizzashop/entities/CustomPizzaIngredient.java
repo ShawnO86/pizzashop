@@ -22,15 +22,14 @@ public class CustomPizzaIngredient {
     private int quantityUsed;
 
     @Transient
-    private boolean extra;
+    private boolean isExtra;
 
     public CustomPizzaIngredient() {}
 
-    public CustomPizzaIngredient(CustomPizza customPizza, Ingredient ingredient, boolean extra) {
+    public CustomPizzaIngredient(CustomPizza customPizza, Ingredient ingredient, boolean isExtra) {
         this.customPizza = customPizza;
         this.ingredient = ingredient;
-        this.extra = extra;
-        this.setQuantityBySize(customPizza.getSize());
+        this.isExtra = isExtra;
     }
 
     public int getId() {
@@ -65,36 +64,19 @@ public class CustomPizzaIngredient {
         this.quantityUsed = quantityUsed;
     }
 
-    public boolean getExtra() {
-        return extra;
+    public boolean getIsExtra() {
+        return isExtra;
     }
 
-    public void setExtra(boolean extra) {
-        this.extra = extra;
+    public void setIsExtra(boolean isExtra) {
+        this.isExtra = isExtra;
     }
 
-    public void setQuantityBySize(PizzaSizeEnum size) {
-        int additional = 0;
-
-        switch (size) {
-            case PizzaSizeEnum.SMALL:
-                if (this.extra) {
-                    additional = PizzaSizeEnum.SMALL.getExtraIngredientAmount();
-                }
-                this.quantityUsed = PizzaSizeEnum.SMALL.getIngredientAmount() + additional;
-                break;
-            case PizzaSizeEnum.MEDIUM:
-                if (this.extra) {
-                    additional = PizzaSizeEnum.MEDIUM.getExtraIngredientAmount();
-                }
-                this.quantityUsed = PizzaSizeEnum.MEDIUM.getIngredientAmount() + additional;
-                break;
-            case PizzaSizeEnum.LARGE:
-                if (this.extra) {
-                    additional = PizzaSizeEnum.LARGE.getExtraIngredientAmount();
-                }
-                this.quantityUsed = PizzaSizeEnum.LARGE.getIngredientAmount() + additional;
-                break;
+    public void setQuantityUsedBySize(PizzaSizeEnum size) {
+        if (this.isExtra) {
+            this.quantityUsed = size.getExtraIngredientAmount();
+        } else {
+            this.quantityUsed = size.getIngredientAmount();
         }
     }
 }

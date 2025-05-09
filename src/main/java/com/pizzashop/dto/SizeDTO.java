@@ -6,6 +6,13 @@ public class SizeDTO {
     private PizzaSizeEnum size;
     private int price;
 
+    public SizeDTO() {}
+
+    public SizeDTO(PizzaSizeEnum size, int price) {
+        this.size = size;
+        this.price = price;
+    }
+
     public PizzaSizeEnum getSize() {
         return size;
     }

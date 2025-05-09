@@ -186,41 +186,35 @@ public class MenuTests {
     public void testValidateOrderDTO() {
         OrderDTO orderDTO = new OrderDTO();
 
-        //25000 is actual 45000 after 1 removed and price corrected from DB
         OrderMenuItemDTO orderMenuItemDTO = new OrderMenuItemDTO(
-                menuItemDAO.findByName("Spaghetti Bolognese").getId(), "Spaghetti Bolognese", 1, 50, 500
+                menuItemDAO.findByName("Spaghetti Bolognese").getId(), "Spaghetti Bolognese", 1, 50, 420
         );
-        //200
+
         OrderMenuItemDTO orderMenuItemDTO2 = new OrderMenuItemDTO(
                 menuItemDAO.findByName("Bread sticks").getId(), "Bread sticks", 1, 50, 200
         );
-        //768
+
         OrderMenuItemDTO orderMenuItemDTO3 = new OrderMenuItemDTO(
                 menuItemDAO.findByName("Lg Soda").getId(), "Lg Soda", 4, 40, 192
         );
-        //1000
-        OrderMenuItemDTO orderMenuItemDTO4 = new OrderMenuItemDTO(
-                55, "Lasagna", 1, 50, 1000
-        );
 
-        // 270 for pep
         ToppingDTO toppingDTO1 = new ToppingDTO("Pepperoni", ingredientDAO.findByName("Pepperoni").getId());
         ToppingDTO toppingDTO2 = new ToppingDTO("Ground Beef", ingredientDAO.findByName("Ground Beef").getId());
-        // 1125 for large plain cheese
+
         SizeDTO sizeDTO = new SizeDTO(PizzaSizeEnum.LARGE, 1125);
 
         CustomPizzaDTO customPizzaDTO = new CustomPizzaDTO(
                 "Pizza 1", List.of(toppingDTO1, toppingDTO2), null, sizeDTO, 2
         );
 
-        customPizzaDTO.setPricePerPizza(1395);
-        customPizzaDTO.setTotalPizzaPrice(2790);
+        customPizzaDTO.setPricePerPizza(2250);
+        customPizzaDTO.setTotalPizzaPrice(4500);
 
-        orderDTO.setMenuItemList(List.of(orderMenuItemDTO, orderMenuItemDTO2, orderMenuItemDTO3, orderMenuItemDTO4));
+        orderDTO.setMenuItemList(List.of(orderMenuItemDTO, orderMenuItemDTO2, orderMenuItemDTO3));
         orderDTO.setCustomPizzaList(List.of(customPizzaDTO));
 
         // 47363 should be price after validation
-        orderDTO.setTotalPrice(28363);
+        orderDTO.setTotalPrice(5888);
 
         System.out.println("Order before ->" + orderDTO);
 
@@ -229,13 +223,16 @@ public class MenuTests {
 
         System.out.println("Order after ->" + orderDTO);
 
+        int submissionResponse = orderService.submitOrder(orderDTO, buildTestUser().getUsername());
+
+        System.out.println("*** submission response: " + submissionResponse);
+
         assertEquals(3, orderDTO.getMenuItemList().size());
         assertEquals(1, orderDTO.getCustomPizzaList().size());
         assertEquals(2, orderResponse.size());
     }
 
-/*    @Test
-    public void submitOrderForFulfillmentTest() {
+    public User buildTestUser() {
         User user;
         UserDetail userDetail;
         Role role;
@@ -257,8 +254,7 @@ public class MenuTests {
         role = new Role(RoleEnum.ROLE_CUSTOMER);
         user.addRole(role);
         userDAO.save(user);
-
-        // todo : test submitting orders in OrderService.submitOrderForFulfillment()
-    }*/
+        return user;
+    }
 
 }

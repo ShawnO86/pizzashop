@@ -1,7 +1,6 @@
 package com.pizzashop.dao;
 
 import com.pizzashop.entities.Ingredient;
-import com.pizzashop.entities.MenuItem;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.Query;
@@ -57,10 +56,8 @@ public class IngredientDAOImpl implements IngredientDAO {
 
     @Override
     public List<Ingredient> findAllIn(List<Integer> ids) {
-        System.out.println("Inside findAllIn " + ids);
         TypedQuery<Ingredient> query = em.createQuery("FROM Ingredient i WHERE i.id IN (:ids)", Ingredient.class);
         query.setParameter("ids", ids);
-        System.out.println("Inside findAllIn " + query.getResultList());
         return query.getResultList();
     }
 

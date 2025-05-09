@@ -73,20 +73,10 @@ public class OrderMenuItem {
 
     @Override
     public String toString() {
-        if (menuItem != null) {
-            return "OrderMenuItem{" +
-                    "order=" + order +
-                    ", menuItem=" + menuItem +
-                    '}';
-        } else if (customPizza != null) {
-            return "OrderMenuItem{" +
-                    "order=" + order +
-                    ", customPizza=" + customPizza +
-                    '}';
-        } else {
-            return "OrderMenuItem{" +
-                    "order=" + order;
-        }
-
+        return "OrderMenuItem{" +
+                "menuItem=" + menuItem +
+                ", customPizza=" + customPizza +
+                ", itemQuantity=" + itemQuantity +
+                '}';
     }
 }

@@ -1,40 +1,40 @@
 package com.pizzashop.services;
 
-import com.pizzashop.dao.IngredientDAO;
-import com.pizzashop.dao.MenuItemDAO;
-import com.pizzashop.dao.OrderDAO;
+import com.pizzashop.dao.*;
 
 import com.pizzashop.dto.CustomPizzaDTO;
 import com.pizzashop.dto.OrderDTO;
 import com.pizzashop.dto.OrderMenuItemDTO;
 import com.pizzashop.dto.ToppingDTO;
 
-import com.pizzashop.entities.Ingredient;
-import com.pizzashop.entities.MenuItem;
-import com.pizzashop.entities.Order;
-import com.pizzashop.entities.PizzaSizeEnum;
+import com.pizzashop.entities.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
 public class OrderServiceImpl implements OrderService {
 
     private final MenuItemDAO menuItemDAO;
+    private final CustomPizzaDAO customPizzaDAO;
     private final IngredientDAO ingredientDAO;
     private final OrderDAO orderDAO;
+    private final UserDAO userDAO;
 
-    private final List<String> availabilityErrors = new ArrayList<>();
-    private final List<String> priceErrors = new ArrayList<>();
+    private List<String> availabilityErrors;
+    private List<String> priceErrors;
 
     @Autowired
-    public OrderServiceImpl(MenuItemDAO menuItemDAO, IngredientDAO ingredientDAO, OrderDAO orderDAO) {
+    public OrderServiceImpl(MenuItemDAO menuItemDAO, CustomPizzaDAO customPizzaDAO, IngredientDAO ingredientDAO, OrderDAO orderDAO, UserDAO userDAO) {
         this.menuItemDAO = menuItemDAO;
+        this.customPizzaDAO = customPizzaDAO;
         this.ingredientDAO = ingredientDAO;
         this.orderDAO = orderDAO;
+        this.userDAO = userDAO;
     }
 
     // todo: if no errors, reduce ingredients used in menuItems/customPizzas in order and update menuItems amt available "updateMenuItemAmountAvailable(MenuItem)"
@@ -43,9 +43,89 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public int submitOrder(OrderDTO order, String username) {
-        // todo : check for correct Id return value after save
-        Order orderEntity = new Order();
+        User user = userDAO.findByUsername(username);
 
+        if (user == null) {
+            return 0;
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        Order orderEntity = new Order(user, now);
+        orderEntity.setIs_complete(false);
+        orderEntity.setFinal_price_cents(order.getTotalPrice());
+        List<OrderMenuItem> orderMenuItems = new ArrayList<>();
+
+        // todo : creating list of orderMenuItems,
+        //  -- : needs either menuItem or customPizza object
+        if (order.getMenuItemList() != null && !order.getMenuItemList().isEmpty()) {
+            Map<Integer, Integer> menuItemIdQty = new HashMap<>();
+            for (OrderMenuItemDTO orderMenuItemDTO : order.getMenuItemList()) {
+                menuItemIdQty.put(orderMenuItemDTO.getMenuItemID(), orderMenuItemDTO.getMenuItemAmount());
+            }
+            List<Integer> menuItemIDs = new ArrayList<>(menuItemIdQty.keySet());
+            List<MenuItem> availableMenuItems = menuItemDAO.findAllAvailableIn(menuItemIDs);
+            for (MenuItem menuItem : availableMenuItems) {
+                OrderMenuItem orderMenuItem = new OrderMenuItem(orderEntity);
+                orderMenuItem.setItemQuantity(menuItemIdQty.get(menuItem.getId()));
+                orderMenuItem.setMenuItem(menuItem);
+
+                orderMenuItems.add(orderMenuItem);
+            }
+        }
+
+        if (order.getCustomPizzaList() != null && !order.getCustomPizzaList().isEmpty()) {
+            // todo : create customPizza for each. . add to orderMenuItems list with qty
+            for (CustomPizzaDTO customPizzaDTO : order.getCustomPizzaList()) {
+                CustomPizza customPizza = new CustomPizza(
+                        customPizzaDTO.getPizzaName(), customPizzaDTO.getPricePerPizza(), customPizzaDTO.getPizzaSize().getSize());
+                List<CustomPizzaIngredient> customPizzaIngredients = new ArrayList<>();
+
+                List<Integer> ingredientIDs = new ArrayList<>();
+                List<Ingredient> ingredients;
+                if (customPizzaDTO.getToppings() != null && !customPizzaDTO.getToppings().isEmpty()) {
+                    for (ToppingDTO toppingDTO : customPizzaDTO.getToppings()) {
+                        ingredientIDs.add(toppingDTO.getId());
+                    }
+
+                    ingredients = ingredientDAO.findAllIn(ingredientIDs);
+                    for (Ingredient ingredient : ingredients) {
+                        CustomPizzaIngredient customPizzaIngredient = new CustomPizzaIngredient(
+                                customPizza, ingredient, false
+                        );
+                        customPizzaIngredient.setQuantityUsedBySize(customPizza.getSize());
+                        customPizzaIngredients.add(customPizzaIngredient);
+                    }
+                }
+
+                List<Integer> extraIngredientIDs = new ArrayList<>();
+                List<Ingredient> extraIngredients;
+                if (customPizzaDTO.getExtraToppings() != null && !customPizzaDTO.getExtraToppings().isEmpty()) {
+                    for (ToppingDTO toppingDTO : customPizzaDTO.getExtraToppings()) {
+                        extraIngredientIDs.add(toppingDTO.getId());
+                    }
+
+                    extraIngredients = ingredientDAO.findAllIn(extraIngredientIDs);
+                    for (Ingredient ingredient : extraIngredients) {
+                        CustomPizzaIngredient customPizzaIngredient = new CustomPizzaIngredient(
+                                customPizza, ingredient, true
+                        );
+                        customPizzaIngredient.setQuantityUsedBySize(customPizza.getSize());
+                        customPizzaIngredients.add(customPizzaIngredient);
+                    }
+                }
+                customPizza.setCustomPizzaIngredients(customPizzaIngredients);
+                customPizzaDAO.save(customPizza);
+                
+                OrderMenuItem orderMenuItem = new OrderMenuItem(orderEntity);
+                orderMenuItem.setItemQuantity(customPizzaDTO.getQuantity());
+                orderMenuItem.setCustomPizza(customPizza);
+                orderMenuItems.add(orderMenuItem);
+            }
+
+        }
+
+        orderEntity.setOrderMenuItems(orderMenuItems);
+        System.out.println(orderEntity);
 
         return orderDAO.save(orderEntity);
     }
@@ -53,6 +133,8 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Map<String, List<String>> submitOrderForValidation(OrderDTO order) {
         Map<String, List<String>> errors = new HashMap<>();
+        availabilityErrors = new ArrayList<>();
+        priceErrors = new ArrayList<>();
 
         if (order.getMenuItemList() != null && !order.getMenuItemList().isEmpty()) {
             validateMenuItems(order);
@@ -84,8 +166,7 @@ public class OrderServiceImpl implements OrderService {
         }
         // uses a map for quick lookup time of found available menu items from database
         // adds error string and removes menuItem DTO element from end of sorted list using reverse loop
-        // if no availability errors, check for correct price
-        int menuItemsTotalPrice = 0;
+        // if no availability errors, checks for correct price and sets it
         for (int i = orderMenuItemDTOs.size() - 1; i >= 0; i--) {
             OrderMenuItemDTO currentMenuItemDTO = orderMenuItemDTOs.get(i);
             MenuItem currentMenuItem = menuItemIdMap.get(currentMenuItemDTO.getMenuItemID());
@@ -168,7 +249,6 @@ public class OrderServiceImpl implements OrderService {
         int pizzasPrice = 0;
         int menuPrice = 0;
 
-
         if (order.getMenuItemList() != null && !order.getMenuItemList().isEmpty()) {
             menuPrice = getMenuItemsPrice(order.getMenuItemList());
         }
@@ -225,24 +305,20 @@ public class OrderServiceImpl implements OrderService {
                 availabilityErrors.add("Sorry, " + size.name().toLowerCase() + " pizza is not available at this time.");
                 return 0;
             } else if (basePizza.getAmountAvailable() < customPizzaDTO.getQuantity()) {
-                availabilityErrors.add("Sorry, not enough stock for " + customPizzaDTO.getQuantity() + " pizzas, cart is updated to reflect amount available.");
+                availabilityErrors.add("Sorry, not enough stock for " + customPizzaDTO.getQuantity() + " pizza(s), cart is updated to reflect amount available.");
                 customPizzaDTO.setQuantity(basePizza.getAmountAvailable());
                 return 0;
             }
 
-            System.out.println("*** base pizza price: " + basePizza.getPriceCents());
             pizzaPrice = basePizza.getPriceCents();
 
             for (Ingredient ingredient : toppingIngredients) {
-                System.out.println("*** topping " + ingredient.getIngredientName() +  " price: " + ingredient.getCentsPricePer() + " amount: " + toppingAmount + " total: " + (ingredient.getCentsPricePer() * toppingAmount));
                 pizzaPrice += ingredient.getCentsPricePer() * toppingAmount;
             }
 
             for (Ingredient ingredient : extraIngredients) {
                 pizzaPrice += ingredient.getCentsPricePer() * extraToppingAmount;
             }
-
-            System.out.println("DTO price: " + customPizzaDTO.getPricePerPizza() + "actual price: " + pizzaPrice);
 
             if (pizzaPrice != customPizzaDTO.getPricePerPizza()) {
                 customPizzaDTO.setPricePerPizza(pizzaPrice);

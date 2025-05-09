@@ -29,6 +29,12 @@ public class CustomPizza {
 
     public CustomPizza() {}
 
+    public CustomPizza(String name, int priceCents, PizzaSizeEnum size) {
+        this.name = name;
+        this.priceCents = priceCents;
+        this.size = size;
+    }
+
     public int getId() {
         return id;
     }
@@ -67,13 +73,6 @@ public class CustomPizza {
 
     public void setCustomPizzaIngredients(List<CustomPizzaIngredient> customPizzaIngredients) {
         this.customPizzaIngredients = customPizzaIngredients;
-    }
-
-    public void addIngredient(CustomPizzaIngredient ingredient) {
-        if (customPizzaIngredients == null) {
-            customPizzaIngredients = new ArrayList<>();
-        }
-        customPizzaIngredients.add(ingredient);
     }
 
     @Override

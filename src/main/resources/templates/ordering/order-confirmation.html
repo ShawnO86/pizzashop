@@ -13,12 +13,12 @@
 <main>
   <section>
     <h2>--  order receipt --</h2>
-    <ul th:each="item : ${receipt}">
-      <li th:text="${item}"></li>
-    </ul>
-    <p th:text="${total}"></p>
+    <!-- order is from addFlashAttribute of redirectAttributes model -->
+    <p th:text="${order}"></p>
+
   </section>
 </main>
 
 </body>
+<script src="/js/confirmationPage.js" defer></script>
 </html>

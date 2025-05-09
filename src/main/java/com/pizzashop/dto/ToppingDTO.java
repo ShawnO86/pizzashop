@@ -6,6 +6,11 @@ public class ToppingDTO {
 
     public ToppingDTO() {}
 
+    public ToppingDTO(String name, Integer id) {
+        this.name = name;
+        this.id = id;
+    }
+
     public String getName() {
         return name;
     }

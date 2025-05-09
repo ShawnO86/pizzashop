@@ -4,5 +4,7 @@ import com.pizzashop.entities.Order;
 
 public interface OrderDAO {
 
-    void save(Order order);
+    Integer save(Order order);
+
+    Order findById(Integer id);
 }
