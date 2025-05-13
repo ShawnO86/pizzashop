@@ -181,18 +181,20 @@ public class OrderServiceImpl implements OrderService {
         List<Ingredient> ingredients = ingredientDAO.findAllInJoinFetchMenuItemIngredients(ingredientIDs);
         Set<MenuItem> affectedMenuItems = new HashSet<>();
         Map<Integer, List<MenuItemIngredient>> menuItemIngredientsByMenuItemId = new HashMap<>();
-
+        System.out.println("*** Ingredient ID Amounts: " + ingredientIdAmounts);
+        System.out.println("*** Affected Ingredients: " + ingredients);
         for (Ingredient ingredient : ingredients) {
             // set ingredient stock to reduced amount found in ingredientIdAmounts
             System.out.println("reducing stock for: " + ingredient);
             ingredient.setCurrentStock(ingredientIdAmounts.get(ingredient.getId()));
-            ingredientDAO.update(ingredient);
             List<MenuItemIngredient> menuItemIngredients = ingredient.getMenuItemIngredients();
             for (MenuItemIngredient menuItemIngredient : menuItemIngredients) {
                 affectedMenuItems.add(menuItemIngredient.getMenuItem());
                 // maps MenuItem id to new ArrayList if absent, adds MenuItemIngredients associated with it to list.
                 menuItemIngredientsByMenuItemId.computeIfAbsent(menuItemIngredient.getMenuItem().getId(), k -> new ArrayList<>()).add(menuItemIngredient);
             }
+
+            ingredientDAO.update(ingredient);
         }
 
         if (!affectedMenuItems.isEmpty()) {
