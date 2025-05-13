@@ -7,7 +7,7 @@ export function handleAddMenuItem(event, menuAmountContainer) {
     const orderItemPrice = event.target.dataset.itemPrice;
     const orderItemMax = parseInt(event.target.dataset.itemMax, 10);
     const orderInitQty = event.target.parentElement.querySelector('input[type="number"]');
-    const quantity = orderInitQty.value ? parseInt(orderInitQty.value, 10) : 1;
+    const quantity = orderInitQty.value ? orderInitQty.value : 1;
 
     if (quantity > orderItemMax) {
         orderInitQty.value = orderItemMax;

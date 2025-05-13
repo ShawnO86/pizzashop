@@ -15,7 +15,8 @@ public class Order {
     @Column(name = "id")
     private int id;
 
-    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH},
+            fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -28,7 +29,7 @@ public class Order {
     @Column(name = "is_complete")
     private boolean is_complete;
 
-    @OneToMany(mappedBy = "order" , cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "order" , cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<OrderMenuItem> orderMenuItems;
 
     public Order() {}
@@ -103,7 +104,8 @@ public class Order {
     @Override
     public String toString() {
         return "Order{" +
-                "user=" + user.getUsername() +
+                "id=" + id +
+                ", user=" + user.getUsername() +
                 ", order_date=" + order_date +
                 ", final_price_cents=" + final_price_cents +
                 ", menuItems=" + orderMenuItems +

@@ -35,7 +35,6 @@ public class MenuItemDAOImpl implements MenuItemDAO {
     public MenuItem findById(int id) {
         TypedQuery<MenuItem> query = em.createQuery("FROM MenuItem m WHERE m.id = :id", MenuItem.class);
         query.setParameter("id", id);
-
         try {
             return query.getSingleResult();
         } catch (NoResultException e) {

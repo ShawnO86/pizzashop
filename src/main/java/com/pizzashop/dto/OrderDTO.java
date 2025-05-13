@@ -1,5 +1,6 @@
 package com.pizzashop.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class OrderDTO {
@@ -27,6 +28,20 @@ public class OrderDTO {
     }
     public void setTotalPrice(int totalPrice) {
         this.totalPrice = totalPrice;
+    }
+
+    public void addMenuItem(OrderMenuItemDTO menuItem) {
+        if (menuItemList == null) {
+            menuItemList = new ArrayList<>();
+        }
+        menuItemList.add(menuItem);
+    }
+
+    public void addCustomPizza(CustomPizzaDTO customPizza) {
+        if (customPizzaList == null) {
+            customPizzaList = new ArrayList<>();
+        }
+        customPizzaList.add(customPizza);
     }
 
     @Override

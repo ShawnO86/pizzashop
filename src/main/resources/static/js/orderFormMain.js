@@ -34,6 +34,14 @@ document.addEventListener('DOMContentLoaded', ()=> {
     if (cartErrorElement || validationErrorElement) {
         if (cartErrorElement) {
             removeErrorElement(cartErrorElement, 5000);
+            if (cartErrorElement.innerText === "Your current order is being processed!") {
+                if (sessionStorage.getItem("menuItems")) {
+                    sessionStorage.removeItem("menuItems");
+                }
+                if (sessionStorage.getItem("customPizzas")) {
+                    sessionStorage.removeItem("customPizzas");
+                }
+            }
         }
         if (validationErrorElement) {
             removeErrorElement(validationErrorElement, 8000);
@@ -41,15 +49,9 @@ document.addEventListener('DOMContentLoaded', ()=> {
         parseThymeleafItems();
     } else {
         // populate cart if exist in session
-        console.log("outside of parse thymeleaf:", orderDTO);
         populateCartUI();
         updateCartTotal();
     }
-
-    console.log("menuItems:");
-    console.log(menuItems);
-    console.log("customPizzas:");
-    console.log(customPizzas);
 
     function removeErrorElement(element, time) {
         setTimeout(() => {
@@ -74,7 +76,6 @@ document.addEventListener('DOMContentLoaded', ()=> {
 
     function saveMenuObjectsToSession() {
         if (menuItems) {
-            console.log("save menu items...");
             sessionStorage.setItem("menuItems", JSON.stringify(menuItems));
         }
         updateCartTotal();
@@ -82,7 +83,6 @@ document.addEventListener('DOMContentLoaded', ()=> {
 
     function savePizzaObjectsToSession() {
         if (customPizzas) {
-            console.log("save pizza items...");
             sessionStorage.setItem("customPizzas", JSON.stringify(customPizzas));
         }
         updateCartTotal();

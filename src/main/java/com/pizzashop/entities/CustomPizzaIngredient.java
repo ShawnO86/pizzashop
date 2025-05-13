@@ -79,4 +79,15 @@ public class CustomPizzaIngredient {
             this.quantityUsed = size.getIngredientAmount();
         }
     }
+
+    @Override
+    public String toString() {
+        return "CustomPizzaIngredient{" +
+                "id=" + id +
+                ", customPizza=" + customPizza +
+                ", ingredient=" + ingredient +
+                ", quantityUsed=" + quantityUsed +
+                ", isExtra=" + isExtra +
+                '}';
+    }
 }

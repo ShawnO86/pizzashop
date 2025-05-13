@@ -15,6 +15,11 @@ public class CustomPizzaDTO {
 
     }
 
+    public CustomPizzaDTO(String pizzaName, int quantity) {
+        this.pizzaName = pizzaName;
+        this.quantity = quantity;
+    }
+
     public CustomPizzaDTO(String pizzaName, List<ToppingDTO> toppings, List<ToppingDTO> extraToppings, SizeDTO pizzaSize, int quantity) {
         this.pizzaName = pizzaName;
         this.toppings = toppings;

@@ -23,7 +23,6 @@ public class OrderServiceImpl implements OrderService {
     private final MenuItemDAO menuItemDAO;
     private final CustomPizzaDAO customPizzaDAO;
     private final IngredientDAO ingredientDAO;
-    private final MenuItemIngredientDAO menuItemIngredientDAO;
     private final OrderDAO orderDAO;
     private final UserDAO userDAO;
 
@@ -33,12 +32,11 @@ public class OrderServiceImpl implements OrderService {
     private List<String> priceErrors;
 
     @Autowired
-    public OrderServiceImpl(MenuItemDAO menuItemDAO, CustomPizzaDAO customPizzaDAO, IngredientDAO ingredientDAO, MenuItemIngredientDAO menuItemIngredientDAO,
+    public OrderServiceImpl(MenuItemDAO menuItemDAO, CustomPizzaDAO customPizzaDAO, IngredientDAO ingredientDAO,
                             OrderDAO orderDAO, UserDAO userDAO, MenuItemService menuItemService) {
         this.menuItemDAO = menuItemDAO;
         this.customPizzaDAO = customPizzaDAO;
         this.ingredientDAO = ingredientDAO;
-        this.menuItemIngredientDAO = menuItemIngredientDAO;
         this.orderDAO = orderDAO;
         this.userDAO = userDAO;
         this.menuItemService = menuItemService;
@@ -78,7 +76,7 @@ public class OrderServiceImpl implements OrderService {
 
                 orderMenuItems.add(orderMenuItem);
 
-                // build ingredientIdAmounts Map for menuItems
+                // build ingredientIdAmounts Map for menuItems to reduce stock
                 for (MenuItemIngredient menuItemIngredient : menuItem.getMenuItemIngredients()) {
                     Ingredient ingredient = menuItemIngredient.getIngredient();
                     // if no id in map, set id and current stock amt, then reduce that stock value later
@@ -192,14 +190,14 @@ public class OrderServiceImpl implements OrderService {
             List<MenuItemIngredient> menuItemIngredients = ingredient.getMenuItemIngredients();
             for (MenuItemIngredient menuItemIngredient : menuItemIngredients) {
                 affectedMenuItems.add(menuItemIngredient.getMenuItem());
-                // maps MenuItem id to MenuItemIngredients associated with it
+                // maps MenuItem id to new ArrayList if absent, adds MenuItemIngredients associated with it to list.
                 menuItemIngredientsByMenuItemId.computeIfAbsent(menuItemIngredient.getMenuItem().getId(), k -> new ArrayList<>()).add(menuItemIngredient);
             }
         }
 
         if (!affectedMenuItems.isEmpty()) {
             for (MenuItem menuItem : affectedMenuItems) {
-                System.out.println("reducing amount available for: " + menuItem);
+                System.out.println("updating amount available for: " + menuItem);
                 int newAmtAvailable = menuItemService.updateMenuItemAmountAvailableWithIngredients(menuItem, menuItemIngredientsByMenuItemId.get(menuItem.getId()));
                 if (newAmtAvailable != menuItem.getAmountAvailable()) {
                     menuItem.setAmountAvailable(newAmtAvailable);
@@ -412,8 +410,5 @@ public class OrderServiceImpl implements OrderService {
         }
         return totalPrice;
     }
-
-
-
 
 }

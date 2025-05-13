@@ -3,7 +3,7 @@ package com.pizzashop.controllers;
 import com.pizzashop.dao.IngredientDAO;
 import com.pizzashop.dao.MenuItemDAO;
 import com.pizzashop.dao.OrderDAO;
-import com.pizzashop.dto.OrderDTO;
+import com.pizzashop.dto.*;
 import com.pizzashop.entities.*;
 import com.pizzashop.services.OrderService;
 
@@ -59,6 +59,10 @@ public class OrderController {
         //  -- output errors in order form and send orderDTO back
 
         System.out.println("orderDTO --> \n" + orderDTO);
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String username = ((UserDetails) principal).getUsername();
+
+        Order existingOrder = orderDAO.findByUsername(username);
 
         // {availabilityErrors, []}, {priceErrors, []}
         Map<String, List<String>> validationResponse;
@@ -67,7 +71,12 @@ public class OrderController {
             model.addAttribute("cartError", "Nothing in cart!");
             model.addAttribute("order", orderDTO);
             return showOrderForm(model);
+        } else if (existingOrder != null) {
+            model.addAttribute("cartError", "Your current order is being processed!");
+            model.addAttribute("order", new OrderDTO());
+            return showOrderForm(model);
         } else {
+            System.out.println("* validation *");
             validationResponse = orderService.submitOrderForValidation(orderDTO);
         }
 
@@ -87,9 +96,6 @@ public class OrderController {
             return showOrderForm(model);
         }
 
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String username = ((UserDetails) principal).getUsername();
-
         int orderId = orderService.submitOrder(orderDTO, username);
 
         if (orderId == 0) {
@@ -99,14 +105,22 @@ public class OrderController {
         }
 
         redirectAttributes.addFlashAttribute("order", orderDTO);
+
         return "redirect:/order/confirmOrder?orderId=" + orderId;
     }
 
     @GetMapping("/confirmOrder")
     public String showConfirmation(Model model, @RequestParam("orderId") int orderId) {
 
-        model.addAttribute("heading", "Your order is confirmed!");
-        model.addAttribute("orderId", orderId);
+        if (!model.containsAttribute("order")) {
+            Order confirmedOrder = orderDAO.findById(orderId);
+            if (confirmedOrder != null) {
+                model.addAttribute("heading", "Your order is confirmed!");
+                model.addAttribute("order", convertOrderToDTO(confirmedOrder));
+            } else {
+                model.addAttribute("orderError", "Order not found!");
+            }
+        }
 
         return "ordering/order-confirmation";
     }
@@ -123,5 +137,50 @@ public class OrderController {
         }
 
         return menuItemsByCategory;
+    }
+
+    private OrderDTO convertOrderToDTO(Order order) {
+        OrderDTO orderDTO = new OrderDTO();
+        orderDTO.setTotalPrice(order.getFinal_price_cents());
+        for (OrderMenuItem orderMenuItem : order.getOrderMenuItems()) {
+            if (orderMenuItem.getMenuItem() != null) {
+                MenuItem menuItem = orderMenuItem.getMenuItem();
+                OrderMenuItemDTO orderMenuItemDTO = new OrderMenuItemDTO(
+                        menuItem.getId(), menuItem.getDishName(), orderMenuItem.getItemQuantity(),
+                        menuItem.getAmountAvailable(), menuItem.getPriceCents()
+                );
+                orderDTO.addMenuItem(orderMenuItemDTO);
+            } else if (orderMenuItem.getCustomPizza() != null) {
+                CustomPizza customPizza = orderMenuItem.getCustomPizza();
+                CustomPizzaDTO customPizzaDTO = new CustomPizzaDTO(customPizza.getName(), orderMenuItem.getItemQuantity());
+                SizeDTO sizeDTO = new SizeDTO(customPizza.getSize(),
+                        menuItemDAO.findByName(customPizza.getSize().getPizzaName()).getPriceCents());
+                List<ToppingDTO> toppingDTOList = new ArrayList<>();
+                List<ToppingDTO> extraToppingDTOList = new ArrayList<>();
+                for (CustomPizzaIngredient customPizzaIngredient : customPizza.getCustomPizzaIngredients()) {
+                    Ingredient ingredient = customPizzaIngredient.getIngredient();
+                    ToppingDTO toppingDTO = new ToppingDTO(ingredient.getIngredientName(), ingredient.getId());
+                    if (customPizzaIngredient.getIsExtra()) {
+                        extraToppingDTOList.add(toppingDTO);
+                    } else {
+                        toppingDTOList.add(toppingDTO);
+                    }
+                }
+                if (!toppingDTOList.isEmpty()) {
+                    customPizzaDTO.setToppings(toppingDTOList);
+                }
+                if (!extraToppingDTOList.isEmpty()) {
+                    customPizzaDTO.setExtraToppings(extraToppingDTOList);
+                }
+                customPizzaDTO.setPizzaSize(sizeDTO);
+                customPizzaDTO.setPricePerPizza(customPizza.getPriceCents());
+                customPizzaDTO.setTotalPizzaPrice(customPizza.getPriceCents() * orderMenuItem.getItemQuantity());
+
+                orderDTO.addCustomPizza(customPizzaDTO);
+            }
+
+        }
+
+        return orderDTO;
     }
 }
