@@ -13,8 +13,42 @@
 <main>
   <section>
     <h2>--  order receipt --</h2>
-    <!-- order is from addFlashAttribute of redirectAttributes model -->
-    <p th:text="${order}"></p>
+    <div th:if="${order.menuItemList != null}">
+      <p>From The Menu:</p>
+      <ul>
+        <li th:each="menuItem : ${order.menuItemList}">
+          <p class="space-between">
+            <span th:text="${menuItem.menuItemName + ' x' + menuItem.menuItemAmount}"></span><span th:text="${'@' + #numbers.formatCurrency(menuItem.pricePerItem / 100 + '.' + menuItem.pricePerItem % 100) + 'ea.'}"></span>
+          </p>
+          <p th:text="${#numbers.formatCurrency((menuItem.pricePerItem * menuItem.menuItemAmount) / 100 + '.' + (menuItem.pricePerItem * menuItem.menuItemAmount) % 100)}"></p>
+        </li>
+      </ul>
+    </div>
+
+    <div th:if="${order.customPizzaList != null}">
+      <p>Custom Made Pizzas:</p>
+      <ul>
+        <li th:each="pizza : ${order.customPizzaList}">
+          <p class="space-between">
+            <span th:text="${#strings.capitalize(#strings.toLowerCase(pizza.pizzaSize.size)) + ' ' + pizza.pizzaName + ' x' + pizza.quantity}"></span>
+            <span th:text="${'@' + #numbers.formatCurrency(pizza.pricePerPizza / 100 + '.' + pizza.pricePerPizza % 100) + 'ea.'}"></span>
+          </p>
+          <p th:text="${#numbers.formatCurrency(pizza.totalPizzaPrice / 100 + '.' + pizza.totalPizzaPrice % 100)}"></p>
+          <p th:if="${pizza.toppings != null}">Toppings:
+            <span th:each="topping, iterStat : ${pizza.toppings}" th:if="${!#lists.isEmpty(pizza.toppings)}">
+              <th:block th:text="${topping.name}"></th:block><th:block th:unless="${iterStat.last}">, </th:block>
+            </span>
+          </p>
+          <p th:if="${pizza.extraToppings != null}">Extra/Light Toppings:
+            <span th:each="topping, iterStat : ${pizza.extraToppings}" th:if="${!#lists.isEmpty(pizza.extraToppings)}">
+              <th:block th:text="${topping.name}"></th:block><th:block th:unless="${iterStat.last}">, </th:block>
+            </span>
+          </p>
+        </li>
+      </ul>
+    </div>
+
+    <p th:text="${'Total: ' + #numbers.formatCurrency(order.totalPrice / 100 + '.' + order.totalPrice % 100)}"></p>
 
   </section>
 </main>
