@@ -9,6 +9,7 @@ import com.pizzashop.dto.ToppingDTO;
 
 import com.pizzashop.entities.*;
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -22,26 +23,32 @@ public class OrderServiceImpl implements OrderService {
     private final MenuItemDAO menuItemDAO;
     private final CustomPizzaDAO customPizzaDAO;
     private final IngredientDAO ingredientDAO;
+    private final MenuItemIngredientDAO menuItemIngredientDAO;
     private final OrderDAO orderDAO;
     private final UserDAO userDAO;
+
+    private final MenuItemService menuItemService;
 
     private List<String> availabilityErrors;
     private List<String> priceErrors;
 
     @Autowired
-    public OrderServiceImpl(MenuItemDAO menuItemDAO, CustomPizzaDAO customPizzaDAO, IngredientDAO ingredientDAO, OrderDAO orderDAO, UserDAO userDAO) {
+    public OrderServiceImpl(MenuItemDAO menuItemDAO, CustomPizzaDAO customPizzaDAO, IngredientDAO ingredientDAO, MenuItemIngredientDAO menuItemIngredientDAO,
+                            OrderDAO orderDAO, UserDAO userDAO, MenuItemService menuItemService) {
         this.menuItemDAO = menuItemDAO;
         this.customPizzaDAO = customPizzaDAO;
         this.ingredientDAO = ingredientDAO;
+        this.menuItemIngredientDAO = menuItemIngredientDAO;
         this.orderDAO = orderDAO;
         this.userDAO = userDAO;
+        this.menuItemService = menuItemService;
     }
 
-    // todo: if no errors, reduce ingredients used in menuItems/customPizzas in order and update menuItems amt available "updateMenuItemAmountAvailable(MenuItem)"
-    //  -- ingredients reduced need to have menuItems updated.. "updateAllMenuItemsAmountAvailableByIngredient(Ingredient)"
-    //  -- validate prices for menuitems, custom pizzas, and total
-
+    //  build ingredientIdAmounts Map <IngredientID, newAmt> by using already fetched ingredients/menuItems and subtracting recipe * item qty
+    //  reduce ingredient stock used in menuItems/customPizzas in submitOrder()
+    //  update each Ingredient separately and menuItems amount available
     @Override
+    @Transactional
     public int submitOrder(OrderDTO order, String username) {
         User user = userDAO.findByUsername(username);
 
@@ -54,9 +61,9 @@ public class OrderServiceImpl implements OrderService {
         orderEntity.setIs_complete(false);
         orderEntity.setFinal_price_cents(order.getTotalPrice());
         List<OrderMenuItem> orderMenuItems = new ArrayList<>();
+        // <ingredientId, newAmtAvailable>
+        Map<Integer, Integer> ingredientIdAmounts = new HashMap<>();
 
-        // todo : creating list of orderMenuItems,
-        //  -- : needs either menuItem or customPizza object
         if (order.getMenuItemList() != null && !order.getMenuItemList().isEmpty()) {
             Map<Integer, Integer> menuItemIdQty = new HashMap<>();
             for (OrderMenuItemDTO orderMenuItemDTO : order.getMenuItemList()) {
@@ -70,16 +77,39 @@ public class OrderServiceImpl implements OrderService {
                 orderMenuItem.setMenuItem(menuItem);
 
                 orderMenuItems.add(orderMenuItem);
+
+                // build ingredientIdAmounts Map for menuItems
+                for (MenuItemIngredient menuItemIngredient : menuItem.getMenuItemIngredients()) {
+                    Ingredient ingredient = menuItemIngredient.getIngredient();
+                    // if no id in map, set id and current stock amt, then reduce that stock value later
+                    if (!ingredientIdAmounts.containsKey(ingredient.getId())) {
+                        ingredientIdAmounts.put(ingredient.getId(), ingredient.getCurrentStock());
+                    }
+                    int orderQuantity = menuItemIdQty.get(menuItemIngredient.getMenuItem().getId());
+                    int newStock = ingredientIdAmounts.get(ingredient.getId()) - (menuItemIngredient.getQuantityUsed() * orderQuantity);
+                    ingredientIdAmounts.put(ingredient.getId(), newStock);
+                }
             }
         }
 
         if (order.getCustomPizzaList() != null && !order.getCustomPizzaList().isEmpty()) {
-            // todo : create customPizza for each. . add to orderMenuItems list with qty
             for (CustomPizzaDTO customPizzaDTO : order.getCustomPizzaList()) {
                 CustomPizza customPizza = new CustomPizza(
                         customPizzaDTO.getPizzaName(), customPizzaDTO.getPricePerPizza(), customPizzaDTO.getPizzaSize().getSize());
                 List<CustomPizzaIngredient> customPizzaIngredients = new ArrayList<>();
 
+                // set ingredients used in base pizza(s) for ingredientIdAmounts map
+                MenuItem basePizza = menuItemDAO.findByName(customPizzaDTO.getPizzaSize().getSize().getPizzaName());
+                for (MenuItemIngredient menuItemIngredient : basePizza.getMenuItemIngredients()) {
+                    Ingredient ingredient = menuItemIngredient.getIngredient();
+                    if (!ingredientIdAmounts.containsKey(ingredient.getId())) {
+                        ingredientIdAmounts.put(ingredient.getId(), ingredient.getCurrentStock());
+                    }
+                    int newStock = ingredientIdAmounts.get(ingredient.getId()) - (menuItemIngredient.getQuantityUsed() * customPizzaDTO.getQuantity());
+                    ingredientIdAmounts.put(ingredient.getId(), newStock);
+                }
+
+                // set ingredients used for toppings
                 List<Integer> ingredientIDs = new ArrayList<>();
                 List<Ingredient> ingredients;
                 if (customPizzaDTO.getToppings() != null && !customPizzaDTO.getToppings().isEmpty()) {
@@ -92,11 +122,20 @@ public class OrderServiceImpl implements OrderService {
                         CustomPizzaIngredient customPizzaIngredient = new CustomPizzaIngredient(
                                 customPizza, ingredient, false
                         );
+
                         customPizzaIngredient.setQuantityUsedBySize(customPizza.getSize());
                         customPizzaIngredients.add(customPizzaIngredient);
+
+                        if (!ingredientIdAmounts.containsKey(ingredient.getId())) {
+                            ingredientIdAmounts.put(ingredient.getId(), ingredient.getCurrentStock());
+                        }
+
+                        int newStock = ingredientIdAmounts.get(ingredient.getId()) - (customPizzaIngredient.getQuantityUsed() * customPizzaDTO.getQuantity());
+                        ingredientIdAmounts.put(ingredient.getId(), newStock);
                     }
                 }
 
+                // set ingredients used for extra toppings
                 List<Integer> extraIngredientIDs = new ArrayList<>();
                 List<Ingredient> extraIngredients;
                 if (customPizzaDTO.getExtraToppings() != null && !customPizzaDTO.getExtraToppings().isEmpty()) {
@@ -109,10 +148,19 @@ public class OrderServiceImpl implements OrderService {
                         CustomPizzaIngredient customPizzaIngredient = new CustomPizzaIngredient(
                                 customPizza, ingredient, true
                         );
+
                         customPizzaIngredient.setQuantityUsedBySize(customPizza.getSize());
                         customPizzaIngredients.add(customPizzaIngredient);
+
+                        if (!ingredientIdAmounts.containsKey(ingredient.getId())) {
+                            ingredientIdAmounts.put(ingredient.getId(), ingredient.getCurrentStock());
+                        }
+
+                        int newStock = ingredientIdAmounts.get(ingredient.getId()) - (customPizzaIngredient.getQuantityUsed() * customPizzaDTO.getQuantity());
+                        ingredientIdAmounts.put(ingredient.getId(), newStock);
                     }
                 }
+
                 customPizza.setCustomPizzaIngredients(customPizzaIngredients);
                 customPizzaDAO.save(customPizza);
                 
@@ -121,13 +169,44 @@ public class OrderServiceImpl implements OrderService {
                 orderMenuItem.setCustomPizza(customPizza);
                 orderMenuItems.add(orderMenuItem);
             }
-
         }
 
         orderEntity.setOrderMenuItems(orderMenuItems);
-        System.out.println(orderEntity);
+        reduceInventory(ingredientIdAmounts);
 
         return orderDAO.save(orderEntity);
+    }
+
+    @Transactional
+    protected void reduceInventory(Map<Integer, Integer> ingredientIdAmounts) {
+        List<Integer> ingredientIDs = new ArrayList<>(ingredientIdAmounts.keySet());
+        List<Ingredient> ingredients = ingredientDAO.findAllInJoinFetchMenuItemIngredients(ingredientIDs);
+        Set<MenuItem> affectedMenuItems = new HashSet<>();
+        Map<Integer, List<MenuItemIngredient>> menuItemIngredientsByMenuItemId = new HashMap<>();
+
+        for (Ingredient ingredient : ingredients) {
+            // set ingredient stock to reduced amount found in ingredientIdAmounts
+            System.out.println("reducing stock for: " + ingredient);
+            ingredient.setCurrentStock(ingredientIdAmounts.get(ingredient.getId()));
+            ingredientDAO.update(ingredient);
+            List<MenuItemIngredient> menuItemIngredients = ingredient.getMenuItemIngredients();
+            for (MenuItemIngredient menuItemIngredient : menuItemIngredients) {
+                affectedMenuItems.add(menuItemIngredient.getMenuItem());
+                // maps MenuItem id to MenuItemIngredients associated with it
+                menuItemIngredientsByMenuItemId.computeIfAbsent(menuItemIngredient.getMenuItem().getId(), k -> new ArrayList<>()).add(menuItemIngredient);
+            }
+        }
+
+        if (!affectedMenuItems.isEmpty()) {
+            for (MenuItem menuItem : affectedMenuItems) {
+                System.out.println("reducing amount available for: " + menuItem);
+                int newAmtAvailable = menuItemService.updateMenuItemAmountAvailableWithIngredients(menuItem, menuItemIngredientsByMenuItemId.get(menuItem.getId()));
+                if (newAmtAvailable != menuItem.getAmountAvailable()) {
+                    menuItem.setAmountAvailable(newAmtAvailable);
+                    menuItemDAO.update(menuItem);
+                }
+            }
+        }
     }
 
     @Override
@@ -333,6 +412,8 @@ public class OrderServiceImpl implements OrderService {
         }
         return totalPrice;
     }
+
+
 
 
 }

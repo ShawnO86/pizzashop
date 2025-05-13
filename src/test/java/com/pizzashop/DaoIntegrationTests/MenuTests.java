@@ -5,12 +5,16 @@ import com.pizzashop.controllers.ManagementController;
 import com.pizzashop.controllers.RegistrationController;
 import com.pizzashop.dao.IngredientDAO;
 import com.pizzashop.dao.MenuItemDAO;
+import com.pizzashop.dao.MenuItemIngredientDAO;
 import com.pizzashop.dao.UserDAO;
 import com.pizzashop.dto.*;
 import com.pizzashop.entities.*;
+import com.pizzashop.entities.MenuItem;
 import com.pizzashop.services.MenuItemService;
 import com.pizzashop.services.OrderService;
 import com.pizzashop.services.UserRegistrationService;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +23,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 
 import java.util.*;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -27,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ComponentScan(
         basePackages = "com.pizzashop",
         includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {
+                MenuItemIngredientDAO.class,
                 MenuItemDAO.class,
                 IngredientDAO.class,
                 MenuItemService.class,
@@ -39,10 +45,13 @@ import static org.junit.jupiter.api.Assertions.*;
                 ManagementController.class
         })
 )
+
 public class MenuTests {
 
     @Autowired
     private MenuItemService menuItemService;
+    @Autowired
+    private MenuItemIngredientDAO menuItemIngredientDAO;
     @Autowired
     private MenuItemDAO menuItemDAO;
     @Autowired
@@ -51,6 +60,8 @@ public class MenuTests {
     private OrderService orderService;
     @Autowired
     private UserDAO userDAO;
+    @Autowired
+    private EntityManager entityManager;
 
 
     private static final Map<String, Integer> sodaSizes = new HashMap<>();
@@ -65,10 +76,11 @@ public class MenuTests {
         // Creating dishes and quantities are done once upon dish creation outside of testing.
 
         //create breadsticks dish and it's ingredients
-        MenuItemDTO breadSticks = new MenuItemDTO("Bread sticks", "sticks of bread", MenuCategoryEnum.APP);
+
         Ingredient dough = new Ingredient("Dough", 500, 100, 3);
         System.out.println("inserting test ingredients...");
         ingredientDAO.save(dough);
+        MenuItemDTO breadSticks = new MenuItemDTO("Bread sticks", "sticks of bread", MenuCategoryEnum.APP);
         // set ingredient quantities and save menuItem
         List<int[]> breadSticksIngredientsQuantities = new ArrayList<>();
         breadSticksIngredientsQuantities.add(new int[]{dough.getId(), 1});
@@ -78,10 +90,11 @@ public class MenuTests {
         menuItemService.saveMenuItem(breadSticks);
 
         //create soda and it's ingredients
-        MenuItemDTO lgSoda = new MenuItemDTO("Lg Soda", "Large Soda", MenuCategoryEnum.DRINK);
+
         Ingredient soda = new Ingredient("Soda", 1280, 3, 3);
         System.out.println("inserting test ingredients...");
         ingredientDAO.save(soda);
+        MenuItemDTO lgSoda = new MenuItemDTO("Lg Soda", "Large Soda", MenuCategoryEnum.DRINK);
         // set ingredient quantities
         List<int[]> sodaIngredientsQuantities = new ArrayList<>();
         sodaIngredientsQuantities.add(new int[]{soda.getId(), sodaSizes.get("Lg")});
@@ -92,7 +105,6 @@ public class MenuTests {
         menuItemService.saveMenuItem(lgSoda);
 
         //create spaghetti dish and it's ingredients
-        MenuItemDTO spaghetti = new MenuItemDTO("Spaghetti Bolognese", "Pasta with a meat and tomato sauce", MenuCategoryEnum.PASTA);
         Ingredient tomatoSauce = new Ingredient("Tomato sauce", 2000, 10, 3);
         System.out.println("inserting test ingredients...");
         ingredientDAO.save(tomatoSauce);
@@ -101,6 +113,7 @@ public class MenuTests {
         Ingredient groundBeef = new Ingredient("Ground Beef", 100,30, 3);
         groundBeef.setIsPizzaTopping(true);
         ingredientDAO.save(groundBeef);
+        MenuItemDTO spaghetti = new MenuItemDTO("Spaghetti Bolognese", "Pasta with a meat and tomato sauce", MenuCategoryEnum.PASTA);
         // set ingredient quantities
         List<int[]> spaghettiIngredientsQuantities = new ArrayList<>();
         spaghettiIngredientsQuantities.add(new int[]{tomatoSauce.getId(), 3});
@@ -112,10 +125,11 @@ public class MenuTests {
         System.out.println("inserting test spaghetti...");
         menuItemService.saveMenuItem(spaghetti);
 
-        MenuItemDTO smPizza = new MenuItemDTO("Small Cheese Pizza", "8in cheese pizza", MenuCategoryEnum.PIZZA);
+
         Ingredient cheese = new Ingredient("Cheese", 500, 10, 3);
         cheese.setIsPizzaTopping(true);
         ingredientDAO.save(cheese);
+        MenuItemDTO smPizza = new MenuItemDTO("Small Cheese Pizza", "8in cheese pizza", MenuCategoryEnum.PIZZA);
         List<int[]> smPizzaIngredientsQuantities = new ArrayList<>();
         int smAmount = PizzaSizeEnum.SMALL.getIngredientAmount();
         smPizzaIngredientsQuantities.add(new int[]{cheese.getId(), smAmount});
@@ -127,9 +141,9 @@ public class MenuTests {
         System.out.println("inserting test sm pizza...");
         menuItemService.saveMenuItem(smPizza);
 
-        MenuItemDTO mdPizza = new MenuItemDTO("Medium Cheese Pizza", "12in cheese pizza", MenuCategoryEnum.PIZZA);
         List<int[]> mdPizzaIngredientsQuantities = new ArrayList<>();
         int mdAmount = PizzaSizeEnum.MEDIUM.getIngredientAmount();
+        MenuItemDTO mdPizza = new MenuItemDTO("Medium Cheese Pizza", "12in cheese pizza", MenuCategoryEnum.PIZZA);
         mdPizzaIngredientsQuantities.add(new int[]{cheese.getId(), mdAmount});
         mdPizzaIngredientsQuantities.add(new int[]{dough.getId(), mdAmount});
         mdPizzaIngredientsQuantities.add(new int[]{tomatoSauce.getId(), mdAmount});
@@ -139,9 +153,9 @@ public class MenuTests {
         System.out.println("inserting test md pizza...");
         menuItemService.saveMenuItem(mdPizza);
 
-        MenuItemDTO lgPizza = new MenuItemDTO("Large Cheese Pizza", "16in cheese pizza", MenuCategoryEnum.PIZZA);
         List<int[]> lgPizzaIngredientsQuantities = new ArrayList<>();
         int lgAmount = PizzaSizeEnum.LARGE.getIngredientAmount();
+        MenuItemDTO lgPizza = new MenuItemDTO("Large Cheese Pizza", "16in cheese pizza", MenuCategoryEnum.PIZZA);
         lgPizzaIngredientsQuantities.add(new int[]{cheese.getId(), lgAmount});
         lgPizzaIngredientsQuantities.add(new int[]{dough.getId(), lgAmount});
         lgPizzaIngredientsQuantities.add(new int[]{tomatoSauce.getId(), lgAmount});
@@ -150,7 +164,6 @@ public class MenuTests {
 
         System.out.println("inserting test lg pizza...");
         menuItemService.saveMenuItem(lgPizza);
-
 
         //create other pizza toppings
 
@@ -161,47 +174,49 @@ public class MenuTests {
 
     @Test
     public void openMenuTest() {
+        entityManager.flush();
+        entityManager.clear();
+
         System.out.println("finding test menu...");
-        List<MenuItem> menuItems = menuItemDAO.findAll();
 
-        // look at menu items and mapped ingredients
-        for (MenuItem menuItem : menuItems) {
-            System.out.println(menuItem);
-            for (MenuItemIngredient menuItemIngredient : menuItem.getMenuItemIngredients()) {
-                Ingredient ingredient = menuItemIngredient.getIngredient();
-                System.out.println(ingredient.getIngredientName() + " -- quantity: " + menuItemIngredient.getQuantityUsed());
-            }
+        System.out.println("*** find all menuItemIngredients *** ");
+        List<MenuItemIngredient> ingredients = menuItemIngredientDAO.findAllJoinFetchMenuIngredients();
+        for (MenuItemIngredient menuItemIngredient : ingredients) {
+            System.out.println("menuItemIngredient: " + menuItemIngredient);
         }
 
-        List<Ingredient> pizzaToppings = ingredientDAO.findAllPizzaToppings();
-        for (Ingredient ingredient : pizzaToppings) {
-            System.out.println(ingredient + " id: " + ingredient.getId());
-        }
-
-        assertEquals(6, menuItems.size());
-        assertEquals(3, pizzaToppings.size());
+        assertEquals(14, ingredients.size());
     }
 
     @Test
     public void testValidateOrderDTO() {
         OrderDTO orderDTO = new OrderDTO();
 
+        entityManager.flush();
+        entityManager.clear();
+
+        MenuItem spaghetti = menuItemDAO.findByName("Spaghetti Bolognese");
         OrderMenuItemDTO orderMenuItemDTO = new OrderMenuItemDTO(
-                menuItemDAO.findByName("Spaghetti Bolognese").getId(), "Spaghetti Bolognese", 1, 50, 420
+                spaghetti.getId(), spaghetti.getDishName(), 1, spaghetti.getAmountAvailable(), spaghetti.getPriceCents()
         );
 
+        MenuItem breadSticks = menuItemDAO.findByName("Bread sticks");
         OrderMenuItemDTO orderMenuItemDTO2 = new OrderMenuItemDTO(
-                menuItemDAO.findByName("Bread sticks").getId(), "Bread sticks", 1, 50, 200
+                breadSticks.getId(), breadSticks.getDishName(), 1, breadSticks.getAmountAvailable(), breadSticks.getPriceCents()
         );
 
+        MenuItem lgSoda = menuItemDAO.findByName("Lg Soda");
         OrderMenuItemDTO orderMenuItemDTO3 = new OrderMenuItemDTO(
-                menuItemDAO.findByName("Lg Soda").getId(), "Lg Soda", 4, 40, 192
+                lgSoda.getId(), lgSoda.getDishName(), 4, lgSoda.getAmountAvailable(), lgSoda.getPriceCents()
         );
 
-        ToppingDTO toppingDTO1 = new ToppingDTO("Pepperoni", ingredientDAO.findByName("Pepperoni").getId());
-        ToppingDTO toppingDTO2 = new ToppingDTO("Ground Beef", ingredientDAO.findByName("Ground Beef").getId());
+        Ingredient pepperoni = ingredientDAO.findByName("Pepperoni");
+        ToppingDTO toppingDTO1 = new ToppingDTO(pepperoni.getIngredientName(), pepperoni.getId());
+        Ingredient groundBeef = ingredientDAO.findByName("Ground Beef");
+        ToppingDTO toppingDTO2 = new ToppingDTO(groundBeef.getIngredientName(), groundBeef.getId());
 
-        SizeDTO sizeDTO = new SizeDTO(PizzaSizeEnum.LARGE, 1125);
+        MenuItem basePizza = menuItemDAO.findByName(PizzaSizeEnum.LARGE.getPizzaName());
+        SizeDTO sizeDTO = new SizeDTO(PizzaSizeEnum.LARGE, basePizza.getPriceCents());
 
         CustomPizzaDTO customPizzaDTO = new CustomPizzaDTO(
                 "Pizza 1", List.of(toppingDTO1, toppingDTO2), null, sizeDTO, 2
@@ -213,7 +228,6 @@ public class MenuTests {
         orderDTO.setMenuItemList(List.of(orderMenuItemDTO, orderMenuItemDTO2, orderMenuItemDTO3));
         orderDTO.setCustomPizzaList(List.of(customPizzaDTO));
 
-        // 47363 should be price after validation
         orderDTO.setTotalPrice(5888);
 
         System.out.println("Order before ->" + orderDTO);
@@ -223,9 +237,21 @@ public class MenuTests {
 
         System.out.println("Order after ->" + orderDTO);
 
+        List<Ingredient> ingredientsBefore = new ArrayList<>(ingredientDAO.findAll());
+        System.out.println("*** ingredients before submit *** ");
+        for (Ingredient ingredient : ingredientsBefore) {
+            System.out.println("ingredient: " + ingredient);
+        }
+
         int submissionResponse = orderService.submitOrder(orderDTO, buildTestUser().getUsername());
 
         System.out.println("*** submission response: " + submissionResponse);
+
+        List<Ingredient> ingredientsAfter = ingredientDAO.findAll();
+        System.out.println("*** ingredients after submit *** ");
+        for (Ingredient ingredient : ingredientsAfter) {
+            System.out.println("ingredient: " + ingredient);
+        }
 
         assertEquals(3, orderDTO.getMenuItemList().size());
         assertEquals(1, orderDTO.getCustomPizzaList().size());

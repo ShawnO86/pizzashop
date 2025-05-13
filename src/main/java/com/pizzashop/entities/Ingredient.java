@@ -118,10 +118,12 @@ public class Ingredient {
         this.customPizzaIngredients = customPizzaIngredients;
     }
 
+
     @Override
     public String toString() {
         return "Ingredient{" +
-                "ingredientName='" + ingredientName + '\'' +
+                "id=" + id +
+                ", ingredientName='" + ingredientName + '\'' +
                 ", currentStock=" + currentStock +
                 ", unitOfMeasure='" + unitOfMeasure + '\'' +
                 ", centsCostPer=" + centsCostPer +

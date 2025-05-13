@@ -62,6 +62,15 @@ public class IngredientDAOImpl implements IngredientDAO {
     }
 
     @Override
+    public List<Ingredient> findAllInJoinFetchMenuItemIngredients(List<Integer> ids) {
+        TypedQuery<Ingredient> query = em.createQuery("SELECT i FROM Ingredient i " +
+                "JOIN FETCH i.menuItemIngredients mii JOIN FETCH mii.menuItem" +
+                " WHERE i.id IN (:ids)", Ingredient.class);
+        query.setParameter("ids", ids);
+        return query.getResultList();
+    }
+
+    @Override
     @Transactional
     public void save(Ingredient ingredient) {
         em.persist(ingredient);

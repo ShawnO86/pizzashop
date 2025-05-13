@@ -6,10 +6,7 @@ import com.pizzashop.dao.MenuItemIngredientDAO;
 import com.pizzashop.dao.OrderMenuItemDAO;
 import com.pizzashop.dto.IngredientDTO;
 import com.pizzashop.dto.MenuItemDTO;
-import com.pizzashop.entities.Ingredient;
-import com.pizzashop.entities.MenuItem;
-import com.pizzashop.entities.MenuItemIngredient;
-import com.pizzashop.entities.OrderMenuItem;
+import com.pizzashop.entities.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -118,8 +115,7 @@ public class MenuItemServiceImpl implements MenuItemService {
                 menuItemDTO.getIsAvailable()
         );
 
-        List<int[]> newIngredientQuantityArray = menuItemDTO.getIngredientIdAmounts();
-        mapIngredientsToMenuItem(menuItem, newIngredientQuantityArray);
+        mapIngredientsToMenuItem(menuItem, menuItemDTO.getIngredientIdAmounts());
 
         menuItem.setMarkupMultiplier(menuItemDTO.getMarkupMultiplier());
         setSingleMenuItemCostPrice(menuItem);
@@ -133,7 +129,10 @@ public class MenuItemServiceImpl implements MenuItemService {
     @Transactional
     public void updateMenuItem(int menuItemId, MenuItemDTO menuItemDTO) {
         MenuItem menuItem = menuItemDAO.findById(menuItemId);
-        if (!menuItem.getDishName().equals("Small Cheese Pizza") && !menuItem.getDishName().equals("Medium Cheese Pizza") && !menuItem.getDishName().equals("Large Cheese Pizza")) {
+        if (!menuItem.getDishName().equals(PizzaSizeEnum.SMALL.getPizzaName()) &&
+                !menuItem.getDishName().equals(PizzaSizeEnum.MEDIUM.getPizzaName()) &&
+                !menuItem.getDishName().equals(PizzaSizeEnum.LARGE.getPizzaName())) {
+
             menuItem.setDishName(menuItemDTO.getDishName());
             menuItem.setMenuCategory(menuItemDTO.getMenuCategory());
         }
@@ -144,9 +143,7 @@ public class MenuItemServiceImpl implements MenuItemService {
         menuItem.setDescription(menuItemDTO.getDescription());
         menuItem.setIsAvailable(menuItemDTO.getIsAvailable());
 
-        List<int[]> newIngredientQuantityArray = menuItemDTO.getIngredientIdAmounts();
-
-        mapIngredientsToMenuItem(menuItem, newIngredientQuantityArray);
+        mapIngredientsToMenuItem(menuItem, menuItemDTO.getIngredientIdAmounts());
 
         setSingleMenuItemCostPrice(menuItem);
         menuItem.setAmountAvailable(updateMenuItemAmountAvailable(menuItem));
@@ -211,12 +208,14 @@ public class MenuItemServiceImpl implements MenuItemService {
         menuItem.setPriceCents(cost * menuItem.getMarkupMultiplier());
     }
 
+    @Override
     @Transactional
-    protected void updateAllMenuItemsAmountAvailableByIngredient(Ingredient ingredient) {
+    public void updateAllMenuItemsAmountAvailableByIngredient(Ingredient ingredient) {
         List<MenuItemIngredient> menuItemIngredients = ingredient.getMenuItemIngredients();
 
         for (MenuItemIngredient menuItemIngredient : menuItemIngredients) {
             MenuItem currentMenuItem = menuItemIngredient.getMenuItem();
+            System.out.println(currentMenuItem);
             currentMenuItem.setAmountAvailable(updateMenuItemAmountAvailable(currentMenuItem));
 
             menuItemDAO.update(currentMenuItem);
@@ -253,6 +252,24 @@ public class MenuItemServiceImpl implements MenuItemService {
         List<MenuItemIngredient> menuItemIngredients = menuItem.getMenuItemIngredients();
 
         for (MenuItemIngredient menuItemIngredient : menuItemIngredients) {
+            Ingredient currentIngredient = menuItemIngredient.getIngredient();
+
+            int futureStock = currentIngredient.getCurrentStock() / menuItemIngredient.getQuantityUsed();
+
+            // setting the lowest amount of inventory available for this ingredient
+            if (futureStock < lowestInventoryAvailable) {
+                lowestInventoryAvailable = futureStock;
+            }
+        }
+
+        return lowestInventoryAvailable;
+    }
+
+    @Override
+    public int updateMenuItemAmountAvailableWithIngredients(MenuItem menuItem, List<MenuItemIngredient> ingredients) {
+        int lowestInventoryAvailable = Integer.MAX_VALUE;
+
+        for (MenuItemIngredient menuItemIngredient : ingredients) {
             Ingredient currentIngredient = menuItemIngredient.getIngredient();
 
             int futureStock = currentIngredient.getCurrentStock() / menuItemIngredient.getQuantityUsed();

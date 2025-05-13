@@ -24,16 +24,16 @@ public class MenuItemIngredientDAOImpl implements MenuItemIngredientDAO {
     }
 
     @Override
-    public List<MenuItemIngredient> findAllByMenuItemId(Integer menuItemId) {
-        TypedQuery<MenuItemIngredient> query = em.createQuery("FROM MenuItemIngredient m WHERE m.menuItem.id = :menuItemId", MenuItemIngredient.class);
-        query.setParameter("menuItemId", menuItemId);
+    public List<MenuItemIngredient> findAllByIngredientId(Integer ingredientId) {
+        TypedQuery<MenuItemIngredient> query = em.createQuery("FROM MenuItemIngredient m WHERE m.ingredient.id = :ingredientId", MenuItemIngredient.class);
+        query.setParameter("ingredientId", ingredientId);
         return query.getResultList();
     }
 
     @Override
-    public List<MenuItemIngredient> findAllByIngredientId(Integer ingredientId) {
-        TypedQuery<MenuItemIngredient> query = em.createQuery("FROM MenuItemIngredient m WHERE m.ingredient.id = :ingredientId", MenuItemIngredient.class);
-        query.setParameter("ingredientId", ingredientId);
+    public List<MenuItemIngredient> findAllJoinFetchMenuIngredients() {
+        TypedQuery<MenuItemIngredient> query = em.createQuery("SELECT Mii FROM MenuItemIngredient Mii " +
+                "JOIN FETCH Mii.menuItem JOIN FETCH Mii.ingredient", MenuItemIngredient.class);
         return query.getResultList();
     }
 
@@ -46,14 +46,6 @@ public class MenuItemIngredientDAOImpl implements MenuItemIngredientDAO {
     public void deleteByMenuItemId(Integer menuItemId) {
         Query query = em.createQuery("DELETE FROM MenuItemIngredient m WHERE m.menuItem.id = :menuItemId");
         query.setParameter("menuItemId", menuItemId);
-        query.executeUpdate();
-    }
-
-    @Override
-    public void deleteByMenuItemIdIngredientId(Integer menuItemId, Integer ingredientId) {
-        Query query = em.createQuery("DELETE from MenuItemIngredient m WHERE m.menuItem.id = :menuItemId AND m.ingredient.id = :ingredientId");
-        query.setParameter("menuItemId", menuItemId);
-        query.setParameter("ingredientId", ingredientId);
         query.executeUpdate();
     }
 }

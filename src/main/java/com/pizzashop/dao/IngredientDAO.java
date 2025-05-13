@@ -15,6 +15,8 @@ public interface IngredientDAO {
 
     List<Ingredient> findAllIn(List<Integer> ingredients);
 
+    List<Ingredient> findAllInJoinFetchMenuItemIngredients(List<Integer> ingredients);
+
     void save(Ingredient ingredient);
 
     int deleteById(int id);
