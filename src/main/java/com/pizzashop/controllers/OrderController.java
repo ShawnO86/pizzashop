@@ -25,13 +25,16 @@ public class OrderController {
     private final IngredientDAO ingredientDAO;
     private final OrderService orderService;
     private final OrderDAO orderDAO;
+    private final OrderNotificationController orderNotificationController;
 
     @Autowired
-    public OrderController(MenuItemDAO menuItemDAO, IngredientDAO ingredientDAO, OrderService orderService, OrderDAO orderDAO) {
+    public OrderController(MenuItemDAO menuItemDAO, IngredientDAO ingredientDAO, OrderService orderService, OrderDAO orderDAO,
+                           OrderNotificationController orderNotificationController) {
         this.menuItemDAO = menuItemDAO;
         this.ingredientDAO = ingredientDAO;
         this.orderService = orderService;
         this.orderDAO = orderDAO;
+        this.orderNotificationController = orderNotificationController;
     }
 
     @GetMapping("/showMenu")
@@ -104,6 +107,8 @@ public class OrderController {
             return showOrderForm(model);
         }
 
+        System.out.println("*** Notify of new order...");
+        orderNotificationController.notifyNewOrder(orderDTO);
         redirectAttributes.addFlashAttribute("order", orderDTO);
 
         return "redirect:/order/confirmOrder?orderId=" + orderId;
@@ -115,8 +120,9 @@ public class OrderController {
         if (!model.containsAttribute("order")) {
             Order confirmedOrder = orderDAO.findById(orderId);
             if (confirmedOrder != null) {
+                OrderDTO confirmedOrderDTO = convertOrderToDTO(confirmedOrder);
                 model.addAttribute("heading", "Your order is confirmed!");
-                model.addAttribute("order", convertOrderToDTO(confirmedOrder));
+                model.addAttribute("order", confirmedOrderDTO);
             } else {
                 model.addAttribute("orderError", "Order not found!");
             }

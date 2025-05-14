@@ -6,8 +6,8 @@ import java.util.List;
 public class OrderDTO {
     private List<OrderMenuItemDTO> menuItemList;
     private List<CustomPizzaDTO> customPizzaList;
-
     private int totalPrice;
+    private Integer orderID;
 
     public OrderDTO() {}
 
@@ -28,6 +28,12 @@ public class OrderDTO {
     }
     public void setTotalPrice(int totalPrice) {
         this.totalPrice = totalPrice;
+    }
+    public Integer getOrderID() {
+        return orderID;
+    }
+    public void setOrderID(Integer orderID) {
+        this.orderID = orderID;
     }
 
     public void addMenuItem(OrderMenuItemDTO menuItem) {
