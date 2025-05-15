@@ -56,12 +56,6 @@ public class OrderController {
 
     @PostMapping("/processOrder")
     public String processOrder(Model model, @ModelAttribute("order") OrderDTO orderDTO, RedirectAttributes redirectAttributes) {
-
-        // todo : validate orderDTO, enough ingredients, price -- done
-        //  -- DO - send to confirmation page with receipt and render valid orderDTO OR
-        //  -- output errors in order form and send orderDTO back
-
-        System.out.println("orderDTO --> \n" + orderDTO);
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String username = ((UserDetails) principal).getUsername();
 
@@ -107,6 +101,7 @@ public class OrderController {
             return showOrderForm(model);
         }
 
+        orderDTO.setOrderID(orderId);
         System.out.println("*** Notify of new order...");
         orderNotificationController.notifyNewOrder(orderDTO);
         redirectAttributes.addFlashAttribute("order", orderDTO);
@@ -120,7 +115,7 @@ public class OrderController {
         if (!model.containsAttribute("order")) {
             Order confirmedOrder = orderDAO.findById(orderId);
             if (confirmedOrder != null) {
-                OrderDTO confirmedOrderDTO = convertOrderToDTO(confirmedOrder);
+                OrderDTO confirmedOrderDTO = orderService.convertOrderToDTO(confirmedOrder);
                 model.addAttribute("heading", "Your order is confirmed!");
                 model.addAttribute("order", confirmedOrderDTO);
             } else {
@@ -143,50 +138,5 @@ public class OrderController {
         }
 
         return menuItemsByCategory;
-    }
-
-    private OrderDTO convertOrderToDTO(Order order) {
-        OrderDTO orderDTO = new OrderDTO();
-        orderDTO.setTotalPrice(order.getFinal_price_cents());
-        for (OrderMenuItem orderMenuItem : order.getOrderMenuItems()) {
-            if (orderMenuItem.getMenuItem() != null) {
-                MenuItem menuItem = orderMenuItem.getMenuItem();
-                OrderMenuItemDTO orderMenuItemDTO = new OrderMenuItemDTO(
-                        menuItem.getId(), menuItem.getDishName(), orderMenuItem.getItemQuantity(),
-                        menuItem.getAmountAvailable(), menuItem.getPriceCents()
-                );
-                orderDTO.addMenuItem(orderMenuItemDTO);
-            } else if (orderMenuItem.getCustomPizza() != null) {
-                CustomPizza customPizza = orderMenuItem.getCustomPizza();
-                CustomPizzaDTO customPizzaDTO = new CustomPizzaDTO(customPizza.getName(), orderMenuItem.getItemQuantity());
-                SizeDTO sizeDTO = new SizeDTO(customPizza.getSize(),
-                        menuItemDAO.findByName(customPizza.getSize().getPizzaName()).getPriceCents());
-                List<ToppingDTO> toppingDTOList = new ArrayList<>();
-                List<ToppingDTO> extraToppingDTOList = new ArrayList<>();
-                for (CustomPizzaIngredient customPizzaIngredient : customPizza.getCustomPizzaIngredients()) {
-                    Ingredient ingredient = customPizzaIngredient.getIngredient();
-                    ToppingDTO toppingDTO = new ToppingDTO(ingredient.getIngredientName(), ingredient.getId());
-                    if (customPizzaIngredient.getIsExtra()) {
-                        extraToppingDTOList.add(toppingDTO);
-                    } else {
-                        toppingDTOList.add(toppingDTO);
-                    }
-                }
-                if (!toppingDTOList.isEmpty()) {
-                    customPizzaDTO.setToppings(toppingDTOList);
-                }
-                if (!extraToppingDTOList.isEmpty()) {
-                    customPizzaDTO.setExtraToppings(extraToppingDTOList);
-                }
-                customPizzaDTO.setPizzaSize(sizeDTO);
-                customPizzaDTO.setPricePerPizza(customPizza.getPriceCents());
-                customPizzaDTO.setTotalPizzaPrice(customPizza.getPriceCents() * orderMenuItem.getItemQuantity());
-
-                orderDTO.addCustomPizza(customPizzaDTO);
-            }
-
-        }
-
-        return orderDTO;
     }
 }

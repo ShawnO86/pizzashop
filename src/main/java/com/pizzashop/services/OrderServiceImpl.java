@@ -2,10 +2,7 @@ package com.pizzashop.services;
 
 import com.pizzashop.dao.*;
 
-import com.pizzashop.dto.CustomPizzaDTO;
-import com.pizzashop.dto.OrderDTO;
-import com.pizzashop.dto.OrderMenuItemDTO;
-import com.pizzashop.dto.ToppingDTO;
+import com.pizzashop.dto.*;
 
 import com.pizzashop.entities.*;
 
@@ -228,6 +225,53 @@ public class OrderServiceImpl implements OrderService {
         errors.put("priceErrors", priceErrors);
 
         return errors;
+    }
+
+    @Override
+    public OrderDTO convertOrderToDTO(Order order) {
+        OrderDTO orderDTO = new OrderDTO();
+        orderDTO.setOrderID(order.getId());
+        orderDTO.setTotalPrice(order.getFinal_price_cents());
+        for (OrderMenuItem orderMenuItem : order.getOrderMenuItems()) {
+            if (orderMenuItem.getMenuItem() != null) {
+                MenuItem menuItem = orderMenuItem.getMenuItem();
+                OrderMenuItemDTO orderMenuItemDTO = new OrderMenuItemDTO(
+                        menuItem.getId(), menuItem.getDishName(), orderMenuItem.getItemQuantity(),
+                        menuItem.getAmountAvailable(), menuItem.getPriceCents()
+                );
+                orderDTO.addMenuItem(orderMenuItemDTO);
+            } else if (orderMenuItem.getCustomPizza() != null) {
+                CustomPizza customPizza = orderMenuItem.getCustomPizza();
+                CustomPizzaDTO customPizzaDTO = new CustomPizzaDTO(customPizza.getName(), orderMenuItem.getItemQuantity());
+                SizeDTO sizeDTO = new SizeDTO(customPizza.getSize(),
+                        menuItemDAO.findByName(customPizza.getSize().getPizzaName()).getPriceCents());
+                List<ToppingDTO> toppingDTOList = new ArrayList<>();
+                List<ToppingDTO> extraToppingDTOList = new ArrayList<>();
+                for (CustomPizzaIngredient customPizzaIngredient : customPizza.getCustomPizzaIngredients()) {
+                    Ingredient ingredient = customPizzaIngredient.getIngredient();
+                    ToppingDTO toppingDTO = new ToppingDTO(ingredient.getIngredientName(), ingredient.getId());
+                    if (customPizzaIngredient.getIsExtra()) {
+                        extraToppingDTOList.add(toppingDTO);
+                    } else {
+                        toppingDTOList.add(toppingDTO);
+                    }
+                }
+                if (!toppingDTOList.isEmpty()) {
+                    customPizzaDTO.setToppings(toppingDTOList);
+                }
+                if (!extraToppingDTOList.isEmpty()) {
+                    customPizzaDTO.setExtraToppings(extraToppingDTOList);
+                }
+                customPizzaDTO.setPizzaSize(sizeDTO);
+                customPizzaDTO.setPricePerPizza(customPizza.getPriceCents());
+                customPizzaDTO.setTotalPizzaPrice(customPizza.getPriceCents() * orderMenuItem.getItemQuantity());
+
+                orderDTO.addCustomPizza(customPizzaDTO);
+            }
+
+        }
+
+        return orderDTO;
     }
 
     private void validateMenuItems(OrderDTO order) {

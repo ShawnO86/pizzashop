@@ -1,6 +1,9 @@
 package com.pizzashop.controllers;
 
+import com.pizzashop.dao.OrderDAO;
 import com.pizzashop.dto.OrderDTO;
+import com.pizzashop.entities.Order;
+import com.pizzashop.services.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,6 +13,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
@@ -20,16 +24,20 @@ import java.util.concurrent.TimeUnit;
 @RequestMapping("/employees")
 public class OrderNotificationController {
 
-    private final List<SseEmitter> emitters = new CopyOnWriteArrayList<>();
     private final ObjectMapper objectMapper;
+    private final OrderDAO orderDAO;
+    private final OrderService orderService;
 
+    private final List<SseEmitter> emitters = new CopyOnWriteArrayList<>();
     private final ScheduledExecutorService heartbeatScheduler = Executors.newSingleThreadScheduledExecutor();
     private final long HEARTBEAT_INTERVAL_MS = TimeUnit.SECONDS.toMillis(60); // heartbeat every 60 seconds
     private final long SSE_TIMEOUT_MS = TimeUnit.MINUTES.toMillis(5); // sse timeout 5 minutes
 
     @Autowired
-    public OrderNotificationController(ObjectMapper objectMapper) {
+    public OrderNotificationController(ObjectMapper objectMapper, OrderDAO orderDAO, OrderService orderService) {
         this.objectMapper = objectMapper;
+        this.orderDAO = orderDAO;
+        this.orderService = orderService;
     }
 
     @GetMapping(value = "/subscribeOrders", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
@@ -45,7 +53,7 @@ public class OrderNotificationController {
 
         // Send "connected" event on successful connection to client
         try {
-            emitter.send(SseEmitter.event().name("connected").data("Successfully subscribed to receive order notifications."));
+            emitter.send(SseEmitter.event().name("connected").data("Successfully connected to order notifications."));
         } catch (IOException e) {
             emitter.completeWithError(e);
         }
@@ -71,15 +79,27 @@ public class OrderNotificationController {
     }
 
     public void notifyNewOrder(OrderDTO order) {
-        for (SseEmitter emitter : this.emitters) {
+        for (SseEmitter emitter : emitters) {
             try {
                 String orderDTO_JSON = objectMapper.writeValueAsString(order);
                 emitter.send(SseEmitter.event().name("new-order").data(orderDTO_JSON));
             } catch (IOException e) {
                 emitter.completeWithError(e);
-                this.emitters.remove(emitter);
+                emitters.remove(emitter);
             }
         }
+    }
+
+    @GetMapping(value = "/getCurrentOrders", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<OrderDTO> getCurrentOrders() {
+        List<OrderDTO> orders = new ArrayList<>();
+        List<Order> currentOrders = orderDAO.findAllIncomplete();
+        for (Order currentOrder : currentOrders) {
+            OrderDTO orderDTO = orderService.convertOrderToDTO(currentOrder);
+            orders.add(orderDTO);
+        }
+
+        return orders;
     }
 
 }

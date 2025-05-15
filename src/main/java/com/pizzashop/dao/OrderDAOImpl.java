@@ -7,6 +7,8 @@ import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public class OrderDAOImpl implements OrderDAO {
     EntityManager em;
@@ -33,13 +35,23 @@ public class OrderDAOImpl implements OrderDAO {
 
     @Override
     public Order findByUsername(String username) {
-        TypedQuery<Order> query = em.createQuery("FROM Order o WHERE o.user.username = :username AND o.is_complete = false", Order.class);
+        TypedQuery<Order> query = em.createQuery("SELECT o FROM Order o " +
+                "WHERE o.user.username = :username AND o.is_complete = false", Order.class);
         query.setParameter("username", username);
         try {
             return query.getSingleResult();
         } catch (NoResultException e) {
             return null;
         }
+    }
+
+    @Override
+    public List<Order> findAllIncomplete() {
+        TypedQuery<Order> query = em.createQuery("SELECT o FROM Order o " +
+                "JOIN FETCH o.orderMenuItems Omi " +
+                "LEFT JOIN FETCH Omi.menuItem LEFT JOIN FETCH Omi.customPizza " +
+                "WHERE o.is_complete = false", Order.class);
+        return query.getResultList();
     }
 
 }

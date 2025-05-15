@@ -105,7 +105,6 @@ public class Order {
     public String toString() {
         return "Order{" +
                 "id=" + id +
-                ", user=" + user.getUsername() +
                 ", order_date=" + order_date +
                 ", final_price_cents=" + final_price_cents +
                 ", menuItems=" + orderMenuItems +
