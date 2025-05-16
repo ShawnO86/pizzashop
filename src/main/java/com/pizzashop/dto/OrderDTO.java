@@ -1,5 +1,6 @@
 package com.pizzashop.dto;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,6 +9,7 @@ public class OrderDTO {
     private List<CustomPizzaDTO> customPizzaList;
     private int totalPrice;
     private Integer orderID;
+    private LocalDateTime orderDateTime;
 
     public OrderDTO() {}
 
@@ -34,6 +36,12 @@ public class OrderDTO {
     }
     public void setOrderID(Integer orderID) {
         this.orderID = orderID;
+    }
+    public LocalDateTime getOrderDateTime() {
+        return orderDateTime;
+    }
+    public void setOrderDateTime(LocalDateTime orderDateTime) {
+        this.orderDateTime = orderDateTime;
     }
 
     public void addMenuItem(OrderMenuItemDTO menuItem) {

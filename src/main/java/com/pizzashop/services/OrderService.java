@@ -8,7 +8,7 @@ import java.util.Map;
 
 public interface OrderService {
 
-    int submitOrder(OrderDTO order, String username);
+    Order submitOrder(OrderDTO order, String username);
 
     Map<String, List<String>> submitOrderForValidation(OrderDTO order);
 

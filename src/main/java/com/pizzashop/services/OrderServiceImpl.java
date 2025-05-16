@@ -44,11 +44,11 @@ public class OrderServiceImpl implements OrderService {
     //  update each Ingredient separately and menuItems amount available
     @Override
     @Transactional
-    public int submitOrder(OrderDTO order, String username) {
+    public Order submitOrder(OrderDTO order, String username) {
         User user = userDAO.findByUsername(username);
 
         if (user == null) {
-            return 0;
+            return null;
         }
 
         LocalDateTime now = LocalDateTime.now();
@@ -232,6 +232,7 @@ public class OrderServiceImpl implements OrderService {
         OrderDTO orderDTO = new OrderDTO();
         orderDTO.setOrderID(order.getId());
         orderDTO.setTotalPrice(order.getFinal_price_cents());
+        orderDTO.setOrderDateTime(order.getOrder_date());
         for (OrderMenuItem orderMenuItem : order.getOrderMenuItems()) {
             if (orderMenuItem.getMenuItem() != null) {
                 MenuItem menuItem = orderMenuItem.getMenuItem();
@@ -243,6 +244,7 @@ public class OrderServiceImpl implements OrderService {
             } else if (orderMenuItem.getCustomPizza() != null) {
                 CustomPizza customPizza = orderMenuItem.getCustomPizza();
                 CustomPizzaDTO customPizzaDTO = new CustomPizzaDTO(customPizza.getName(), orderMenuItem.getItemQuantity());
+                customPizzaDTO.setCustomPizzaID(customPizza.getId());
                 SizeDTO sizeDTO = new SizeDTO(customPizza.getSize(),
                         menuItemDAO.findByName(customPizza.getSize().getPizzaName()).getPriceCents());
                 List<ToppingDTO> toppingDTOList = new ArrayList<>();

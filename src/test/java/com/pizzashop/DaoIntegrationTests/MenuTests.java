@@ -243,7 +243,7 @@ public class MenuTests {
             System.out.println("ingredient: " + ingredient);
         }
 
-        int submissionResponse = orderService.submitOrder(orderDTO, buildTestUser().getUsername());
+        Order submissionResponse = orderService.submitOrder(orderDTO, buildTestUser().getUsername());
 
         System.out.println("*** submission response: " + submissionResponse);
 

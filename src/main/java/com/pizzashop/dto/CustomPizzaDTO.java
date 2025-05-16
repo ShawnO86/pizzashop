@@ -10,6 +10,7 @@ public class CustomPizzaDTO {
     private int quantity;
     private int pricePerPizza;
     private int totalPizzaPrice;
+    private Integer customPizzaID;
 
     public CustomPizzaDTO() {
 
@@ -69,6 +70,12 @@ public class CustomPizzaDTO {
     }
     public void setTotalPizzaPrice(int totalPizzaPrice) {
         this.totalPizzaPrice = totalPizzaPrice;
+    }
+    public Integer getCustomPizzaID() {
+        return customPizzaID;
+    }
+    public void setCustomPizzaID(Integer customPizzaID) {
+        this.customPizzaID = customPizzaID;
     }
 
     @Override

@@ -15,7 +15,7 @@ public class EmployeeDashboardController {
 
     @GetMapping("/showOrders")
     public String showOrders(Model model) {
-        model.addAttribute("header", "Current Orders");
+        model.addAttribute("heading", "Current Orders");
 
         return "management/showNewOrders";
     }

@@ -19,9 +19,9 @@ public class OrderDAOImpl implements OrderDAO {
 
     @Override
     @Transactional
-    public Integer save(Order order) {
+    public Order save(Order order) {
         em.persist(order);
-        return order.getId();
+        return order;
     }
 
     @Override

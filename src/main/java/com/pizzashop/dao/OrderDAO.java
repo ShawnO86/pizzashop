@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface OrderDAO {
 
-    Integer save(Order order);
+    Order save(Order order);
 
     Order findById(Integer id);
 
