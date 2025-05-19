@@ -59,7 +59,7 @@ public class OrderController {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String username = ((UserDetails) principal).getUsername();
 
-        Order existingOrder = orderDAO.findByUsername(username);
+        //Order existingOrder = orderDAO.findByUsername(username);
 
         // {availabilityErrors, []}, {priceErrors, []}
         Map<String, List<String>> validationResponse;
@@ -68,11 +68,11 @@ public class OrderController {
             model.addAttribute("cartError", "Nothing in cart!");
             model.addAttribute("order", orderDTO);
             return showOrderForm(model);
-        } else if (existingOrder != null) {
+        }/* else if (existingOrder != null) {
             model.addAttribute("cartError", "Your current order is being processed!");
             model.addAttribute("order", new OrderDTO());
             return showOrderForm(model);
-        } else {
+        }*/ else {
             System.out.println("* validation *");
             validationResponse = orderService.submitOrderForValidation(orderDTO);
         }
@@ -93,20 +93,20 @@ public class OrderController {
             return showOrderForm(model);
         }
 
-        int orderId = orderService.submitOrder(orderDTO, username);
+        Order order = orderService.submitOrder(orderDTO, username);
 
-        if (orderId == 0) {
+        if (order == null) {
             model.addAttribute("cartError", "User not found!");
             model.addAttribute("order", orderDTO);
             return showOrderForm(model);
         }
 
-        orderDTO.setOrderID(orderId);
+        orderDTO.setOrderID(order.getId());
         System.out.println("*** Notify of new order...");
-        orderNotificationController.notifyNewOrder(orderDTO);
+        orderNotificationController.notifyNewOrder(orderService.convertOrderToDTO(order));
         redirectAttributes.addFlashAttribute("order", orderDTO);
 
-        return "redirect:/order/confirmOrder?orderId=" + orderId;
+        return "redirect:/order/confirmOrder?orderId=" + order.getId();
     }
 
     @GetMapping("/confirmOrder")

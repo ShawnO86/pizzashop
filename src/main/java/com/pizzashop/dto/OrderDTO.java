@@ -10,6 +10,8 @@ public class OrderDTO {
     private int totalPrice;
     private Integer orderID;
     private LocalDateTime orderDateTime;
+    private boolean inProgress;
+    private String employeeName;
 
     public OrderDTO() {}
 
@@ -43,6 +45,18 @@ public class OrderDTO {
     public void setOrderDateTime(LocalDateTime orderDateTime) {
         this.orderDateTime = orderDateTime;
     }
+    public boolean getInProgress() {
+        return inProgress;
+    }
+    public void setInProgress(boolean inProgress) {
+        this.inProgress = inProgress;
+    }
+    public String getEmployeeName() {
+        return employeeName;
+    }
+    public void setEmployeeName(String employeeName) {
+        this.employeeName = employeeName;
+    }
 
     public void addMenuItem(OrderMenuItemDTO menuItem) {
         if (menuItemList == null) {
@@ -50,7 +64,6 @@ public class OrderDTO {
         }
         menuItemList.add(menuItem);
     }
-
     public void addCustomPizza(CustomPizzaDTO customPizza) {
         if (customPizzaList == null) {
             customPizzaList = new ArrayList<>();
@@ -64,6 +77,10 @@ public class OrderDTO {
                 "menuItemList=" + menuItemList +
                 ", customPizzaList=" + customPizzaList +
                 ", totalPrice=" + totalPrice +
+                ", orderID=" + orderID +
+                ", orderDateTime=" + orderDateTime +
+                ", inProgress=" + inProgress +
+                ", employeeName='" + employeeName + '\'' +
                 '}';
     }
 }

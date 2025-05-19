@@ -34,7 +34,7 @@ public interface MenuItemService {
 
     void updateAllMenuItemsAmountAvailableByIngredient(Ingredient ingredient);
 
-    List<String[]> buildRecipeByMenuItem(MenuItem menuItem);
+    List<String[]> buildRecipeByMenuItemId(int id);
 
     List<int[]> buildIngredientIdAmounts(Integer[] ingredientIdsAmountsKeys, Integer[] ingredientIdAmountValues);
 

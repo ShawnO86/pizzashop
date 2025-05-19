@@ -44,9 +44,8 @@ public class MenuItemController {
     @GetMapping("/showMenuItemRecipe")
     public String showMenuItemRecipe(@RequestParam("menuItemId") int menuItemId,
                                      @RequestParam("menuItemName") String menuItemName, Model model) {
-        MenuItem menuItem = menuItemService.findMenuItemById(menuItemId);
 
-        model.addAttribute("menuItemRecipe", menuItemService.buildRecipeByMenuItem(menuItem));
+        model.addAttribute("menuItemRecipe", menuItemService.buildRecipeByMenuItemId(menuItemId));
         model.addAttribute("menuItemName", menuItemName);
         model.addAttribute("menuItemId", menuItemId);
         model.addAttribute("heading", menuItemName + " recipe");
@@ -69,7 +68,7 @@ public class MenuItemController {
             model.addAttribute("heading", "Update " + menuItem.getDishName());
             model.addAttribute("menuItem", menuItem);
             model.addAttribute("menuItemId", menuItemId);
-            model.addAttribute("menuItemRecipe", menuItemService.buildRecipeByMenuItem(menuItem));
+            model.addAttribute("menuItemRecipe", menuItemService.buildRecipeByMenuItemId(menuItemId));
         }
 
         return "management/addMenuItem";
@@ -130,7 +129,7 @@ public class MenuItemController {
                 model.addAttribute("heading", "Create A New Menu Item");
             } else {
                 MenuItem menuItem = menuItemService.findMenuItemById(menuItemId);
-                List<String[]> menuItemRecipe = menuItemService.buildRecipeByMenuItem(menuItem);
+                List<String[]> menuItemRecipe = menuItemService.buildRecipeByMenuItemId(menuItemId);
                 model.addAttribute("heading", "Update " + menuItem.getDishName());
                 model.addAttribute("menuItemRecipe", menuItemRecipe);
             }

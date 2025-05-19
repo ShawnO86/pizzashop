@@ -25,7 +25,7 @@ public class OrderDAOImpl implements OrderDAO {
     }
 
     @Override
-    public Order findById(Integer id) {
+    public Order findById(int id) {
         try {
             return em.find(Order.class, id);
         } catch (NoResultException e) {
@@ -52,6 +52,12 @@ public class OrderDAOImpl implements OrderDAO {
                 "LEFT JOIN FETCH Omi.menuItem LEFT JOIN FETCH Omi.customPizza " +
                 "WHERE o.is_complete = false", Order.class);
         return query.getResultList();
+    }
+
+    @Override
+    @Transactional
+    public void update(Order order) {
+        em.merge(order);
     }
 
 }

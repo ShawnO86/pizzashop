@@ -1,23 +1,37 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
   <meta charset="UTF-8">
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
   <title>Pizza Shop System</title>
   <link rel="stylesheet" type="text/css" href="/styles/main.css">
 </head>
+
 <body>
 <header th:insert="~{header :: head}"></header>
 
-<section>
-  <button id="connect-btn">Connect to order stream</button>
-  <button id="disconnect-btn">Disconnect</button>
-</section>
+<main>
 
-<section id="orders-container">
+  <section>
+    <h2>
+      <span>Employee Name:</span>
+      <span sec:authentication="principal.username" id="employee-name"></span>
+    </h2>
+    <button id="connect-btn">Connect to order stream</button>
+    <button id="disconnect-btn">Disconnect</button>
+  </section>
+
+  <section id="order-display" class="space-between">
+    <div id="orders-container"></div>
+
+    <div id="fulfilled-container"></div>
+  </section>
 
 
-</section>
+</main>
 
 </body>
-<script src="/js/getOrders.js" defer></script>
+<script src="/js/getOrders.js" type="module"></script>
+<script src="/js/getOrdersUtils.js" type="module"></script>
 </html>

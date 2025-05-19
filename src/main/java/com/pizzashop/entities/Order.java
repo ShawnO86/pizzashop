@@ -29,6 +29,12 @@ public class Order {
     @Column(name = "is_complete")
     private boolean is_complete;
 
+    @Column(name = "in_progress")
+    private boolean in_progress;
+
+    @Column(name = "fulfilled_by")
+    private String fulfilled_by;
+
     @OneToMany(mappedBy = "order" , cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<OrderMenuItem> orderMenuItems;
 
@@ -86,6 +92,22 @@ public class Order {
         this.is_complete = is_complete;
     }
 
+    public boolean getIn_progress() {
+        return in_progress;
+    }
+
+    public void setIn_progress(boolean in_progress) {
+        this.in_progress = in_progress;
+    }
+
+    public String getFulfilled_by() {
+        return fulfilled_by;
+    }
+
+    public void setFulfilled_by(String fulfilled_by) {
+        this.fulfilled_by = fulfilled_by;
+    }
+
     public List<OrderMenuItem> getOrderMenuItems() {
         return orderMenuItems;
     }
@@ -109,6 +131,8 @@ public class Order {
                 ", final_price_cents=" + final_price_cents +
                 ", menuItems=" + orderMenuItems +
                 ", is_complete=" + is_complete +
+                ", in_progress=" + in_progress +
+                ", fulfilled_by='" + fulfilled_by + '\'' +
                 '}';
     }
 }

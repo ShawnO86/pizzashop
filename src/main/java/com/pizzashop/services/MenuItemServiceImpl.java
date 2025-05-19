@@ -223,16 +223,17 @@ public class MenuItemServiceImpl implements MenuItemService {
     }
 
     @Override
-    public List<String[]> buildRecipeByMenuItem(MenuItem menuItem) {
+    public List<String[]> buildRecipeByMenuItemId(int id) {
+        MenuItem menuItem = menuItemDAO.findById(id);
         List<String[]> menuItemRecipe = new ArrayList<>();
         List<MenuItemIngredient> ingredients = menuItem.getMenuItemIngredients();
         for (MenuItemIngredient menuItemIngredient : ingredients) {
+            Ingredient ingredient = menuItemIngredient.getIngredient();
             menuItemRecipe.add(new String[]{
-                    menuItemIngredient.getIngredient().getIngredientName(),
+                    ingredient.getIngredientName(),
                     String.valueOf(menuItemIngredient.getQuantityUsed()),
-                    menuItemIngredient.getIngredient().getUnitOfMeasure()
+                    ingredient.getUnitOfMeasure()
             });
-
         }
         return menuItemRecipe;
     }

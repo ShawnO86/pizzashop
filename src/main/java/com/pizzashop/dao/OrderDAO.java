@@ -8,9 +8,11 @@ public interface OrderDAO {
 
     Order save(Order order);
 
-    Order findById(Integer id);
+    Order findById(int id);
 
     Order findByUsername(String username);
 
     List<Order> findAllIncomplete();
+
+    void update(Order order);
 }

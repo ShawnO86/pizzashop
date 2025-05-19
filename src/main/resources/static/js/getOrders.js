@@ -1,14 +1,13 @@
-// todo :
-//  -- : orderId in DTO for setting isComplete to true ..
-//  -- : use REST controller to get all current orders on initial connect/reconnect, and to update completed order ..
+import {getCurrentOrders, appendOrderToUI, setOrderInProgress,
+    setOrderComplete, getMenuItemRecipe, getCustomPizzaRecipe} from "./getOrdersUtils.js";
 
 document.addEventListener('DOMContentLoaded', ()=> {
     const connectBtn = document.getElementById("connect-btn");
     const disconnectBtn = document.getElementById("disconnect-btn");
+    const orderDisplayContainer = document.getElementById("order-display");
     const orderContainer = document.getElementById("orders-container");
+    const fulfilledContainer = document.getElementById("fulfilled-container");
 
-
-    const currentOrdersEndpoint = "/employees/getCurrentOrders";
 
     let eventSource;
     //when new order comes in, add to end of orders[] array (like a queue) after getCurrentOrders() finishes
@@ -16,43 +15,32 @@ document.addEventListener('DOMContentLoaded', ()=> {
     //populate page with fetched orders first, then add to display as they come in.
 
     let orders = {};
+    let fulfilled = {};
     let isClosed = true;
-
-    let messageCount= 0;
 
     connectBtn.addEventListener("click", manualConnect);
     disconnectBtn.addEventListener("click", manualDisconnect);
 
     async function connect() {
-        orders = await getCurrentOrders(currentOrdersEndpoint);
-        eventSource  = new EventSource('/employees/subscribeOrders');
+        try {
+            orders = await getCurrentOrders();
+        } catch (e) {
+            alert("Error fetching initial orders, please try again. Error message: " + e);
+            return;
+        }
 
+        eventSource  = new EventSource('/employees/subscribeOrders');
         populateInitialUI();
-        //todo : will need to build template literals for orders to display
 
         eventSource.onopen = () => {
             console.log("Notification stream open.")
             isClosed = false;
         };
         eventSource.onmessage = (event) => {
-            messageCount += 1;
-            console.log(event.data + " count: " + messageCount);
+            console.log(event.data);
         };
-
-        eventSource.addEventListener('new-order', (event) => {
-            const newOrderMessage = JSON.parse(event.data);
-            console.log('New Order Alert:', newOrderMessage);
-
-            orders[newOrderMessage["orderID"]] = newOrderMessage;
-            // Display the newOrderMessage to the employees
-
-            console.log("orders after update: ", orders);
-
-        });
-
         eventSource.onerror = (error) => {
-            console.error('Error connecting to order notifications:', error);
-             // Attempt to close and potentially reconnect
+            // if not manually closed, close stream and attempt to reconnect.
             if (!isClosed) {
                 eventSource.close();
                 console.log("Attempting reconnect in 3 seconds...");
@@ -61,6 +49,38 @@ document.addEventListener('DOMContentLoaded', ()=> {
                 console.log("Auto reconnect disabled, stream was closed intentionally.")
             }
         };
+
+        eventSource.addEventListener('new-order', (event) => {
+            const newOrderMsg = JSON.parse(event.data);
+            console.log('New Order Alert:', newOrderMsg);
+
+            orders[newOrderMsg["orderID"]] = newOrderMsg;
+            // Display the newOrderMessage to the employees
+            appendOrderToUI(orders[newOrderMsg["orderID"]], orderContainer);
+
+            console.log("orders after update: ", orders);
+        });
+
+        // todo: complete these listeners. . .
+        eventSource.addEventListener('order-in-progress', (event) => {
+            //remove received order by id key, put into pendingOrders object with completedBy
+            const fulfilledOrderMsg = JSON.parse(event.data);
+
+            console.log("order in progress received: ", fulfilledOrderMsg);
+            delete orders[fulfilledOrderMsg["orderID"]];
+            fulfilled[fulfilledOrderMsg["orderID"]] = fulfilledOrderMsg;
+
+            appendOrderToUI(fulfilled[fulfilledOrderMsg["orderID"]], fulfilledContainer);
+            const removeEl = orderContainer.querySelector(`[data-order-id="${fulfilledOrderMsg["orderID"]}"]`)
+            removeEl.remove();
+        });
+
+        eventSource.addEventListener('order-complete', (event) => {
+            const completedOrderId = event.data;
+
+            const removeEl = fulfilledContainer.querySelector(`[data-order-id="${completedOrderId}"]`)
+            removeEl.remove();
+        });
     }
 
     function manualConnect() {
@@ -71,6 +91,8 @@ document.addEventListener('DOMContentLoaded', ()=> {
         }
     }
 
+    // todo: send alert if orders being processed by employee name...
+    //  --: iterate over fulfilled object to see, dont allow manual disconnect if so.
     function manualDisconnect() {
         if (eventSource && eventSource.readyState !== EventSource.CLOSED) {
             eventSource.close();
@@ -83,34 +105,42 @@ document.addEventListener('DOMContentLoaded', ()=> {
 
     function populateInitialUI() {
         orderContainer.innerHTML = "";
+        fulfilledContainer.innerHTML = "";
         for (let order in orders) {
-            console.log("building this order's display:", order);
-            appendOrderToUI(orders[order]);
+            if (orders[order]["inProgress"]) {
+                appendOrderToUI(orders[order], fulfilledContainer);
+            } else {
+                appendOrderToUI(orders[order], orderContainer);
+            }
         }
     }
 
-    function appendOrderToUI(order) {
-        const orderTemplate = document.createElement("div");
-
-        // todo: format date,
-
-        orderTemplate.innerHTML = `
-                <div class="order" data-order-id="${order['orderID']}">
-                    <details>
-                        <summary class="order-summary">
-                            <span>Order ID: ${order["orderID"]}</span>
-                            <span>-- Time: ${new Date(order["orderDateTime"]).toString()}</span>
-                        </summary>
-                        
-                        <p>blahhhh</p>
-                    </details>
-                    <hr>
-                </div>
-            `;
-
-        orderContainer.appendChild(orderTemplate);
-    }
-
+    orderDisplayContainer.addEventListener("click", async (event) => {
+        // todo: btn classes - complete-btn, fulfill-btn, get-menu-item-recipe-btn, get-custom-pizza-recipe-btn
+        //  --: data-* data-order-id or data-item-id
+        console.log(event.target)
+        const target = event.target;
+        const targetClasses = target.classList;
+        if (targetClasses.contains("fulfill-btn")) {
+            console.log("fulfill btn pressed: ", target.dataset.orderId);
+            try {
+                await setOrderInProgress(target.dataset.orderId);
+            } catch (e) {
+                console.error("Error during setOrderInProgress:", e);
+            }
+        } else if (targetClasses.contains("complete-btn")) {
+            console.log("complete btn pressed: ", target.dataset.orderId);
+            try {
+                await setOrderComplete(target.dataset.orderId);
+            } catch (e) {
+                console.error("Error during setOrderComplete:", e);
+            }
+        } else if (targetClasses.contains("get-menu-item-recipe-btn")) {
+            console.log("menu item recipe btn pressed: ", target.dataset.itemId);
+        } else if (targetClasses.contains("get-custom-pizza-recipe-btn")) {
+            console.log("custom pizza recipe btn pressed: ", target.dataset.itemId);
+        }
+    });
 
 });
 
@@ -119,13 +149,4 @@ document.addEventListener('DOMContentLoaded', ()=> {
 
 
 
-async function getCurrentOrders(endpoint) {
-    try {
-        const response = await fetch(endpoint);
-        const result = await response.json();
-        console.log("current orders", result);
-        return result;
-    } catch (e) {
-        console.error(e.message);
-    }
-}
+

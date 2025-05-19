@@ -172,6 +172,7 @@ public class OrderServiceImpl implements OrderService {
         return orderDAO.save(orderEntity);
     }
 
+    // todo: implement logger for this method
     @Transactional
     protected void reduceInventory(Map<Integer, Integer> ingredientIdAmounts) {
         List<Integer> ingredientIDs = new ArrayList<>(ingredientIdAmounts.keySet());
@@ -233,6 +234,14 @@ public class OrderServiceImpl implements OrderService {
         orderDTO.setOrderID(order.getId());
         orderDTO.setTotalPrice(order.getFinal_price_cents());
         orderDTO.setOrderDateTime(order.getOrder_date());
+
+        if (order.getIn_progress()) {
+            orderDTO.setInProgress(true);
+        }
+        if (order.getFulfilled_by() != null) {
+            orderDTO.setEmployeeName(order.getFulfilled_by());
+        }
+
         for (OrderMenuItem orderMenuItem : order.getOrderMenuItems()) {
             if (orderMenuItem.getMenuItem() != null) {
                 MenuItem menuItem = orderMenuItem.getMenuItem();
