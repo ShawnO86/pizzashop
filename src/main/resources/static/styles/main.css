@@ -87,7 +87,17 @@ th, td {
     padding: 1rem;
 }
 
+button {
+    cursor: pointer;
+}
+
+#order-display {
+    margin: 2rem auto;
+    max-width: 80vw;
+}
+
 .order {
+    margin: 2rem auto;
     min-width: 20rem;
 }
 

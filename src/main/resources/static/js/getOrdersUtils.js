@@ -101,32 +101,33 @@ export function appendOrderToUI(order, container) {
     }
 
     const orderDateReceived = new Date(order['orderDateTime']);
-    const orderDateFormatted = [orderDateReceived.getMonth(), orderDateReceived.getDate(), orderDateReceived.getHours(), orderDateReceived.getMinutes()]
+    const orderDateFormatted = [orderDateReceived.getMonth() + 1, orderDateReceived.getDate(), orderDateReceived.getHours(), orderDateReceived.getMinutes()]
+
+    orderTemplate.classList.add("order");
+    orderTemplate.setAttribute("data-order-id", order['orderID']);
 
     orderTemplate.innerHTML = `
-                <div class="order" data-order-id="${order['orderID']}">
-                    <details>
-                        <summary class="order-summary space-between">
-                            <span>Order ID: ${order['orderID']}</span>
-                            <span>Received on: ${orderDateFormatted[0]}/${orderDateFormatted[1]} @ ${orderDateFormatted[2]}:${orderDateFormatted[3]}</span>
-                        </summary>
-                        ${menuItemHTML ? menuItemHTML : ""}
-                        ${menuItemHTML && customPizzaHTML ? `<br>` : ""}
-                        ${customPizzaHTML ? customPizzaHTML : ""}
-                        <div>
-                            ${order["employeeName"] === EMPLOYEE_NAME ? `<button class="complete-btn" data-order-id="${order['orderID']}">Complete Order</button>` : ''}
-                            ${order["inProgress"] !== true ? `<button class="fulfill-btn" data-order-id="${order['orderID']}">Fulfill Order</button>` : `<p>Being fulfilled by: ${order["employeeName"]}</p>`}
-                        </div>
-                    </details>
-                    <hr>
-                </div>
-            `;
+        <details>
+            <summary class="order-summary space-between">
+                <span>Order ID: ${order['orderID']}</span>
+                <span>Received on: ${orderDateFormatted[0]}/${orderDateFormatted[1]} @ ${orderDateFormatted[2]}:${orderDateFormatted[3]}</span>
+            </summary>
+            ${menuItemHTML ? menuItemHTML : ""}
+            ${menuItemHTML && customPizzaHTML ? `<br>` : ""}
+            ${customPizzaHTML ? customPizzaHTML : ""}
+            <div>
+                ${order["employeeName"] === EMPLOYEE_NAME ? `<button class="complete-btn" data-order-id="${order['orderID']}">Complete Order</button>` : ''}
+                ${order["inProgress"] !== true ? `<button class="fulfill-btn" data-order-id="${order['orderID']}">Fulfill Order</button>` : `<p>Being fulfilled by: ${order["employeeName"]}</p>`}
+            </div>
+        </details>
+        <hr>
+    `;
 
     container.appendChild(orderTemplate);
 }
 
 function buildMenuItemHTML(menuItems) {
-    let menuItemsTemplate = "<h3>Menu Items</h3><hr>";
+    let menuItemsTemplate = "<h3>Menu Items</h3>";
     for (let menuItem of menuItems) {
         menuItemsTemplate += `
             <p class="space-between"><strong>${menuItem['menuItemName']} x ${menuItem['menuItemAmount']}</strong>
@@ -139,7 +140,7 @@ function buildMenuItemHTML(menuItems) {
 }
 
 function buildCustomPizzaHTML(customPizzas) {
-    let customPizzasTemplate = "<h3>Custom Pizzas</h3><hr>";
+    let customPizzasTemplate = "<h3>Custom Pizzas</h3>";
     for (let customPizza of customPizzas) {
         customPizzasTemplate += `
             <p class="space-between"><strong>${customPizza['pizzaSize']['size']} ${customPizza['pizzaName']} x ${customPizza['quantity']}</strong>
@@ -164,7 +165,7 @@ export function buildRecipeDisplay(item, container) {
     container.innerHTML = `
         <h3>${item["Name"][0]}</h3>
         <p>${item["Description"][0]}</p>
-        <h4>Ingredients</h4>
+        <h4>Base Ingredients</h4>
         <ul>
             ${ingredientsHTML}
         </ul>
