@@ -1,5 +1,7 @@
-import {getCurrentOrders, appendOrderToUI, setOrderInProgress,
-    setOrderComplete, getMenuItemRecipe, getCustomPizzaRecipe} from "./getOrdersUtils.js";
+import {
+    getCurrentOrders, appendOrderToUI, setOrderInProgress,
+    setOrderComplete, getMenuItemRecipe, getCustomPizzaRecipe, buildRecipeDisplay
+} from "./getOrdersUtils.js";
 
 document.addEventListener('DOMContentLoaded', ()=> {
     const connectBtn = document.getElementById("connect-btn");
@@ -7,7 +9,9 @@ document.addEventListener('DOMContentLoaded', ()=> {
     const orderDisplayContainer = document.getElementById("order-display");
     const orderContainer = document.getElementById("orders-container");
     const fulfilledContainer = document.getElementById("fulfilled-container");
-
+    const recipeDialog = document.getElementById("recipe-dialog");
+    const recipeContainer = document.getElementById("recipe-container");
+    const closeRecipeBtn = document.getElementById("close-recipe-dialog");
 
     let eventSource;
     //when new order comes in, add to end of orders[] array (like a queue) after getCurrentOrders() finishes
@@ -20,6 +24,9 @@ document.addEventListener('DOMContentLoaded', ()=> {
 
     connectBtn.addEventListener("click", manualConnect);
     disconnectBtn.addEventListener("click", manualDisconnect);
+    closeRecipeBtn.addEventListener("click", () => {
+        recipeDialog.close();
+    })
 
     async function connect() {
         try {
@@ -116,29 +123,38 @@ document.addEventListener('DOMContentLoaded', ()=> {
     }
 
     orderDisplayContainer.addEventListener("click", async (event) => {
-        // todo: btn classes - complete-btn, fulfill-btn, get-menu-item-recipe-btn, get-custom-pizza-recipe-btn
-        //  --: data-* data-order-id or data-item-id
-        console.log(event.target)
         const target = event.target;
         const targetClasses = target.classList;
         if (targetClasses.contains("fulfill-btn")) {
-            console.log("fulfill btn pressed: ", target.dataset.orderId);
             try {
                 await setOrderInProgress(target.dataset.orderId);
             } catch (e) {
                 console.error("Error during setOrderInProgress:", e);
             }
         } else if (targetClasses.contains("complete-btn")) {
-            console.log("complete btn pressed: ", target.dataset.orderId);
             try {
                 await setOrderComplete(target.dataset.orderId);
             } catch (e) {
                 console.error("Error during setOrderComplete:", e);
             }
         } else if (targetClasses.contains("get-menu-item-recipe-btn")) {
-            console.log("menu item recipe btn pressed: ", target.dataset.itemId);
+            try {
+                const menuItemRecipe = await getMenuItemRecipe(target.dataset.itemId);
+                buildRecipeDisplay(menuItemRecipe, recipeContainer);
+                recipeDialog.showModal();
+                console.log("menu item recipe finished:", menuItemRecipe);
+            } catch (e) {
+                console.error("Error during getMenuItemRecipe:", e);
+            }
         } else if (targetClasses.contains("get-custom-pizza-recipe-btn")) {
-            console.log("custom pizza recipe btn pressed: ", target.dataset.itemId);
+            try {
+                const pizzaItemRecipe = await getCustomPizzaRecipe(target.dataset.itemId);
+                buildRecipeDisplay(pizzaItemRecipe, recipeContainer);
+                recipeDialog.showModal();
+                console.log("pizza item recipe finished:", pizzaItemRecipe);
+            } catch (e) {
+                console.error("Error during getCustomPizzaRecipe:", e);
+            }
         }
     });
 

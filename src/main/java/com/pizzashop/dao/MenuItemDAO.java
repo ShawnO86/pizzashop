@@ -9,6 +9,10 @@ public interface MenuItemDAO {
 
     MenuItem findById(int id);
 
+    MenuItem findByNameJoinFetchIngredients(String name);
+
+    MenuItem findByIdJoinFetchIngredients(int id);
+
     List<MenuItem> findAll();
 
     List<MenuItem> findAllAvailable();

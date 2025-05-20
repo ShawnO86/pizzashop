@@ -43,6 +43,32 @@ public class MenuItemDAOImpl implements MenuItemDAO {
     }
 
     @Override
+    public MenuItem findByNameJoinFetchIngredients(String name) {
+        TypedQuery<MenuItem> query = em.createQuery("FROM MenuItem m " +
+                "JOIN FETCH m.menuItemIngredients mii JOIN FETCH mii.ingredient " +
+                "WHERE m.dishName = :name", MenuItem.class);
+        query.setParameter("name", name);
+        try {
+            return query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+
+    @Override
+    public MenuItem findByIdJoinFetchIngredients(int id) {
+        TypedQuery<MenuItem> query = em.createQuery("FROM MenuItem m " +
+                "JOIN FETCH m.menuItemIngredients mii JOIN FETCH mii.ingredient " +
+                "WHERE m.id = :id", MenuItem.class);
+        query.setParameter("id", id);
+        try {
+            return query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+
+    @Override
     public List<MenuItem> findAll() {
         TypedQuery<MenuItem> query = em.createQuery("FROM MenuItem", MenuItem.class);
         return query.getResultList();

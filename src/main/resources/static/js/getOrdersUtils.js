@@ -65,13 +65,11 @@ export async function setOrderComplete(orderId) {
     }
 }
 
-// todo: -> finish recipe stuff. add cancel fulfillment btn
-export async function getMenuItemRecipe(menuItemId, menuItemName) {
+export async function getMenuItemRecipe(menuItemId) {
     try {
-        //need menuItem id and name
-        const response = await fetch(MENU_ITEM_RECIPE_ENDPOINT + "?=");
+        const response = await fetch(MENU_ITEM_RECIPE_ENDPOINT + "?menuItemId=" + menuItemId);
         const result = await response.json();
-        console.log("current orders", result);
+        console.log("fetching menu item recipe...");
         return result;
     } catch (e) {
         console.error(e.message);
@@ -80,16 +78,16 @@ export async function getMenuItemRecipe(menuItemId, menuItemName) {
 
 export async function getCustomPizzaRecipe(customPizzaId) {
     try {
-        //need menuItem id and name
-        const response = await fetch(MENU_ITEM_RECIPE_ENDPOINT + "?=");
+        const response = await fetch(CUSTOM_PIZZA_RECIPE_ENDPOINT + "?customPizzaId=" + customPizzaId);
         const result = await response.json();
-        console.log("current orders", result);
+        console.log("fetching custom pizza recipe...");
         return result;
     } catch (e) {
         console.error(e.message);
     }
 }
 
+// todo: -> add cancel fulfillment btn and related endpoints/fetch?
 export function appendOrderToUI(order, container) {
     const orderTemplate = document.createElement("div");
     let menuItemHTML, customPizzaHTML;
@@ -102,12 +100,15 @@ export function appendOrderToUI(order, container) {
         customPizzaHTML = buildCustomPizzaHTML(order['customPizzaList']);
     }
 
+    const orderDateReceived = new Date(order['orderDateTime']);
+    const orderDateFormatted = [orderDateReceived.getMonth(), orderDateReceived.getDate(), orderDateReceived.getHours(), orderDateReceived.getMinutes()]
+
     orderTemplate.innerHTML = `
                 <div class="order" data-order-id="${order['orderID']}">
                     <details>
-                        <summary class="order-summary">
+                        <summary class="order-summary space-between">
                             <span>Order ID: ${order['orderID']}</span>
-                            <span>-- Time: ${new Date(order['orderDateTime']).toString()}</span>
+                            <span>Received on: ${orderDateFormatted[0]}/${orderDateFormatted[1]} @ ${orderDateFormatted[2]}:${orderDateFormatted[3]}</span>
                         </summary>
                         ${menuItemHTML ? menuItemHTML : ""}
                         ${menuItemHTML && customPizzaHTML ? `<br>` : ""}
@@ -125,10 +126,10 @@ export function appendOrderToUI(order, container) {
 }
 
 function buildMenuItemHTML(menuItems) {
-    let menuItemsTemplate = "<h3>Menu Items</h3>";
+    let menuItemsTemplate = "<h3>Menu Items</h3><hr>";
     for (let menuItem of menuItems) {
         menuItemsTemplate += `
-            <p>${menuItem['menuItemName']} x${menuItem['menuItemAmount']}
+            <p class="space-between"><strong>${menuItem['menuItemName']} x ${menuItem['menuItemAmount']}</strong>
                 <button class="get-menu-item-recipe-btn" data-item-id="${menuItem["menuItemID"]}">Get Recipe</button>
             </p>
         `;
@@ -138,10 +139,10 @@ function buildMenuItemHTML(menuItems) {
 }
 
 function buildCustomPizzaHTML(customPizzas) {
-    let customPizzasTemplate = "<h3>Custom Pizzas</h3>";
+    let customPizzasTemplate = "<h3>Custom Pizzas</h3><hr>";
     for (let customPizza of customPizzas) {
         customPizzasTemplate += `
-            <p>${customPizza['pizzaSize']['size']} ${customPizza['pizzaName']} x${customPizza['quantity']}
+            <p class="space-between"><strong>${customPizza['pizzaSize']['size']} ${customPizza['pizzaName']} x ${customPizza['quantity']}</strong>
                 <button class="get-custom-pizza-recipe-btn" data-item-id="${customPizza["customPizzaID"]}">Get Recipe</button>
             </p>
         `;
@@ -149,3 +150,45 @@ function buildCustomPizzaHTML(customPizzas) {
 
     return customPizzasTemplate;
 }
+
+// todo: build dialog box with recipe and close button
+export function buildRecipeDisplay(item, container) {
+    console.log("in build recipe display:", item);
+
+    const ingredientsHTML = buildIngredientsHTML(item["Ingredients"]);
+    let toppingsHTML = "";
+    if (item["Toppings"]) {
+        toppingsHTML = buildIngredientsHTML(item["Toppings"]);
+    }
+
+    container.innerHTML = `
+        <h3>${item["Name"][0]}</h3>
+        <p>${item["Description"][0]}</p>
+        <h4>Ingredients</h4>
+        <ul>
+            ${ingredientsHTML}
+        </ul>
+        ${toppingsHTML !== "" ? `
+        <h4>Toppings</h4>
+        <ul>
+        ${toppingsHTML}
+        </ul>
+        ` : ""}
+    `;
+
+
+}
+
+function buildIngredientsHTML(ingredients) {
+    let ingredientList = "";
+    for (let ingredient of ingredients) {
+        ingredientList += `<li>${ingredient}</li>`
+    }
+    return ingredientList;
+}
+
+
+
+
+
+

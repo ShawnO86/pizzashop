@@ -87,6 +87,10 @@ th, td {
     padding: 1rem;
 }
 
+.order {
+    min-width: 20rem;
+}
+
 .order-summary {
     cursor: pointer;
 }

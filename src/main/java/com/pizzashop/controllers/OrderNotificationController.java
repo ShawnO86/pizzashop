@@ -1,19 +1,23 @@
 package com.pizzashop.controllers;
 
+import com.pizzashop.dao.CustomPizzaDAO;
+import com.pizzashop.dao.MenuItemDAO;
 import com.pizzashop.dao.OrderDAO;
 import com.pizzashop.dto.OrderDTO;
-import com.pizzashop.entities.Order;
+import com.pizzashop.entities.*;
 import com.pizzashop.services.OrderService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,16 +33,21 @@ public class OrderNotificationController {
     private final ObjectMapper objectMapper;
     private final OrderDAO orderDAO;
     private final OrderService orderService;
+    private final MenuItemDAO menuItemDAO;
+    private final CustomPizzaDAO customPizzaDAO;
 
     private final List<SseEmitter> emitters = new CopyOnWriteArrayList<>();
     private final ScheduledExecutorService heartbeatScheduler = Executors.newSingleThreadScheduledExecutor();
     private final long HEARTBEAT_INTERVAL_MS = TimeUnit.SECONDS.toMillis(30); // set heartbeat to every 30 seconds
 
     @Autowired
-    public OrderNotificationController(ObjectMapper objectMapper, OrderDAO orderDAO, OrderService orderService) {
+    public OrderNotificationController(ObjectMapper objectMapper, OrderDAO orderDAO, OrderService orderService,
+                                       MenuItemDAO menuItemDAO, CustomPizzaDAO customPizzaDAO) {
         this.objectMapper = objectMapper;
         this.orderDAO = orderDAO;
         this.orderService = orderService;
+        this.menuItemDAO = menuItemDAO;
+        this.customPizzaDAO = customPizzaDAO;
     }
 
     @GetMapping(value = "/subscribeOrders", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
@@ -77,6 +86,62 @@ public class OrderNotificationController {
         }
 
         return orders;
+    }
+
+    @GetMapping(value = "/showMenuItemRecipe", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, String[]> showMenuItemRecipe(@RequestParam("menuItemId") int menuItemId) {
+        Map<String, String[]> recipe = new HashMap<>();
+        MenuItem menuItem = menuItemDAO.findByIdJoinFetchIngredients(menuItemId);
+        List<MenuItemIngredient> menuItemIngredients = menuItem.getMenuItemIngredients();
+
+        recipe.put("Name", new String[]{menuItem.getDishName()});
+        recipe.put("Description", new String[]{menuItem.getDescription()});
+        String[] ingredients = new String[menuItemIngredients.size()];
+
+        for (int i = 0; i < ingredients.length; i++) {
+            String ingredientAmtStr = menuItemIngredients.get(i).getQuantityUsed() + " " +
+                    menuItemIngredients.get(i).getIngredient().getUnitOfMeasure() + " " +
+                    menuItemIngredients.get(i).getIngredient().getIngredientName();
+            ingredients[i] = ingredientAmtStr;
+        }
+
+        recipe.put("Ingredients", ingredients);
+        return recipe;
+    }
+
+    @GetMapping(value = "/showCustomPizzaRecipe", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, String[]> showCustomPizzaRecipe(@RequestParam("customPizzaId") int customPizzaId) {
+        Map<String, String[]> recipe = new HashMap<>();
+        CustomPizza customPizza = customPizzaDAO.findByIdJoinFetchIngredients(customPizzaId);
+        List<CustomPizzaIngredient> customPizzaIngredients = customPizza.getCustomPizzaIngredients();
+
+        String titleCaseSize = StringUtils.capitalize(customPizza.getSize().name().toLowerCase());
+        String basePizzaName = titleCaseSize + " Cheese Pizza";
+        MenuItem basePizza = menuItemDAO.findByNameJoinFetchIngredients(basePizzaName);
+        List<MenuItemIngredient> menuItemIngredients = basePizza.getMenuItemIngredients();
+
+        recipe.put("Name", new String[]{titleCaseSize + " " + customPizza.getName()});
+        recipe.put("Description", new String[]{"Base pizza: " + basePizza.getDescription()});
+        String[] basePizzaIngredients = new String[basePizza.getMenuItemIngredients().size()];
+        String[] toppings = new String[customPizzaIngredients.size()];
+
+        for (int i = 0; i < basePizzaIngredients.length; i++) {
+            String ingredientAmtStr = menuItemIngredients.get(i).getQuantityUsed() + " " +
+                    menuItemIngredients.get(i).getIngredient().getUnitOfMeasure() + " " +
+                    menuItemIngredients.get(i).getIngredient().getIngredientName();
+            basePizzaIngredients[i] = ingredientAmtStr;
+        }
+        recipe.put("Ingredients", basePizzaIngredients);
+
+        for (int i = 0; i < toppings.length; i++) {
+            String ingredientAmtStr = customPizzaIngredients.get(i).getQuantityUsed() + " " +
+                    customPizzaIngredients.get(i).getIngredient().getUnitOfMeasure() + " " +
+                    customPizzaIngredients.get(i).getIngredient().getIngredientName();
+            toppings[i] = ingredientAmtStr;
+        }
+        recipe.put("Toppings", toppings);
+
+        return recipe;
     }
 
     @PostMapping("/setInProgress")
