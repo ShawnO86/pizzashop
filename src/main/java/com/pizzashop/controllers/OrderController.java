@@ -17,8 +17,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.*;
 
-// todo : add viewport to all html ...
-
 @Controller
 @RequestMapping("/order")
 public class OrderController {
@@ -61,21 +59,20 @@ public class OrderController {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String username = ((UserDetails) principal).getUsername();
 
-        // todo: uncomment existing check after testing
-        //Order existingOrder = orderDAO.findByUsername(username);
+        Order existingOrder = orderDAO.findByUsername(username);
 
-        // {availabilityErrors, []}, {priceErrors, []}
+        // represents: {availabilityErrors, []}, {priceErrors, []}
         Map<String, List<String>> validationResponse;
 
         if (orderDTO.getCustomPizzaList() == null && orderDTO.getMenuItemList() == null) {
             model.addAttribute("cartError", "Nothing in cart!");
             model.addAttribute("order", orderDTO);
             return showOrderForm(model);
-        }/* else if (existingOrder != null) {
+        } else if (existingOrder != null) {
             model.addAttribute("cartError", "Your current order is being processed!");
             model.addAttribute("order", new OrderDTO());
             return showOrderForm(model);
-        }*/ else {
+        } else {
             System.out.println("* validation *");
             validationResponse = orderService.submitOrderForValidation(orderDTO);
         }
@@ -105,7 +102,6 @@ public class OrderController {
         }
 
         orderDTO.setOrderID(order.getId());
-        System.out.println("*** Notify of new order...");
         orderNotificationController.notifyNewOrder(orderService.convertOrderToDTO(order, true));
         redirectAttributes.addFlashAttribute("order", orderDTO);
 
@@ -115,7 +111,6 @@ public class OrderController {
     @GetMapping("/confirmOrder")
     public String showConfirmation(Model model, @RequestParam("orderId") int orderId) {
         if (!model.containsAttribute("order")) {
-            System.out.println("* confirmation *");
             Order confirmedOrder = orderDAO.findById(orderId);
             if (confirmedOrder != null) {
                 OrderDTO confirmedOrderDTO = orderService.convertOrderToDTO(confirmedOrder, false);

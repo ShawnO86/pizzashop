@@ -1,9 +1,10 @@
 import {
     getCurrentOrders, appendOrderToUI, setOrderInProgress,
-    setOrderComplete, getMenuItemRecipe, getCustomPizzaRecipe, buildRecipeDisplay
+    setOrderComplete, getMenuItemRecipe, getCustomPizzaRecipe, buildRecipeDisplay, cancelOrderInProgress
 } from "./getOrdersUtils.js";
 
 document.addEventListener('DOMContentLoaded', ()=> {
+    const SSE_ENDPOINT = '/employees/subscribeOrders';
     const connectBtn = document.getElementById("connect-btn");
     const disconnectBtn = document.getElementById("disconnect-btn");
     const orderDisplayContainer = document.getElementById("order-display");
@@ -14,10 +15,6 @@ document.addEventListener('DOMContentLoaded', ()=> {
     const closeRecipeBtn = document.getElementById("close-recipe-dialog");
 
     let eventSource;
-    //when new order comes in, add to end of orders[] array (like a queue) after getCurrentOrders() finishes
-    //will have to linear search for order in orders[] when done and tell server order it is complete by id.
-    //populate page with fetched orders first, then add to display as they come in.
-
     let orders = {};
     let fulfilled = {};
     let isClosed = true;
@@ -36,7 +33,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
             return;
         }
 
-        eventSource  = new EventSource('/employees/subscribeOrders');
+        eventSource  = new EventSource(SSE_ENDPOINT);
         populateInitialUI();
 
         eventSource.onopen = () => {
@@ -50,6 +47,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
             // if not manually closed, close stream and attempt to reconnect.
             if (!isClosed) {
                 eventSource.close();
+                console.error(error);
                 console.log("Attempting reconnect in 3 seconds...");
                 setTimeout(connect, 3000);
             } else {
@@ -68,7 +66,6 @@ document.addEventListener('DOMContentLoaded', ()=> {
             console.log("orders after update: ", orders);
         });
 
-        // todo: complete these listeners. . .
         eventSource.addEventListener('order-in-progress', (event) => {
             //remove received order by id key, put into pendingOrders object with completedBy
             const fulfilledOrderMsg = JSON.parse(event.data);
@@ -85,21 +82,33 @@ document.addEventListener('DOMContentLoaded', ()=> {
         eventSource.addEventListener('order-complete', (event) => {
             const completedOrderId = event.data;
 
+            delete fulfilled[completedOrderId];
             const removeEl = fulfilledContainer.querySelector(`[data-order-id="${completedOrderId}"]`)
             removeEl.remove();
+        });
+
+        eventSource.addEventListener('cancel-in-progress', (event) => {
+            const canceledOrderMsg = JSON.parse(event.data);
+            console.log("cancel in progress order received: ", canceledOrderMsg);
+
+            delete fulfilled[canceledOrderMsg["orderID"]];
+            orders[canceledOrderMsg["orderID"]] = canceledOrderMsg;
+
+            const removeEl = fulfilledContainer.querySelector(`[data-order-id="${canceledOrderMsg["orderID"]}"]`)
+            removeEl.remove();
+            populateInitialUI()
         });
     }
 
     function manualConnect() {
         if (isClosed) {
-            connect().then(() => console.log('getCurrentOrders() finished, order notification stream opened.'));
+            connect()
+                .then(() => console.log('order notification stream connected.'));
         } else {
             alert("Notification stream is already active.");
         }
     }
 
-    // todo: send alert if orders being processed by employee name...
-    //  --: iterate over fulfilled object to see, dont allow manual disconnect if so.
     function manualDisconnect() {
         if (eventSource && eventSource.readyState !== EventSource.CLOSED) {
             eventSource.close();
@@ -115,9 +124,17 @@ document.addEventListener('DOMContentLoaded', ()=> {
         fulfilledContainer.innerHTML = "";
         for (let order in orders) {
             if (orders[order]["inProgress"]) {
-                appendOrderToUI(orders[order], fulfilledContainer);
+                fulfilled[order] = orders[order];
             } else {
                 appendOrderToUI(orders[order], orderContainer);
+            }
+        }
+        if (Object.keys(fulfilled).length > 0) {
+            for (let order in fulfilled) {
+                if (orders[order]) {
+                    delete orders[order];
+                }
+                appendOrderToUI(fulfilled[order], fulfilledContainer)
             }
         }
     }
@@ -136,6 +153,12 @@ document.addEventListener('DOMContentLoaded', ()=> {
                 await setOrderComplete(target.dataset.orderId);
             } catch (e) {
                 console.error("Error during setOrderComplete:", e);
+            }
+        } else if (targetClasses.contains("cancel-fulfillment-btn")) {
+            try {
+                await cancelOrderInProgress(target.dataset.orderId);
+            } catch (e) {
+                console.error("Error during cancelOrderInProgress:", e);
             }
         } else if (targetClasses.contains("get-menu-item-recipe-btn")) {
             try {

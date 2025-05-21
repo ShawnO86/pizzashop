@@ -75,16 +75,11 @@ public class OrderNotificationController {
         return emitter;
     }
 
-    // todo: get User.UserDetail First/Last name, Address and Phone# to getCurrentOrders and setPendingOrder from related orderDAO
-    //  --: will need to modify most uses of orderService.convertOrderToDTO() Order param
     @GetMapping(value = "/getCurrentOrders", produces = MediaType.APPLICATION_JSON_VALUE)
     public Map<Integer, OrderDTO> getCurrentOrders() {
         Map<Integer, OrderDTO> orders = new HashMap<>();
         List<Order> currentOrders = orderDAO.findAllIncompleteJoinFetchUserDetails();
         for (Order currentOrder : currentOrders) {
-            // todo: stopped here. gets all user info..
-            System.out.println("Incomplete Order: " + currentOrder);
-            System.out.println("User Detail: " + currentOrder.getUser().getUserDetail());
             OrderDTO orderDTO = orderService.convertOrderToDTO(currentOrder, true);
             orders.put(orderDTO.getOrderID(), orderDTO);
         }
@@ -192,6 +187,26 @@ public class OrderNotificationController {
         return new ResponseEntity<>("Order set isComplete", HttpStatus.OK);
     }
 
+    @PostMapping("/cancelInProgress")
+    public ResponseEntity<String> cancelInProgress(@RequestParam("orderId") int orderId) {
+        Order order = orderDAO.findByIdJoinFetchUserDetails(orderId);
+        if (order == null) {
+            System.out.println("Order not found");
+            return new ResponseEntity<>("Order not found", HttpStatus.NOT_FOUND);
+        } else if (order.getIs_complete()) {
+            System.out.println("Order already completed");
+            notifyOrderComplete(orderId);
+            return new ResponseEntity<>("Order already completed", HttpStatus.CONFLICT);
+        }
+        order.setFulfilled_by(null);
+        order.setIn_progress(false);
+
+        orderDAO.update(order);
+        notifyCancelInProgress(orderService.convertOrderToDTO(order, true));
+
+        return new ResponseEntity<>("Order in progress reverted", HttpStatus.OK);
+    }
+
 
     private Runnable sendHeartbeat(SseEmitter emitter) {
         return () -> {
@@ -235,6 +250,18 @@ public class OrderNotificationController {
         for (SseEmitter emitter : this.emitters) {
             try {
                 emitter.send(SseEmitter.event().name("order-complete").data(orderID));
+            } catch (IOException e) {
+                emitter.completeWithError(e);
+                this.emitters.remove(emitter);
+            }
+        }
+    }
+
+    private void notifyCancelInProgress(OrderDTO order) {
+        for (SseEmitter emitter : this.emitters) {
+            try {
+                String orderDTO_JSON = objectMapper.writeValueAsString(order);
+                emitter.send(SseEmitter.event().name("cancel-in-progress").data(orderDTO_JSON));
             } catch (IOException e) {
                 emitter.completeWithError(e);
                 this.emitters.remove(emitter);

@@ -1,11 +1,13 @@
-const CURRENT_ORDERS_ENDPOINT = "/employees/getCurrentOrders";
+const BASE_ENDPOINT = "/employees"
+const CURRENT_ORDERS_ENDPOINT = BASE_ENDPOINT + "/getCurrentOrders";
 // needs menuItem id, name params
-const MENU_ITEM_RECIPE_ENDPOINT = "/employees/showMenuItemRecipe";
+const MENU_ITEM_RECIPE_ENDPOINT = BASE_ENDPOINT + "/showMenuItemRecipe";
 // needs customPizza id param
-const CUSTOM_PIZZA_RECIPE_ENDPOINT = "/employees/showCustomPizzaRecipe";
+const CUSTOM_PIZZA_RECIPE_ENDPOINT = BASE_ENDPOINT + "/showCustomPizzaRecipe";
 // needs order ID, employeeName
-const SET_IN_PROGRESS_ENDPOINT = "/employees/setInProgress";
-const SET_COMPLETE_ENDPOINT = "/employees/setIsComplete";
+const SET_IN_PROGRESS_ENDPOINT = BASE_ENDPOINT + "/setInProgress";
+const SET_COMPLETE_ENDPOINT = BASE_ENDPOINT + "/setIsComplete";
+const CANCEL_IN_PROGRESS_ENDPOINT = BASE_ENDPOINT + "/cancelInProgress";
 
 const EMPLOYEE_NAME = document.getElementById("employee-name").innerText;
 const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
@@ -15,7 +17,7 @@ export async function getCurrentOrders() {
     try {
         const response = await fetch(CURRENT_ORDERS_ENDPOINT);
         const result = await response.json();
-        console.log("current orders", result);
+        console.log("fetched current orders", result);
         return result;
     } catch (e) {
         console.error(e.message);
@@ -65,6 +67,27 @@ export async function setOrderComplete(orderId) {
     }
 }
 
+export async function cancelOrderInProgress(orderId) {
+    const data = new URLSearchParams();
+    data.append('orderId', orderId);
+    try {
+        const response = await fetch(CANCEL_IN_PROGRESS_ENDPOINT, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                [csrfHeader]: csrfToken
+            },
+            body: data.toString()
+        });
+        if (!response.ok) {
+            console.error(response)
+            alert(await response.text());
+        }
+    } catch (e) {
+        console.error(e);
+    }
+}
+
 export async function getMenuItemRecipe(menuItemId) {
     try {
         const response = await fetch(MENU_ITEM_RECIPE_ENDPOINT + "?menuItemId=" + menuItemId);
@@ -87,18 +110,18 @@ export async function getCustomPizzaRecipe(customPizzaId) {
     }
 }
 
-// todo: -> add cancel fulfillment btn and related endpoints/fetch?
 export function appendOrderToUI(order, container) {
     const orderTemplate = document.createElement("div");
-    let menuItemHTML, customPizzaHTML;
-    // todo: format date, topping arrays, add 'get recipe' button,
-    //  --: will call respective /getRecipe?id=itemId..
+    let menuItemHTML, customPizzaHTML, userdetailHTML;
+
     if (order["menuItemList"] !== null) {
         menuItemHTML = buildMenuItemHTML(order['menuItemList']);
     }
     if (order["customPizzaList"] !== null) {
         customPizzaHTML = buildCustomPizzaHTML(order['customPizzaList']);
     }
+
+    userdetailHTML = buildUserDetailHTML(order["userDetail"]);
 
     const orderDateReceived = new Date(order['orderDateTime']);
     const orderDateFormatted = [orderDateReceived.getMonth() + 1, orderDateReceived.getDate(), orderDateReceived.getHours(), orderDateReceived.getMinutes()]
@@ -113,10 +136,12 @@ export function appendOrderToUI(order, container) {
                 <span>Received on: ${orderDateFormatted[0]}/${orderDateFormatted[1]} @ ${orderDateFormatted[2]}:${orderDateFormatted[3]}</span>
             </summary>
             ${menuItemHTML ? menuItemHTML : ""}
-            ${menuItemHTML && customPizzaHTML ? `<br>` : ""}
             ${customPizzaHTML ? customPizzaHTML : ""}
+            ${userdetailHTML}
             <div>
-                ${order["employeeName"] === EMPLOYEE_NAME ? `<button class="complete-btn" data-order-id="${order['orderID']}">Complete Order</button>` : ''}
+                ${order["employeeName"] === EMPLOYEE_NAME ? `
+                    <button class="complete-btn" data-order-id="${order['orderID']}">Complete Order</button>
+                    <button class="cancel-fulfillment-btn" data-order-id="${order['orderID']}">Cancel In Progress</button>` : ''}
                 ${order["inProgress"] !== true ? `<button class="fulfill-btn" data-order-id="${order['orderID']}">Fulfill Order</button>` : `<p>Being fulfilled by: ${order["employeeName"]}</p>`}
             </div>
         </details>
@@ -127,32 +152,40 @@ export function appendOrderToUI(order, container) {
 }
 
 function buildMenuItemHTML(menuItems) {
-    let menuItemsTemplate = "<h3>Menu Items</h3>";
+    let menuItemsTemplate = "<div><h3>Menu Items</h3>";
     for (let menuItem of menuItems) {
         menuItemsTemplate += `
-            <p class="space-between"><strong>${menuItem['menuItemName']} x ${menuItem['menuItemAmount']}</strong>
-                <button class="get-menu-item-recipe-btn" data-item-id="${menuItem["menuItemID"]}">Get Recipe</button>
+            <p class="space-between-dashed"><strong>${menuItem['menuItemName']} x ${menuItem['menuItemAmount']}</strong>
+                <button class="get-menu-item-recipe-btn" data-item-id="${menuItem['menuItemID']}">Get Recipe</button>
             </p>
         `;
     }
 
-    return menuItemsTemplate;
+    return menuItemsTemplate + "</div>";
 }
 
 function buildCustomPizzaHTML(customPizzas) {
-    let customPizzasTemplate = "<h3>Custom Pizzas</h3>";
+    let customPizzasTemplate = "<div><h3>Custom Pizzas</h3>";
     for (let customPizza of customPizzas) {
         customPizzasTemplate += `
-            <p class="space-between"><strong>${customPizza['pizzaSize']['size']} ${customPizza['pizzaName']} x ${customPizza['quantity']}</strong>
+            <p class="space-between-dashed"><strong>${customPizza['pizzaSize']['size']} ${customPizza['pizzaName']} x ${customPizza['quantity']}</strong>
                 <button class="get-custom-pizza-recipe-btn" data-item-id="${customPizza["customPizzaID"]}">Get Recipe</button>
             </p>
         `;
     }
 
-    return customPizzasTemplate;
+    return customPizzasTemplate + "</div>";
 }
 
-// todo: build dialog box with recipe and close button
+function buildUserDetailHTML(userdetail) {
+    return `<div><h3>Customer Details</h3>
+        <p class="space-between-dashed"><span>Name:</span> <span>${userdetail['firstName']} ${userdetail['lastName']}</span></p>
+        <p class="space-between-dashed"><span>Phone:</span> <span>${userdetail['phone']}</span></p>
+        <p class="space-between-dashed"><span>Address:</span> <span>${userdetail['address']} ${userdetail['city']}, ${userdetail['state']}</span></p>
+        <p class="space-between-dashed"><span>Email:</span> <span>${userdetail['email']}</span></p>
+    </div>`;
+}
+
 export function buildRecipeDisplay(item, container) {
     console.log("in build recipe display:", item);
 
@@ -176,8 +209,6 @@ export function buildRecipeDisplay(item, container) {
         </ul>
         ` : ""}
     `;
-
-
 }
 
 function buildIngredientsHTML(ingredients) {
@@ -187,9 +218,5 @@ function buildIngredientsHTML(ingredients) {
     }
     return ingredientList;
 }
-
-
-
-
 
 

@@ -1,9 +1,7 @@
 package com.pizzashop.services;
 
 import com.pizzashop.dao.*;
-
 import com.pizzashop.dto.*;
-
 import com.pizzashop.entities.*;
 
 import jakarta.transaction.Transactional;
@@ -172,7 +170,6 @@ public class OrderServiceImpl implements OrderService {
         return orderDAO.save(orderEntity);
     }
 
-    // todo: implement logger for this method
     @Transactional
     protected void reduceInventory(Map<Integer, Integer> ingredientIdAmounts) {
         List<Integer> ingredientIDs = new ArrayList<>(ingredientIdAmounts.keySet());
