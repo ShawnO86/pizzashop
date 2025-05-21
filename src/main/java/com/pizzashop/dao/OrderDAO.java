@@ -10,9 +10,11 @@ public interface OrderDAO {
 
     Order findById(int id);
 
+    Order findByIdJoinFetchUserDetails(int id);
+
     Order findByUsername(String username);
 
-    List<Order> findAllIncomplete();
+    List<Order> findAllIncompleteJoinFetchUserDetails();
 
     void update(Order order);
 }

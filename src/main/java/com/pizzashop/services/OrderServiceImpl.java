@@ -229,11 +229,18 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderDTO convertOrderToDTO(Order order) {
+    public OrderDTO convertOrderToDTO(Order order, boolean needUser) {
         OrderDTO orderDTO = new OrderDTO();
         orderDTO.setOrderID(order.getId());
         orderDTO.setTotalPrice(order.getFinal_price_cents());
         orderDTO.setOrderDateTime(order.getOrder_date());
+
+        if (needUser) {
+            UserDetail userDetails = order.getUser().getUserDetail();
+            UserDetailDTO userDetailDTO = new UserDetailDTO(userDetails.getFirstName(), userDetails.getLastName(),
+                    userDetails.getEmail(), userDetails.getPhone(), userDetails.getAddress(), userDetails.getCity(), userDetails.getState());
+            orderDTO.setUserDetail(userDetailDTO);
+        }
 
         if (order.getIn_progress()) {
             orderDTO.setInProgress(true);

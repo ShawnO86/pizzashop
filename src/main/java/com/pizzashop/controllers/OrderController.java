@@ -17,6 +17,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.*;
 
+// todo : add viewport to all html ...
+
 @Controller
 @RequestMapping("/order")
 public class OrderController {
@@ -59,6 +61,7 @@ public class OrderController {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String username = ((UserDetails) principal).getUsername();
 
+        // todo: uncomment existing check after testing
         //Order existingOrder = orderDAO.findByUsername(username);
 
         // {availabilityErrors, []}, {priceErrors, []}
@@ -103,7 +106,7 @@ public class OrderController {
 
         orderDTO.setOrderID(order.getId());
         System.out.println("*** Notify of new order...");
-        orderNotificationController.notifyNewOrder(orderService.convertOrderToDTO(order));
+        orderNotificationController.notifyNewOrder(orderService.convertOrderToDTO(order, true));
         redirectAttributes.addFlashAttribute("order", orderDTO);
 
         return "redirect:/order/confirmOrder?orderId=" + order.getId();
@@ -111,11 +114,11 @@ public class OrderController {
 
     @GetMapping("/confirmOrder")
     public String showConfirmation(Model model, @RequestParam("orderId") int orderId) {
-
         if (!model.containsAttribute("order")) {
+            System.out.println("* confirmation *");
             Order confirmedOrder = orderDAO.findById(orderId);
             if (confirmedOrder != null) {
-                OrderDTO confirmedOrderDTO = orderService.convertOrderToDTO(confirmedOrder);
+                OrderDTO confirmedOrderDTO = orderService.convertOrderToDTO(confirmedOrder, false);
                 model.addAttribute("heading", "Your order is confirmed!");
                 model.addAttribute("order", confirmedOrderDTO);
             } else {

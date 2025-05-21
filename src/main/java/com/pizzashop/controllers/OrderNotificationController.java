@@ -17,7 +17,6 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -76,12 +75,17 @@ public class OrderNotificationController {
         return emitter;
     }
 
+    // todo: get User.UserDetail First/Last name, Address and Phone# to getCurrentOrders and setPendingOrder from related orderDAO
+    //  --: will need to modify most uses of orderService.convertOrderToDTO() Order param
     @GetMapping(value = "/getCurrentOrders", produces = MediaType.APPLICATION_JSON_VALUE)
     public Map<Integer, OrderDTO> getCurrentOrders() {
         Map<Integer, OrderDTO> orders = new HashMap<>();
-        List<Order> currentOrders = orderDAO.findAllIncomplete();
+        List<Order> currentOrders = orderDAO.findAllIncompleteJoinFetchUserDetails();
         for (Order currentOrder : currentOrders) {
-            OrderDTO orderDTO = orderService.convertOrderToDTO(currentOrder);
+            // todo: stopped here. gets all user info..
+            System.out.println("Incomplete Order: " + currentOrder);
+            System.out.println("User Detail: " + currentOrder.getUser().getUserDetail());
+            OrderDTO orderDTO = orderService.convertOrderToDTO(currentOrder, true);
             orders.put(orderDTO.getOrderID(), orderDTO);
         }
 
@@ -147,13 +151,13 @@ public class OrderNotificationController {
     @PostMapping("/setInProgress")
     public ResponseEntity<String> setPendingOrder(@RequestParam("orderId") int orderId, @RequestParam("employeeName") String employeeName) {
         //System.out.println("request received, orderId: " + orderId + ", employeeName: " + employeeName);
-        Order order = orderDAO.findById(orderId);
+        Order order = orderDAO.findByIdJoinFetchUserDetails(orderId);
         if (order == null) {
             System.out.println("Order not found");
             return new ResponseEntity<>("Order not found", HttpStatus.NOT_FOUND);
         } else if (order.getIn_progress()) {
             System.out.println("Order already in progress");
-            notifyOrderInProgress(orderService.convertOrderToDTO(order));
+            notifyOrderInProgress(orderService.convertOrderToDTO(order, true));
             return new ResponseEntity<>("Order already in progress", HttpStatus.CONFLICT);
         } else if (order.getIs_complete()) {
             System.out.println("Order already completed");
@@ -164,7 +168,7 @@ public class OrderNotificationController {
         order.setIn_progress(true);
 
         orderDAO.update(order);
-        notifyOrderInProgress(orderService.convertOrderToDTO(order));
+        notifyOrderInProgress(orderService.convertOrderToDTO(order, true));
 
         return new ResponseEntity<>("Order set inProgress", HttpStatus.OK);
     }
@@ -177,7 +181,7 @@ public class OrderNotificationController {
         } else if (order.getIs_complete()) {
             System.out.println("Order already complete");
             notifyOrderComplete(orderId);
-            return new ResponseEntity<>("Order already in complete", HttpStatus.CONFLICT);
+            return new ResponseEntity<>("Order already complete", HttpStatus.CONFLICT);
         }
         order.setIn_progress(false);
         order.setIs_complete(true);

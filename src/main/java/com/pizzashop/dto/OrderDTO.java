@@ -12,6 +12,7 @@ public class OrderDTO {
     private LocalDateTime orderDateTime;
     private boolean inProgress;
     private String employeeName;
+    private UserDetailDTO userDetail;
 
     public OrderDTO() {}
 
@@ -57,6 +58,12 @@ public class OrderDTO {
     public void setEmployeeName(String employeeName) {
         this.employeeName = employeeName;
     }
+    public UserDetailDTO getUserDetail() {
+        return userDetail;
+    }
+    public void setUserDetail(UserDetailDTO userDetail) {
+        this.userDetail = userDetail;
+    }
 
     public void addMenuItem(OrderMenuItemDTO menuItem) {
         if (menuItemList == null) {
@@ -81,6 +88,7 @@ public class OrderDTO {
                 ", orderDateTime=" + orderDateTime +
                 ", inProgress=" + inProgress +
                 ", employeeName='" + employeeName + '\'' +
+                ", userDetail=" + userDetail +
                 '}';
     }
 }

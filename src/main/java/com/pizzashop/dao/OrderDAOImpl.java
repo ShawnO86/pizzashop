@@ -34,6 +34,20 @@ public class OrderDAOImpl implements OrderDAO {
     }
 
     @Override
+    public Order findByIdJoinFetchUserDetails(int id) {
+        TypedQuery<Order> query = em.createQuery("FROM Order o " +
+                "JOIN FETCH o.orderMenuItems Omi JOIN FETCH o.user u JOIN FETCH u.userDetail " +
+                "LEFT JOIN FETCH Omi.menuItem LEFT JOIN FETCH Omi.customPizza " +
+                "WHERE o.id = :id", Order.class);
+        query.setParameter("id", id);
+        try {
+            return query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+
+    @Override
     public Order findByUsername(String username) {
         TypedQuery<Order> query = em.createQuery("SELECT o FROM Order o " +
                 "WHERE o.user.username = :username AND o.is_complete = false", Order.class);
@@ -46,9 +60,9 @@ public class OrderDAOImpl implements OrderDAO {
     }
 
     @Override
-    public List<Order> findAllIncomplete() {
+    public List<Order> findAllIncompleteJoinFetchUserDetails() {
         TypedQuery<Order> query = em.createQuery("SELECT o FROM Order o " +
-                "JOIN FETCH o.orderMenuItems Omi " +
+                "JOIN FETCH o.orderMenuItems Omi JOIN FETCH o.user u JOIN FETCH u.userDetail " +
                 "LEFT JOIN FETCH Omi.menuItem LEFT JOIN FETCH Omi.customPizza " +
                 "WHERE o.is_complete = false", Order.class);
         return query.getResultList();
