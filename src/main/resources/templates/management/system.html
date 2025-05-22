@@ -26,7 +26,7 @@
         </ul>
         <div>
             <h3>Generate Sales Report:</h3>
-            <form method="POST" th:action="@{/system/showSalesReport}" th:object="${reportDates}">
+            <form method="POST" th:action="@{/system/showSalesReport}" th:object="${salesReportDates}">
                 <label>Start Date:
                     <input th:field="*{startDate}" type="date"/>
                 </label>

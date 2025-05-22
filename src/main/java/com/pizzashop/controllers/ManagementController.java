@@ -192,15 +192,15 @@ public class ManagementController {
 
     }
 
-    // todo: add reporting GET endpoints and DAO methods - will need (startDate, endDate) or month?
-    //  --: orders made during specified timeframe and all ingredients used for each of those orders and total ingredients used
+    // todo: build page with orders made during specified timeframe and all ingredients used for each of those orders and total ingredients used
     @PostMapping("/showSalesReport")
-    public String showSalesReport(@Valid @ModelAttribute("reportDates") SalesReportDateDTO salesReportDates,
+    public String showSalesReport(@Valid @ModelAttribute("salesReportDates") SalesReportDateDTO salesReportDates,
                                   BindingResult bindingResult,
                                   Model model) {
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("heading", "System Administration");
+            model.addAttribute("salesReportDates", new SalesReportDateDTO());
             return "management/system";
         }
         LocalDate startDate = salesReportDates.getStartDate();
@@ -208,6 +208,7 @@ public class ManagementController {
         if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
             bindingResult.rejectValue("endDate", "date.range.invalid", "End date must be after start date.");
             model.addAttribute("heading", "System Administration");
+            model.addAttribute("salesReportDates", new SalesReportDateDTO());
             return "management/system";
         }
 
