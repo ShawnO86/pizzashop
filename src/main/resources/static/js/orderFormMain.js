@@ -20,8 +20,11 @@ document.addEventListener('DOMContentLoaded', ()=> {
     const cartTotalInputElement = document.getElementById("order-total-input");
     const formSubmitBtn = document.getElementById("cart-submit-btn");
 
+    // todo : set check for all error elements.. ids = cart-errors, price-errors, availability-errors
     let cartErrorElement = document.getElementById("cart-errors");
-    let validationErrorElement = document.getElementById("validation-errors");
+    let availabilityErrorElement = document.getElementById("availability-errors");
+    let priceErrorElement = document.getElementById("price-errors");
+
     let menuItems = {};
     let customPizzas = {};
     let editingPizza = {};
@@ -31,9 +34,9 @@ document.addEventListener('DOMContentLoaded', ()=> {
 // populate cart objects in session with orderDTO if returned with error,
 // cart objects will be overwritten with orderDTO if it's there.
     // todo: more robust error removal after setTime for each kind or not removing at all just format UI better?.
-    if (cartErrorElement || validationErrorElement) {
+    if (cartErrorElement || availabilityErrorElement || priceErrorElement) {
         if (cartErrorElement) {
-            removeErrorElement(cartErrorElement, 5000);
+            removeErrorElement(cartErrorElement, 8000);
             if (cartErrorElement.innerText === "Your current order is being processed!") {
                 if (sessionStorage.getItem("menuItems")) {
                     sessionStorage.removeItem("menuItems");
@@ -43,8 +46,11 @@ document.addEventListener('DOMContentLoaded', ()=> {
                 }
             }
         }
-        if (validationErrorElement) {
-            removeErrorElement(validationErrorElement, 8000);
+        if (availabilityErrorElement) {
+            removeErrorElement(availabilityErrorElement, 10000);
+        }
+        if (priceErrorElement) {
+            removeErrorElement(availabilityErrorElement, 10000);
         }
         parseThymeleafItems();
     } else {
