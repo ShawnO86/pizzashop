@@ -84,7 +84,7 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userDAO.findByUsername(username);
+        User user = userDAO.findByUsernameJoinFetchRole(username);
 
         if (user == null) {
             throw new UsernameNotFoundException("Invalid username or password!");

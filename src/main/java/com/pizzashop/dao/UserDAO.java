@@ -11,11 +11,9 @@ public interface UserDAO {
 
     User findByUsername(String username);
 
-    User findByUsernameJoinFetchOrders(String username);
+    User findByUsernameJoinFetchRole(String username);
 
     List<User> findAll();
-
-    List<User> findAllFetchUserDetails();
 
     List<User> findAllFetchUserDetailsRoles();
 

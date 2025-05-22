@@ -51,15 +51,22 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
-    public List<User> findAll() {
-        TypedQuery<User> query = em.createQuery("FROM User", User.class);
-        return query.getResultList();
+    public User findByUsernameJoinFetchRole(String username) {
+        TypedQuery<User> query = em.createQuery("FROM User u " +
+                "JOIN FETCH u.roles " +
+                "WHERE u.username = :username", User.class);
+        query.setParameter("username", username);
+        try {
+            return query.getSingleResult();
+        } catch (NoResultException e) {
+            System.out.println("No user found by username: " + username);
+            return null;
+        }
     }
 
     @Override
-    public List<User> findAllFetchUserDetails() {
-        TypedQuery<User> query = em.createQuery("SELECT u FROM User u " +
-                "JOIN FETCH u.userDetail", User.class);
+    public List<User> findAll() {
+        TypedQuery<User> query = em.createQuery("FROM User", User.class);
         return query.getResultList();
     }
 
@@ -76,21 +83,6 @@ public class UserDAOImpl implements UserDAO {
                 "JOIN FETCH u.userDetail d JOIN FETCH u.roles WHERE d.lastName = :lastName", User.class);
         query.setParameter("lastName", lastName);
         return query.getResultList();
-    }
-
-    @Override
-    public User findByUsernameJoinFetchOrders(String username) {
-        TypedQuery<User> query = em.createQuery(
-                "SELECT u FROM User u " +
-                "JOIN FETCH u.orders " +
-                "WHERE u.username = :username", User.class);
-        query.setParameter("username", username);
-        try {
-            return query.getSingleResult();
-        } catch (NoResultException e) {
-            System.out.println("No user found by username: " + username);
-            return null;
-        }
     }
 
     @Override
