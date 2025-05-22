@@ -7,6 +7,9 @@ import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Repository
@@ -65,6 +68,22 @@ public class OrderDAOImpl implements OrderDAO {
                 "JOIN FETCH o.orderMenuItems Omi JOIN FETCH o.user u JOIN FETCH u.userDetail " +
                 "LEFT JOIN FETCH Omi.menuItem LEFT JOIN FETCH Omi.customPizza " +
                 "WHERE o.is_complete = false", Order.class);
+        return query.getResultList();
+    }
+
+    @Override
+    public List<Order> findAllByDateRange(LocalDate from, LocalDate to) {
+        // Adds time to date input (00:00 to 23:59)
+        LocalDateTime startOfDay = from.atStartOfDay();
+        LocalDateTime endOfDay = to.atTime(LocalTime.MAX);
+
+        TypedQuery<Order> query = em.createQuery("SELECT o FROM Order o " +
+                "JOIN FETCH o.orderMenuItems omi LEFT JOIN FETCH omi.menuItem LEFT JOIN FETCH omi.customPizza " +
+                "WHERE o.order_date BETWEEN :startDateTime AND :endDateTime", Order.class);
+
+        query.setParameter("startDateTime", startOfDay);
+        query.setParameter("endDateTime", endOfDay);
+
         return query.getResultList();
     }
 

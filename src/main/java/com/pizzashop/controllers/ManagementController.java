@@ -1,6 +1,8 @@
 package com.pizzashop.controllers;
 
+import com.pizzashop.dao.OrderDAO;
 import com.pizzashop.dao.UserDAO;
+import com.pizzashop.dto.SalesReportDateDTO;
 import com.pizzashop.dto.UserRegisterDTO;
 import com.pizzashop.entities.Role;
 import com.pizzashop.entities.RoleEnum;
@@ -8,6 +10,7 @@ import com.pizzashop.entities.User;
 import com.pizzashop.entities.UserDetail;
 import com.pizzashop.services.UserRegistrationService;
 import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.stereotype.Controller;
@@ -16,6 +19,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,11 +29,14 @@ public class ManagementController {
 
     private final UserDAO userDAO;
     private final UserRegistrationService userService;
+    private final OrderDAO orderDAO;
+
 
     @Autowired
-    public ManagementController(UserDAO userDAO, UserRegistrationService userService) {
+    public ManagementController(UserDAO userDAO, UserRegistrationService userService, OrderDAO orderDAO) {
         this.userDAO = userDAO;
         this.userService = userService;
+        this.orderDAO = orderDAO;
     }
 
     @InitBinder
@@ -68,7 +75,6 @@ public class ManagementController {
 
         return "auth/register";
     }
-
 
     @GetMapping("/showUpdateUserForm")
     public String showUpdateUserPage(@RequestParam("userId") int userId, Model model) {
@@ -185,6 +191,35 @@ public class ManagementController {
         }
 
     }
+
+    // todo: add reporting GET endpoints and DAO methods - will need (startDate, endDate) or month?
+    //  --: orders made during specified timeframe and all ingredients used for each of those orders and total ingredients used
+    @PostMapping("/showSalesReport")
+    public String showSalesReport(@Valid @ModelAttribute("reportDates") SalesReportDateDTO salesReportDates,
+                                  BindingResult bindingResult,
+                                  Model model) {
+
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("heading", "System Administration");
+            return "management/system";
+        }
+        LocalDate startDate = salesReportDates.getStartDate();
+        LocalDate endDate = salesReportDates.getEndDate();
+        if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
+            bindingResult.rejectValue("endDate", "date.range.invalid", "End date must be after start date.");
+            model.addAttribute("heading", "System Administration");
+            return "management/system";
+        }
+
+        System.out.println("startDate: " + startDate);
+        System.out.println("endDate: " + endDate);
+
+        System.out.println("result: " + orderDAO.findAllByDateRange(startDate, endDate));
+
+
+        return "management/showSalesReport";
+    }
+
 
     private RoleEnum getHighestRole(List<Role> roles) {
         RoleEnum highestRole = null;

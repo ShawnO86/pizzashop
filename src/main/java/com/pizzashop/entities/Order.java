@@ -35,7 +35,7 @@ public class Order {
     @Column(name = "fulfilled_by")
     private String fulfilled_by;
 
-    @OneToMany(mappedBy = "order" , cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "order" , cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<OrderMenuItem> orderMenuItems;
 
     public Order() {}

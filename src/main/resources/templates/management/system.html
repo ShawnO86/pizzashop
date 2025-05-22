@@ -12,22 +12,40 @@
 <header th:insert="~{header :: head}"></header>
 
 <main>
+    <section>
+        <ul>
+            <li>
+                <a th:href="@{/system/inventory/showInventory}">Current Inventory</a>
+            </li>
+            <li>
+                <a th:href="@{/system/changeMenu/showMenuItems}">Current Menu Items</a>
+            </li>
+            <li>
+                <a th:href="@{/system/userData}">User Data</a>
+            </li>
+        </ul>
+        <div>
+            <h3>Generate Sales Report:</h3>
+            <form method="POST" th:action="@{/system/showSalesReport}" th:object="${reportDates}">
+                <label>Start Date:
+                    <input th:field="*{startDate}" type="date"/>
+                </label>
+                <div th:if="${#fields.hasErrors('startDate')}" class="error">
+                    <span th:errors="*{startDate}"></span>
+                </div>
+                <label>End Date:
+                    <input th:field="*{endDate}" type="date"/>
+                </label>
+                <div th:if="${#fields.hasErrors('endDate')}" class="error">
+                    <span th:errors="*{endDate}"></span>
+                </div>
 
-    <ul>
-        <li>
-            <a th:href="@{/system/inventory/showInventory}">Current Inventory</a>
-        </li>
-        <li>
-            <a th:href="@{/system/changeMenu/showMenuItems}">Current Menu Items</a>
-        </li>
-        <li>
-            <a th:href="@{/system/userData}">User Data</a>
-        </li>
-    </ul>
-
-
-
+                <input type="submit" value="Submit">
+            </form>
+        </div>
+    </section>
 </main>
 
+<script src="/js/errorMsgTimeout.js" type="text/javascript"></script>
 </body>
 </html>
