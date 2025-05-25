@@ -3,6 +3,7 @@ package com.pizzashop.dto;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class OrderDTO {
     private List<OrderMenuItemDTO> menuItemList;
@@ -13,6 +14,7 @@ public class OrderDTO {
     private boolean inProgress;
     private String employeeName;
     private UserDetailDTO userDetail;
+    Map<String, List<Integer>> ingredientReport;
 
     public OrderDTO() {}
 
@@ -63,6 +65,12 @@ public class OrderDTO {
     }
     public void setUserDetail(UserDetailDTO userDetail) {
         this.userDetail = userDetail;
+    }
+    public Map<String, List<Integer>> getIngredientReport() {
+        return ingredientReport;
+    }
+    public void setIngredientReport(Map<String, List<Integer>> ingredientReport) {
+        this.ingredientReport = ingredientReport;
     }
 
     public void addMenuItem(OrderMenuItemDTO menuItem) {

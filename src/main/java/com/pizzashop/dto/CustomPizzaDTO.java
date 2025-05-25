@@ -7,6 +7,7 @@ public class CustomPizzaDTO {
     private List<ToppingDTO> toppings;
     private List<ToppingDTO> extraToppings;
     private SizeDTO pizzaSize;
+    private int basePizzaID;
     private int quantity;
     private int pricePerPizza;
     private int totalPizzaPrice;
@@ -52,6 +53,12 @@ public class CustomPizzaDTO {
     }
     public void setPizzaSize(SizeDTO pizzaSize) {
         this.pizzaSize = pizzaSize;
+    }
+    public int getBasePizzaId() {
+        return basePizzaID;
+    }
+    public void setBasePizzaId(int basePizzaID) {
+        this.basePizzaID = basePizzaID;
     }
     public int getQuantity() {
         return quantity;
