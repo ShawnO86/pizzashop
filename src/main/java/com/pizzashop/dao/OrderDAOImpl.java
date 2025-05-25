@@ -80,7 +80,8 @@ public class OrderDAOImpl implements OrderDAO {
         TypedQuery<Order> query = em.createQuery("SELECT o FROM Order o " +
                 "JOIN FETCH o.orderMenuItems omi " +
                 "LEFT JOIN FETCH omi.menuItem mi LEFT JOIN FETCH omi.customPizza cp " +
-                "WHERE o.order_date BETWEEN :startDateTime AND :endDateTime", Order.class);
+                "WHERE o.order_date BETWEEN :startDateTime AND :endDateTime " +
+                "AND o.is_complete = true", Order.class);
 
         query.setParameter("startDateTime", startOfDay);
         query.setParameter("endDateTime", endOfDay);
@@ -90,7 +91,6 @@ public class OrderDAOImpl implements OrderDAO {
 
     @Override
     public List<Order> findAllFulfilledByIdInDateRange(LocalDate from, LocalDate to, String username) {
-        // Adds time to date input (00:00 to 23:59)
         LocalDateTime startOfDay = from.atStartOfDay();
         LocalDateTime endOfDay = to.atTime(LocalTime.MAX);
 
@@ -98,7 +98,8 @@ public class OrderDAOImpl implements OrderDAO {
                 "JOIN FETCH o.orderMenuItems omi " +
                 "LEFT JOIN FETCH omi.menuItem mi LEFT JOIN FETCH omi.customPizza cp " +
                 "WHERE o.order_date BETWEEN :startDateTime AND :endDateTime " +
-                "AND o.fulfilled_by = :username", Order.class);
+                "AND o.fulfilled_by = :username " +
+                "AND o.is_complete = true", Order.class);
 
         query.setParameter("startDateTime", startOfDay);
         query.setParameter("endDateTime", endOfDay);
