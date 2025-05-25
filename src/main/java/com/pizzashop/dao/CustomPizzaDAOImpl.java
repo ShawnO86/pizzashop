@@ -8,6 +8,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public class CustomPizzaDAOImpl implements CustomPizzaDAO {
     EntityManager em;
@@ -39,6 +41,16 @@ public class CustomPizzaDAOImpl implements CustomPizzaDAO {
         } catch (NoResultException e) {
             return null;
         }
+    }
+
+    @Override
+    public List<CustomPizza> findAllInJoinFetchIngredients(List<Integer> ids) {
+        TypedQuery<CustomPizza> query = em.createQuery("FROM CustomPizza c " +
+                "JOIN FETCH c.customPizzaIngredients cpi JOIN FETCH cpi.ingredient " +
+                "WHERE c.id IN (:ids)", CustomPizza.class);
+        query.setParameter("ids", ids);
+
+        return query.getResultList();
     }
 
     @Override

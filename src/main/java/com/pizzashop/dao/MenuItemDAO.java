@@ -19,6 +19,8 @@ public interface MenuItemDAO {
 
     List<MenuItem> findAllAvailableIn(List<Integer> ids);
 
+    List<MenuItem> findAllInJoinFetchIngredients(List<Integer> ids);
+
     void save(MenuItem menuItem);
 
     int deleteById(int id);
