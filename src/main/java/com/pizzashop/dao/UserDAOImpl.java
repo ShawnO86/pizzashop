@@ -1,5 +1,8 @@
 package com.pizzashop.dao;
 
+import com.pizzashop.dto.EmployeeInfoDTO;
+import com.pizzashop.entities.Role;
+import com.pizzashop.entities.RoleEnum;
 import com.pizzashop.entities.User;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
@@ -8,6 +11,7 @@ import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Repository
@@ -67,6 +71,16 @@ public class UserDAOImpl implements UserDAO {
     @Override
     public List<User> findAll() {
         TypedQuery<User> query = em.createQuery("FROM User", User.class);
+        return query.getResultList();
+    }
+
+    @Override
+    public List<String> findAllEmployeeUsernames() {
+        TypedQuery<String> query = em.createQuery(
+                "SELECT DISTINCT u.username " +
+                        "FROM User u JOIN u.roles r " +
+                        "WHERE r.role IN :targetRoles", String.class);
+        query.setParameter("targetRoles", Arrays.asList(RoleEnum.ROLE_EMPLOYEE, RoleEnum.ROLE_MANAGER));
         return query.getResultList();
     }
 

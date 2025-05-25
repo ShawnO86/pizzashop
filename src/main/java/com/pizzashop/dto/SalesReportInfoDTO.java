@@ -6,7 +6,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
-public class SalesReportDateDTO {
+public class SalesReportInfoDTO {
     @NotNull(message = "Start date cannot be null")
     @PastOrPresent(message = "Start date cannot be in the future")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
@@ -17,8 +17,21 @@ public class SalesReportDateDTO {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate endDate;
 
+    private String employeeUsername;
+
     public LocalDate getStartDate() { return startDate; }
     public void setStartDate(LocalDate startDate) { this.startDate = startDate; }
     public LocalDate getEndDate() { return endDate; }
     public void setEndDate(LocalDate endDate) { this.endDate = endDate; }
+    public String getEmployeeUsername() { return employeeUsername; }
+    public void setEmployeeUsername(String employeeUsername) { this.employeeUsername = employeeUsername; }
+
+    @Override
+    public String toString() {
+        return "SalesReportInfoDTO{" +
+                "startDate=" + startDate +
+                ", endDate=" + endDate +
+                ", employeeUsername='" + employeeUsername + '\'' +
+                '}';
+    }
 }

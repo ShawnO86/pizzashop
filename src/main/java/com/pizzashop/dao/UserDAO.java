@@ -15,6 +15,8 @@ public interface UserDAO {
 
     List<User> findAll();
 
+    List<String> findAllEmployeeUsernames();
+
     List<User> findAllFetchUserDetailsRoles();
 
     List<User> findAllByLastName(String lastName);

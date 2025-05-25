@@ -19,5 +19,7 @@ public interface OrderDAO {
 
     List<Order> findAllByDateRange(LocalDate from, LocalDate to);
 
+    List<Order> findAllFulfilledByIdInDateRange(LocalDate from, LocalDate to, String username);
+
     void update(Order order);
 }

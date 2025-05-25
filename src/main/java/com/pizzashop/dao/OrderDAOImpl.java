@@ -66,7 +66,7 @@ public class OrderDAOImpl implements OrderDAO {
     public List<Order> findAllIncompleteJoinFetchUserDetails() {
         TypedQuery<Order> query = em.createQuery("SELECT o FROM Order o " +
                 "JOIN FETCH o.orderMenuItems Omi JOIN FETCH o.user u JOIN FETCH u.userDetail " +
-                "LEFT JOIN FETCH Omi.menuItem LEFT JOIN FETCH Omi.customPizza " +
+                "LEFT JOIN FETCH Omi.menuItem mi LEFT JOIN FETCH Omi.customPizza cp " +
                 "WHERE o.is_complete = false", Order.class);
         return query.getResultList();
     }
@@ -78,11 +78,31 @@ public class OrderDAOImpl implements OrderDAO {
         LocalDateTime endOfDay = to.atTime(LocalTime.MAX);
 
         TypedQuery<Order> query = em.createQuery("SELECT o FROM Order o " +
-                "JOIN FETCH o.orderMenuItems omi LEFT JOIN FETCH omi.menuItem LEFT JOIN FETCH omi.customPizza " +
+                "JOIN FETCH o.orderMenuItems omi " +
+                "LEFT JOIN FETCH omi.menuItem mi LEFT JOIN FETCH omi.customPizza cp " +
                 "WHERE o.order_date BETWEEN :startDateTime AND :endDateTime", Order.class);
 
         query.setParameter("startDateTime", startOfDay);
         query.setParameter("endDateTime", endOfDay);
+
+        return query.getResultList();
+    }
+
+    @Override
+    public List<Order> findAllFulfilledByIdInDateRange(LocalDate from, LocalDate to, String username) {
+        // Adds time to date input (00:00 to 23:59)
+        LocalDateTime startOfDay = from.atStartOfDay();
+        LocalDateTime endOfDay = to.atTime(LocalTime.MAX);
+
+        TypedQuery<Order> query = em.createQuery("SELECT o FROM Order o " +
+                "JOIN FETCH o.orderMenuItems omi " +
+                "LEFT JOIN FETCH omi.menuItem mi LEFT JOIN FETCH omi.customPizza cp " +
+                "WHERE o.order_date BETWEEN :startDateTime AND :endDateTime " +
+                "AND o.fulfilled_by = :username", Order.class);
+
+        query.setParameter("startDateTime", startOfDay);
+        query.setParameter("endDateTime", endOfDay);
+        query.setParameter("username", username);
 
         return query.getResultList();
     }

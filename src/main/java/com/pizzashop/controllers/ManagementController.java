@@ -2,12 +2,10 @@ package com.pizzashop.controllers;
 
 import com.pizzashop.dao.OrderDAO;
 import com.pizzashop.dao.UserDAO;
-import com.pizzashop.dto.SalesReportDateDTO;
+import com.pizzashop.dto.EmployeeInfoDTO;
+import com.pizzashop.dto.SalesReportInfoDTO;
 import com.pizzashop.dto.UserRegisterDTO;
-import com.pizzashop.entities.Role;
-import com.pizzashop.entities.RoleEnum;
-import com.pizzashop.entities.User;
-import com.pizzashop.entities.UserDetail;
+import com.pizzashop.entities.*;
 import com.pizzashop.services.UserRegistrationService;
 import jakarta.validation.Valid;
 
@@ -20,6 +18,7 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -192,35 +191,61 @@ public class ManagementController {
 
     }
 
-    // todo: build page with orders made during specified timeframe and all ingredients used for each of those orders and total ingredients used
-    @PostMapping("/showSalesReport")
-    public String showSalesReport(@Valid @ModelAttribute("salesReportDates") SalesReportDateDTO salesReportDates,
-                                  BindingResult bindingResult,
-                                  Model model) {
+    @GetMapping("/showSalesReportForm")
+    public String showSalesReportForm(Model model) {
+        List<String> employees =  userDAO.findAllEmployeeUsernames();
+        System.out.println("employees usernames: " + employees);
 
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("heading", "System Administration");
-            model.addAttribute("salesReportDates", new SalesReportDateDTO());
-            return "management/system";
-        }
-        LocalDate startDate = salesReportDates.getStartDate();
-        LocalDate endDate = salesReportDates.getEndDate();
-        if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
-            bindingResult.rejectValue("endDate", "date.range.invalid", "End date must be after start date.");
-            model.addAttribute("heading", "System Administration");
-            model.addAttribute("salesReportDates", new SalesReportDateDTO());
-            return "management/system";
-        }
-
-        System.out.println("startDate: " + startDate);
-        System.out.println("endDate: " + endDate);
-
-        System.out.println("result: " + orderDAO.findAllByDateRange(startDate, endDate));
-
-
+        model.addAttribute("employees", employees);
+        model.addAttribute("salesReportInfo", new SalesReportInfoDTO());
+        model.addAttribute("heading", "Sales Report");
         return "management/showSalesReport";
     }
 
+    // todo: build page with orders made during specified timeframe and all ingredients used for each of those orders and total ingredients used
+    @PostMapping("/showSalesReport")
+    public String showSalesReport(@Valid @ModelAttribute("salesReportInfo") SalesReportInfoDTO salesReportInfo,
+                                  BindingResult bindingResult,
+                                  Model model) {
+
+        model.addAttribute("heading", "Sales Report");
+
+        // todo: add select to search fulfilled by a specified employee or all
+        List<String> employees =  userDAO.findAllEmployeeUsernames();
+        model.addAttribute("employees", employees);
+
+        System.out.println("salesReportInfo: " + salesReportInfo);
+
+        if (bindingResult.hasErrors()) {
+            System.out.println("errors: " + bindingResult.getAllErrors());
+            return "management/showSalesReport";
+        }
+        LocalDate startDate = salesReportInfo.getStartDate();
+        LocalDate endDate = salesReportInfo.getEndDate();
+        if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
+            bindingResult.rejectValue("endDate", "date.range.invalid", "End date must be after start date.");
+            return "management/showSalesReport";
+        }
+
+        //  todo : build list of orderDTOs and count ingredients for each order, count ingredients total
+        List<Order> orders =  orderDAO.findAllByDateRange(startDate, endDate);
+
+        System.out.println("result: " + orders);
+        model.addAttribute("report", "report found...");
+
+        for (Order order : orders) {
+            System.out.println("orderMenuItems: " + order.getOrderMenuItems());
+            for (OrderMenuItem orderMenuItem : order.getOrderMenuItems()) {
+                if (orderMenuItem.getMenuItem() != null) {
+                    System.out.println("*** this MenuItem id: " + orderMenuItem.getMenuItem().getId());
+                } else {
+                    System.out.println("*** this Pizza id: " + orderMenuItem.getCustomPizza().getId());
+                }
+            }
+        }
+
+        return "management/showSalesReport";
+    }
 
     private RoleEnum getHighestRole(List<Role> roles) {
         RoleEnum highestRole = null;
@@ -244,6 +269,18 @@ public class ManagementController {
         return userRole.equals(RoleEnum.ROLE_MANAGER.toString()) &&
                 userRole.equals(RoleEnum.ROLE_EMPLOYEE.toString()) &&
                 userRole.equals(RoleEnum.ROLE_CUSTOMER.toString());
+    }
+
+    private List<EmployeeInfoDTO> getEmployeeInfoDTOs(List<User> users) {
+        List<EmployeeInfoDTO> employeeInfoDTOs = new ArrayList<>();
+        for (User user : users) {
+            EmployeeInfoDTO employeeInfoDTO = new EmployeeInfoDTO(
+                    user.getId(), user.getUsername()
+            );
+            employeeInfoDTOs.add(employeeInfoDTO);
+        }
+
+        return employeeInfoDTOs;
     }
 
 }
