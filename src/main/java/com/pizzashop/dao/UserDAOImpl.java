@@ -1,7 +1,5 @@
 package com.pizzashop.dao;
 
-import com.pizzashop.dto.EmployeeInfoDTO;
-import com.pizzashop.entities.Role;
 import com.pizzashop.entities.RoleEnum;
 import com.pizzashop.entities.User;
 import jakarta.persistence.EntityManager;

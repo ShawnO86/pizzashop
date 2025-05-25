@@ -2,11 +2,9 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <body>
 
-<header th:fragment="head">
+<div th:fragment="head">
 
-  <div>
-    <h1 th:text="${heading}"></h1>
-  </div>
+  <h1 th:text="${heading}"></h1>
 
   <nav>
     <ul>
@@ -17,7 +15,7 @@
         <a th:href="@{/order/showMenu}">Menu</a>
       </li>
       <li sec:authorize="hasRole('ROLE_EMPLOYEE')">
-        Employee Portal
+        <a th:href="@{/employees/showOrders}">Show Orders</a>
       </li>
       <li sec:authorize="hasRole('ROLE_MANAGER')">
         <a th:href="@{/system}">Admin Portal</a>
@@ -33,7 +31,7 @@
     </ul>
   </nav>
 
-</header>
+</div>
 
 
 </body>
