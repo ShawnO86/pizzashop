@@ -297,10 +297,16 @@ public class OrderServiceImpl implements OrderService {
 
         for (Order order : orders) {
             OrderDTO orderDTO = this.convertOrderToDTO(order, false);
-            orderDTO.setIngredientReport(this.buildIngredientCount(orderDTO));
+            Map<String, Integer[]> ingredientCount = this.buildIngredientCount(orderDTO);
+            int totalCost = 0;
+            for (Integer[] count : ingredientCount.values()) {
+                System.out.println("value: " + Arrays.toString(count));
+                totalCost += count[2];
+            }
+            orderDTO.setTotalCost(totalCost);
+            orderDTO.setIngredientReport(ingredientCount);
             orderDTOList.add(orderDTO);
         }
-
         return orderDTOList;
     }
 
@@ -326,7 +332,7 @@ public class OrderServiceImpl implements OrderService {
                 List<MenuItemIngredient> menuItemIngredients = menuItem.getMenuItemIngredients();
                 for (MenuItemIngredient menuItemIngredient : menuItemIngredients) {
                     Ingredient ingredient = menuItemIngredient.getIngredient();
-                    ingredientCountMap.put(ingredient.getIngredientName(), buildIngredientCount(
+                    ingredientCountMap.put(ingredient.getIngredientName(), this.buildIngredientCount(
                             ingredientCountMap, menuItemIngredient, null, menuItemQty));
                 }
             }
@@ -349,7 +355,7 @@ public class OrderServiceImpl implements OrderService {
                 List<CustomPizzaIngredient> customPizzaIngredients = customPizza.getCustomPizzaIngredients();
                 for (CustomPizzaIngredient customPizzaIngredient : customPizzaIngredients) {
                     Ingredient ingredient = customPizzaIngredient.getIngredient();
-                    ingredientCountMap.put(ingredient.getIngredientName(), buildIngredientCount(
+                    ingredientCountMap.put(ingredient.getIngredientName(), this.buildIngredientCount(
                             ingredientCountMap, null, customPizzaIngredient, customPizzaQty));
                 }
             }
@@ -360,19 +366,13 @@ public class OrderServiceImpl implements OrderService {
                 List<MenuItemIngredient> menuItemIngredients = menuItem.getMenuItemIngredients();
                 for (MenuItemIngredient menuItemIngredient : menuItemIngredients) {
                     Ingredient ingredient = menuItemIngredient.getIngredient();
-                    ingredientCountMap.put(ingredient.getIngredientName(), buildIngredientCount(
+                    ingredientCountMap.put(ingredient.getIngredientName(), this.buildIngredientCount(
                             ingredientCountMap, menuItemIngredient, null, customPizzaQty));
                 }
             }
         }
 
-        System.out.println("final count map: [count, cost-per, price-per, total-cost, and total-price]");
-        for (Map.Entry<String, Integer[]> entry : ingredientCountMap.entrySet()) {
-            String key = entry.getKey();
-            Integer[] value = entry.getValue();
-            System.out.println("key: " + key + " -- value: " + Arrays.toString(value));
-        }
-
+        // todo: build template for OrderDTO list
         return ingredientCountMap;
     }
 
@@ -404,6 +404,7 @@ public class OrderServiceImpl implements OrderService {
     private Integer[] buildIngredientCount(Map<String, Integer[]> ingredientCountMap,
                                            MenuItemIngredient menuItemIngredient,
                                            CustomPizzaIngredient customPizzaIngredient, int quantity) {
+
         Ingredient ingredient;
         int qtyUsed;
 
@@ -417,22 +418,20 @@ public class OrderServiceImpl implements OrderService {
 
         int ingredientCost = ingredient.getCentsCostPer();
         int ingredientPrice = ingredient.getCentsPricePer();
+        // [count, cost-per, total-cost]
         Integer[] countArr;
         if (ingredientCountMap.get(ingredient.getIngredientName()) == null) {
-            countArr = new Integer[5];
+            countArr = new Integer[3];
             countArr[0] = qtyUsed * quantity;
             countArr[1] = ingredientCost;
-            countArr[2] = ingredientPrice;
-            countArr[3] = (qtyUsed * ingredientCost) * quantity;
-            countArr[4] = (qtyUsed * ingredientPrice) * quantity;
+            countArr[2] = (qtyUsed * ingredientCost) * quantity;
             ingredientCountMap.put(ingredient.getIngredientName(), countArr);
         } else {
             countArr = ingredientCountMap.get(ingredient.getIngredientName());
             countArr[0] += qtyUsed * quantity;
             // countArr[1] = ingredientCost; -- initialized when new
             // countArr[2] = ingredientPrice; -- ^
-            countArr[3] += (qtyUsed * ingredientCost) * quantity;
-            countArr[4] += (qtyUsed * ingredientPrice) * quantity;
+            countArr[2] += (qtyUsed * ingredientCost) * quantity;
             ingredientCountMap.put(ingredient.getIngredientName(), countArr);
         }
         return countArr;

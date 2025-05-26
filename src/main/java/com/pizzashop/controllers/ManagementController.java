@@ -2,10 +2,11 @@ package com.pizzashop.controllers;
 
 import com.pizzashop.dao.OrderDAO;
 import com.pizzashop.dao.UserDAO;
-import com.pizzashop.dto.EmployeeInfoDTO;
+import com.pizzashop.dto.OrderDTO;
 import com.pizzashop.dto.SalesReportInfoDTO;
 import com.pizzashop.dto.UserRegisterDTO;
 import com.pizzashop.entities.*;
+import com.pizzashop.services.OrderService;
 import com.pizzashop.services.UserRegistrationService;
 import jakarta.validation.Valid;
 
@@ -18,8 +19,8 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Controller
@@ -29,13 +30,15 @@ public class ManagementController {
     private final UserDAO userDAO;
     private final UserRegistrationService userService;
     private final OrderDAO orderDAO;
+    private final OrderService orderService;
 
 
     @Autowired
-    public ManagementController(UserDAO userDAO, UserRegistrationService userService, OrderDAO orderDAO) {
+    public ManagementController(UserDAO userDAO, UserRegistrationService userService, OrderDAO orderDAO, OrderService orderService) {
         this.userDAO = userDAO;
         this.userService = userService;
         this.orderDAO = orderDAO;
+        this.orderService = orderService;
     }
 
     @InitBinder
@@ -208,11 +211,9 @@ public class ManagementController {
                                   BindingResult bindingResult,
                                   Model model) {
 
-        model.addAttribute("heading", "Sales Report");
-
-        // todo: add select to search fulfilled by a specified employee or all
         List<String> employees =  userDAO.findAllEmployeeUsernames();
         model.addAttribute("employees", employees);
+        model.addAttribute("heading", "Sales Report");
 
         System.out.println("salesReportInfo: " + salesReportInfo);
 
@@ -220,6 +221,7 @@ public class ManagementController {
             System.out.println("errors: " + bindingResult.getAllErrors());
             return "management/showSalesReport";
         }
+
         LocalDate startDate = salesReportInfo.getStartDate();
         LocalDate endDate = salesReportInfo.getEndDate();
         if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
@@ -227,22 +229,23 @@ public class ManagementController {
             return "management/showSalesReport";
         }
 
-        //  todo : build list of orderDTOs and count ingredients for each order, count ingredients total
-        List<Order> orders =  orderDAO.findAllByDateRange(startDate, endDate);
+        //  todo : build list of orderDTOs and count ingredients total
+        String employeeUsername = salesReportInfo.getEmployeeUsername();
+        List<Order> orders;
 
-        System.out.println("result: " + orders);
-        model.addAttribute("report", "report found...");
-
-        for (Order order : orders) {
-            System.out.println("orderMenuItems: " + order.getOrderMenuItems());
-            for (OrderMenuItem orderMenuItem : order.getOrderMenuItems()) {
-                if (orderMenuItem.getMenuItem() != null) {
-                    System.out.println("*** this MenuItem id: " + orderMenuItem.getMenuItem().getId());
-                } else {
-                    System.out.println("*** this Pizza id: " + orderMenuItem.getCustomPizza().getId());
-                }
-            }
+        if (Objects.equals(employeeUsername, "all")) {
+            orders = orderDAO.findAllByDateRange(startDate, endDate);
+        } else {
+            orders = orderDAO.findAllFulfilledByIdInDateRange(startDate, endDate, employeeUsername);
         }
+
+        // todo: build template this OrderDTO list
+        List<OrderDTO> orderDTOList = orderService.buildOrderDTOlist(orders);
+
+
+        System.out.println("result orderDTOList: " + orderDTOList);
+        model.addAttribute("report", orderDTOList);
+
 
         return "management/showSalesReport";
     }
@@ -269,18 +272,6 @@ public class ManagementController {
         return userRole.equals(RoleEnum.ROLE_MANAGER.toString()) &&
                 userRole.equals(RoleEnum.ROLE_EMPLOYEE.toString()) &&
                 userRole.equals(RoleEnum.ROLE_CUSTOMER.toString());
-    }
-
-    private List<EmployeeInfoDTO> getEmployeeInfoDTOs(List<User> users) {
-        List<EmployeeInfoDTO> employeeInfoDTOs = new ArrayList<>();
-        for (User user : users) {
-            EmployeeInfoDTO employeeInfoDTO = new EmployeeInfoDTO(
-                    user.getId(), user.getUsername()
-            );
-            employeeInfoDTOs.add(employeeInfoDTO);
-        }
-
-        return employeeInfoDTOs;
     }
 
 }

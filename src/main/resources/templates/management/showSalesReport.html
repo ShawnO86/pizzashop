@@ -39,7 +39,54 @@
   </section>
 
   <section th:if="${report}">
-    <p th:text="${report}"></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Order Date</th>
+          <th>Menu Items</th>
+          <th>Custom Pizzas</th>
+          <th>Fulfilled By</th>
+        </tr>
+      </thead>
+      <tbody th:each="order : ${report}">
+        <tr>
+          <!--id-->
+          <td th:text="${order.orderID}"></td>
+          <!--date-->
+          <td>
+            <span th:text="${#temporals.format(order.orderDateTime, 'MM/dd/yyyy')}"></span><br>
+            <span th:text="${#temporals.format(order.orderDateTime, '@hh:mm a')}"></span>
+          </td>
+          <!--menu items-->
+          <td>
+            <sub th:each="menuItem : ${order.menuItemList}">
+              <span th:text="${menuItem.menuItemAmount} + 'x ' + ${menuItem.menuItemName}"></span><br>
+              <hr>
+            </sub>
+            <span th:if="${order.menuItemList == null}" th:text="None"></span>
+          </td>
+          <!--custom pizzas-->
+          <td>
+            <sub th:each="customPizza : ${order.customPizzaList}">
+              <span th:text="${customPizza.quantity}+ 'x ' +${customPizza.pizzaName}"></span><br>
+              <span th:each="topping, iterstat : ${customPizza.toppings}">
+                 <span th:text="${topping.name}"></span><span th:unless="${iterstat.last}">, </span>
+              </span><br>
+              <hr>
+            </sub>
+            <span th:if="${order.customPizzaList == null}" th:text="None"></span>
+          </td>
+          <!--fulfilled by-->
+          <!-- ingredients used
+              qtyx name @$cost-per <br>
+              $ingredient-total-cost -->
+          <!--total cost-->
+          <!--total price-->
+          <!--profit-->
+        </tr>
+      </tbody>
+    </table>
   </section>
 
 </main>

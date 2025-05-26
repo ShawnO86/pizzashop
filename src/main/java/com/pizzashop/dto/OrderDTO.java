@@ -9,12 +9,13 @@ public class OrderDTO {
     private List<OrderMenuItemDTO> menuItemList;
     private List<CustomPizzaDTO> customPizzaList;
     private int totalPrice;
+    private int totalCost;
     private Integer orderID;
     private LocalDateTime orderDateTime;
     private boolean inProgress;
     private String employeeName;
     private UserDetailDTO userDetail;
-    Map<String, List<Integer>> ingredientReport;
+    Map<String, Integer[]> ingredientReport;
 
     public OrderDTO() {}
 
@@ -35,6 +36,12 @@ public class OrderDTO {
     }
     public void setTotalPrice(int totalPrice) {
         this.totalPrice = totalPrice;
+    }
+    public int getTotalCost() {
+        return totalCost;
+    }
+    public void setTotalCost(int totalCost) {
+        this.totalCost = totalCost;
     }
     public Integer getOrderID() {
         return orderID;
@@ -66,10 +73,10 @@ public class OrderDTO {
     public void setUserDetail(UserDetailDTO userDetail) {
         this.userDetail = userDetail;
     }
-    public Map<String, List<Integer>> getIngredientReport() {
+    public Map<String, Integer[]> getIngredientReport() {
         return ingredientReport;
     }
-    public void setIngredientReport(Map<String, List<Integer>> ingredientReport) {
+    public void setIngredientReport(Map<String, Integer[]> ingredientReport) {
         this.ingredientReport = ingredientReport;
     }
 
@@ -97,6 +104,7 @@ public class OrderDTO {
                 ", inProgress=" + inProgress +
                 ", employeeName='" + employeeName + '\'' +
                 ", userDetail=" + userDetail +
+                ", ingredientReport=" + ingredientReport +
                 '}';
     }
 }
