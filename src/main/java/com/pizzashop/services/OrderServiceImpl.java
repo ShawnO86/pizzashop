@@ -258,8 +258,10 @@ public class OrderServiceImpl implements OrderService {
                 CustomPizza customPizza = orderMenuItem.getCustomPizza();
                 CustomPizzaDTO customPizzaDTO = new CustomPizzaDTO(customPizza.getName(), orderMenuItem.getItemQuantity());
                 customPizzaDTO.setCustomPizzaID(customPizza.getId());
+                MenuItem basePizza = menuItemDAO.findByName(customPizza.getSize().getPizzaName());
+                customPizzaDTO.setBasePizzaId(basePizza.getId());
                 SizeDTO sizeDTO = new SizeDTO(customPizza.getSize(),
-                        menuItemDAO.findByName(customPizza.getSize().getPizzaName()).getPriceCents());
+                        basePizza.getPriceCents());
                 List<ToppingDTO> toppingDTOList = new ArrayList<>();
                 List<ToppingDTO> extraToppingDTOList = new ArrayList<>();
                 for (CustomPizzaIngredient customPizzaIngredient : customPizza.getCustomPizzaIngredients()) {
@@ -287,6 +289,153 @@ public class OrderServiceImpl implements OrderService {
         }
 
         return orderDTO;
+    }
+
+    @Override
+    public List<OrderDTO> buildOrderDTOlist(List<Order> orders) {
+        List<OrderDTO> orderDTOList = new ArrayList<>();
+
+        for (Order order : orders) {
+            OrderDTO orderDTO = this.convertOrderToDTO(order, false);
+            orderDTO.setIngredientReport(this.buildIngredientCount(orderDTO));
+            orderDTOList.add(orderDTO);
+        }
+
+        return orderDTOList;
+    }
+
+    private Map<String, Integer[]> buildIngredientCount(OrderDTO order) {
+        Map<String, List<Integer>> extractedIds = this.extractItemIdsFromOrderDTO(order);
+        Map<String, Integer[]> ingredientCountMap = new HashMap<>();
+
+        List<Integer> menuItemIdList = extractedIds.get("MenuItemIDs");
+        List<MenuItem> menuItemsWithIngredients;
+        if (!menuItemIdList.isEmpty()) {
+            // add menu item ingredients
+            menuItemsWithIngredients = menuItemDAO.findAllInJoinFetchIngredients(menuItemIdList);
+
+            for (MenuItem menuItem : menuItemsWithIngredients) {
+                int menuItemQty = 0;
+                for (OrderMenuItemDTO orderMenuItemDTO : order.getMenuItemList()) {
+                    if (orderMenuItemDTO.getMenuItemID().equals(menuItem.getId())) {
+                        menuItemQty = orderMenuItemDTO.getMenuItemAmount();
+                        break;
+                    }
+                }
+
+                List<MenuItemIngredient> menuItemIngredients = menuItem.getMenuItemIngredients();
+                for (MenuItemIngredient menuItemIngredient : menuItemIngredients) {
+                    Ingredient ingredient = menuItemIngredient.getIngredient();
+                    ingredientCountMap.put(ingredient.getIngredientName(), buildIngredientCount(
+                            ingredientCountMap, menuItemIngredient, null, menuItemQty));
+                }
+            }
+        }
+
+        List<Integer> customPizzaIdList = extractedIds.get("CustomPizzaIDs");
+        List<CustomPizza> customPizzasWithIngredients;
+        if (!customPizzaIdList.isEmpty()) {
+            // add custom pizza ingredients
+            customPizzasWithIngredients = customPizzaDAO.findAllInJoinFetchIngredients(customPizzaIdList);
+            int customPizzaQty = 0;
+            for (CustomPizza customPizza : customPizzasWithIngredients) {
+                for (CustomPizzaDTO customPizzaDTO : order.getCustomPizzaList()) {
+                    if (customPizzaDTO.getCustomPizzaID().equals(customPizza.getId())) {
+                        customPizzaQty = customPizzaDTO.getQuantity();
+                        break;
+                    }
+                }
+
+                List<CustomPizzaIngredient> customPizzaIngredients = customPizza.getCustomPizzaIngredients();
+                for (CustomPizzaIngredient customPizzaIngredient : customPizzaIngredients) {
+                    Ingredient ingredient = customPizzaIngredient.getIngredient();
+                    ingredientCountMap.put(ingredient.getIngredientName(), buildIngredientCount(
+                            ingredientCountMap, null, customPizzaIngredient, customPizzaQty));
+                }
+            }
+            // add base pizza ingredients
+            List<Integer> basePizzaIdList = extractedIds.get("BasePizzaIDs");
+            List<MenuItem> basePizzas = menuItemDAO.findAllInJoinFetchIngredients(basePizzaIdList);
+            for (MenuItem menuItem : basePizzas) {
+                List<MenuItemIngredient> menuItemIngredients = menuItem.getMenuItemIngredients();
+                for (MenuItemIngredient menuItemIngredient : menuItemIngredients) {
+                    Ingredient ingredient = menuItemIngredient.getIngredient();
+                    ingredientCountMap.put(ingredient.getIngredientName(), buildIngredientCount(
+                            ingredientCountMap, menuItemIngredient, null, customPizzaQty));
+                }
+            }
+        }
+
+        System.out.println("final count map: [count, cost-per, price-per, total-cost, and total-price]");
+        for (Map.Entry<String, Integer[]> entry : ingredientCountMap.entrySet()) {
+            String key = entry.getKey();
+            Integer[] value = entry.getValue();
+            System.out.println("key: " + key + " -- value: " + Arrays.toString(value));
+        }
+
+        return ingredientCountMap;
+    }
+
+    private Map<String, List<Integer>> extractItemIdsFromOrderDTO(OrderDTO orderDTO) {
+        List<Integer> menuItemIdList = new ArrayList<>();
+        List<Integer> customPizzaIdList = new ArrayList<>();
+        List<Integer> basePizzaIdList = new ArrayList<>();
+
+        if (orderDTO.getMenuItemList() != null && !orderDTO.getMenuItemList().isEmpty()) {
+            for (OrderMenuItemDTO menuItem : orderDTO.getMenuItemList()) {
+                menuItemIdList.add(menuItem.getMenuItemID());
+            }
+        }
+        if (orderDTO.getCustomPizzaList() != null && !orderDTO.getCustomPizzaList().isEmpty()) {
+            for (CustomPizzaDTO customPizza : orderDTO.getCustomPizzaList()) {
+                customPizzaIdList.add(customPizza.getCustomPizzaID());
+                basePizzaIdList.add(customPizza.getBasePizzaId());
+            }
+        }
+
+        Map<String, List<Integer>> itemIdMap = new HashMap<>();
+        itemIdMap.put("MenuItemIDs", menuItemIdList);
+        itemIdMap.put("CustomPizzaIDs", customPizzaIdList);
+        itemIdMap.put("BasePizzaIDs", basePizzaIdList);
+
+        return itemIdMap;
+    }
+
+    private Integer[] buildIngredientCount(Map<String, Integer[]> ingredientCountMap,
+                                           MenuItemIngredient menuItemIngredient,
+                                           CustomPizzaIngredient customPizzaIngredient, int quantity) {
+        Ingredient ingredient;
+        int qtyUsed;
+
+        if (menuItemIngredient != null) {
+            ingredient = menuItemIngredient.getIngredient();
+            qtyUsed = menuItemIngredient.getQuantityUsed();
+        } else {
+            ingredient = customPizzaIngredient.getIngredient();
+            qtyUsed = customPizzaIngredient.getQuantityUsed();
+        }
+
+        int ingredientCost = ingredient.getCentsCostPer();
+        int ingredientPrice = ingredient.getCentsPricePer();
+        Integer[] countArr;
+        if (ingredientCountMap.get(ingredient.getIngredientName()) == null) {
+            countArr = new Integer[5];
+            countArr[0] = qtyUsed * quantity;
+            countArr[1] = ingredientCost;
+            countArr[2] = ingredientPrice;
+            countArr[3] = (qtyUsed * ingredientCost) * quantity;
+            countArr[4] = (qtyUsed * ingredientPrice) * quantity;
+            ingredientCountMap.put(ingredient.getIngredientName(), countArr);
+        } else {
+            countArr = ingredientCountMap.get(ingredient.getIngredientName());
+            countArr[0] += qtyUsed * quantity;
+            // countArr[1] = ingredientCost; -- initialized when new
+            // countArr[2] = ingredientPrice; -- ^
+            countArr[3] += (qtyUsed * ingredientCost) * quantity;
+            countArr[4] += (qtyUsed * ingredientPrice) * quantity;
+            ingredientCountMap.put(ingredient.getIngredientName(), countArr);
+        }
+        return countArr;
     }
 
     private void validateMenuItems(OrderDTO order) {

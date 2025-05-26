@@ -13,4 +13,6 @@ public interface OrderService {
     Map<String, List<String>> submitOrderForValidation(OrderDTO order);
 
     OrderDTO convertOrderToDTO(Order order, boolean needUser);
+
+    List<OrderDTO> buildOrderDTOlist(List<Order> orders);
 }
