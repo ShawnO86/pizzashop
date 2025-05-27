@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -235,8 +236,11 @@ public class ManagementController {
         }
 
         List<OrderDTO> orderDTOList = orderService.buildOrderDTOlist(orders);
+        Map<String, Integer> inventoryUsage = orderService.countTotalInventoryUsage(orderDTOList);
 
+        System.out.println("*** inventory usage: " + inventoryUsage);
         model.addAttribute("report", orderDTOList);
+        model.addAttribute("inventoryUsage", inventoryUsage);
 
         return "management/showSalesReport";
     }

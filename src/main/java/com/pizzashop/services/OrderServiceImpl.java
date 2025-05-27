@@ -297,7 +297,7 @@ public class OrderServiceImpl implements OrderService {
 
         for (Order order : orders) {
             OrderDTO orderDTO = this.convertOrderToDTO(order, false);
-            Map<String, List<Integer>> ingredientCount = this.buildIngredientCount(orderDTO);
+            Map<String, List<Integer>> ingredientCount = this.buildIngredientCountMap(orderDTO);
             int totalCost = 0;
             for (List<Integer> count : ingredientCount.values()) {
                 totalCost += count.get(2);
@@ -310,7 +310,25 @@ public class OrderServiceImpl implements OrderService {
         return orderDTOList;
     }
 
-    private Map<String, List<Integer>> buildIngredientCount(OrderDTO order) {
+    @Override
+    public Map<String, Integer> countTotalInventoryUsage(List<OrderDTO> orderDTOs) {
+        Map<String, Integer> inventoryUsage = new HashMap<>();
+        for (OrderDTO orderDTO : orderDTOs) {
+            Map<String, List<Integer>> ingredientCount = orderDTO.getIngredientReport();
+            for (Map.Entry<String, List<Integer>> entry : ingredientCount.entrySet()) {
+                String ingredientName = entry.getKey();
+                List<Integer> inventoryUsageCount = entry.getValue();
+                if (!inventoryUsage.containsKey(ingredientName)) {
+                    inventoryUsage.put(ingredientName, inventoryUsageCount.getFirst());
+                } else {
+                    inventoryUsage.put(ingredientName, inventoryUsage.get(ingredientName) + inventoryUsageCount.getFirst());
+                }
+            }
+        }
+        return inventoryUsage;
+    }
+
+    private Map<String, List<Integer>> buildIngredientCountMap(OrderDTO order) {
         Map<String, List<Integer>> extractedIds = this.extractItemIdsFromOrderDTO(order);
         Map<String, List<Integer>> ingredientCountMap = new HashMap<>();
 
@@ -372,7 +390,6 @@ public class OrderServiceImpl implements OrderService {
             }
         }
 
-        // todo: build template for OrderDTO list
         return ingredientCountMap;
     }
 

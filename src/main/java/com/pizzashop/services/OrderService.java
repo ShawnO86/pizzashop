@@ -15,4 +15,6 @@ public interface OrderService {
     OrderDTO convertOrderToDTO(Order order, boolean needUser);
 
     List<OrderDTO> buildOrderDTOlist(List<Order> orders);
+
+    Map<String, Integer> countTotalInventoryUsage(List<OrderDTO> orderDTOs);
 }

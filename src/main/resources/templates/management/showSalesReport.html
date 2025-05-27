@@ -11,38 +11,35 @@
 <header th:insert="~{header :: head}"></header>
 
 <main>
-
   <section class="form-info">
-    <div>
-      <h2>Generate Sales Report:</h2>
-      <form method="POST" th:action="@{/system/showSalesReport}" th:object="${salesReportInfo}">
-        <label>Start Date:
-          <input th:field="*{startDate}" type="date"/>
-        </label>
-        <div th:if="${#fields.hasErrors('startDate')}" class="error">
-          <span th:errors="*{startDate}"></span>
-        </div>
-        <label>End Date:
-          <input th:field="*{endDate}" type="date"/>
-        </label>
-        <div th:if="${#fields.hasErrors('endDate')}" class="error">
-          <span th:errors="*{endDate}"></span>
-        </div>
-        <label>Fulfilled By:
-          <select th:field="*{employeeUsername}">
-            <option value="all">All Employees</option>
-            <option th:each="employee: ${employees}" th:value="${employee}" th:text="${employee}"></option>
-          </select>
-        </label>
-        <br>
-        <input type="submit" value="Submit">
-      </form>
-    </div>
+    <h2>Generate Sales Report:</h2>
+    <form method="POST" th:action="@{/system/showSalesReport}" th:object="${salesReportInfo}">
+      <label>Start Date:
+        <input th:field="*{startDate}" type="date"/>
+      </label>
+      <div th:if="${#fields.hasErrors('startDate')}" class="error">
+        <span th:errors="*{startDate}"></span>
+      </div>
+      <label>End Date:
+        <input th:field="*{endDate}" type="date"/>
+      </label>
+      <div th:if="${#fields.hasErrors('endDate')}" class="error">
+        <span th:errors="*{endDate}"></span>
+      </div>
+      <label>Fulfilled By:
+        <select th:field="*{employeeUsername}">
+          <option value="all">All Employees</option>
+          <option th:each="employee: ${employees}" th:value="${employee}" th:text="${employee}"></option>
+        </select>
+      </label>
+      <br>
+      <input type="submit" value="Submit">
+    </form>
   </section>
 
-  <section th:if="${report}">
-    <div>
-      <h3>Report</h3>
+  <section th:if="${report}" class="space-between">
+    <div id="report">
+      <h3>Orders Report</h3>
       <table>
         <thead>
           <tr>
@@ -57,8 +54,8 @@
             <th>Profit</th>
           </tr>
         </thead>
-        <tbody th:each="order : ${report}">
-          <tr>
+        <tbody>
+          <tr th:each="order : ${report}">
             <!--id-->
             <td th:text="${order.orderID}"></td>
             <!--date-->
@@ -157,6 +154,27 @@
                 <span th:text="${#numbers.formatCurrency(order.totalProfit / 100.0)}"></span>
               </sub>
             </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div id="inventory">
+      <h3>Inventory Usage</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>
+              Ingredient
+            </th>
+            <th>
+              Used (in ounces)
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="element : ${inventoryUsage}">
+            <td th:text="${element.key}"></td>
+            <td th:text="${element.value}"></td>
           </tr>
         </tbody>
       </table>
