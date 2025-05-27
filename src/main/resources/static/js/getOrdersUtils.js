@@ -131,7 +131,7 @@ export function appendOrderToUI(order, container) {
 
     orderTemplate.innerHTML = `
         <details>
-            <summary class="order-summary space-between">
+            <summary class="space-between">
                 <span>Order ID: ${order['orderID']}</span>
                 <span>Received on: ${orderDateFormatted[0]}/${orderDateFormatted[1]} @ ${orderDateFormatted[2]}:${orderDateFormatted[3]}</span>
             </summary>

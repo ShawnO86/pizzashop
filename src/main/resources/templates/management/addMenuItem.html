@@ -75,7 +75,9 @@
           <div class="ingredient-amount" th:if="${menuItemRecipe != null}" th:each="ingredientArr : ${menuItemRecipe}">
             <label>Ingredient:
               <select name="ingredientIdAmountsKeys">
-                <option th:each="ingredient : ${ingredients}" th:value="${ingredient.id}" th:text="${ingredient.ingredientName + ' (' + ingredient.unitOfMeasure + ')'}" th:selected="${ingredient.ingredientName == ingredientArr[0]}"></option>
+                <option th:each="ingredient : ${ingredients}" th:value="${ingredient.id}"
+                        th:text="${ingredient.ingredientName + ' (' + ingredient.unitOfMeasure + ')'}"
+                        th:selected="${ingredient.ingredientName == ingredientArr[0]}"></option>
               </select>
             </label>
 
@@ -88,7 +90,8 @@
         <div class="ingredient-amount" th:if="${menuItemRecipe == null}">
           <label>Ingredient:
             <select name="ingredientIdAmountsKeys">
-              <option th:each="ingredient : ${ingredients}" th:value="${ingredient.id}" th:text="${ingredient.ingredientName + ' (' + ingredient.unitOfMeasure + ')'}"></option>
+              <option th:each="ingredient : ${ingredients}" th:value="${ingredient.id}"
+                      th:text="${ingredient.ingredientName + ' (' + ingredient.unitOfMeasure + ')'}"></option>
             </select>
           </label>
 

@@ -32,7 +32,7 @@
         <div th:if="${menuItem.isAvailable}">
           <h4 th:text="${menuItem.dishName}"></h4>
           <p th:text="${menuItem.description}"></p>
-          <p th:text="${#numbers.formatCurrency(menuItem.priceCents / 100 + '.' + menuItem.priceCents % 100)}"></p>
+          <p th:text="${#numbers.formatCurrency(menuItem.priceCents / 100.0)}"></p>
         </div>
 
         <input type="number" placeholder="Qty" min="1" th:max="${menuItem.amountAvailable}" />

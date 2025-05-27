@@ -47,6 +47,10 @@
           <th>Menu Items</th>
           <th>Custom Pizzas</th>
           <th>Fulfilled By</th>
+          <th>Ingredients Used</th>
+          <th>Total Cost</th>
+          <th>Total Price</th>
+          <th>Profit</th>
         </tr>
       </thead>
       <tbody th:each="order : ${report}">
@@ -55,14 +59,13 @@
           <td th:text="${order.orderID}"></td>
           <!--date-->
           <td>
-            <span th:text="${#temporals.format(order.orderDateTime, 'MM/dd/yyyy')}"></span><br>
-            <span th:text="${#temporals.format(order.orderDateTime, '@hh:mm a')}"></span>
+            <span th:text="${#temporals.format(order.orderDateTime, 'MM/dd/yyyy')}"></span>
           </td>
           <!--menu items-->
           <td>
             <sub th:each="menuItem : ${order.menuItemList}">
               <span th:text="${menuItem.menuItemAmount} + 'x ' + ${menuItem.menuItemName}"></span><br>
-              <hr>
+              <hr> <!-- todo: set border bottom instead -->
             </sub>
             <span th:if="${order.menuItemList == null}" th:text="None"></span>
           </td>
@@ -70,20 +73,87 @@
           <td>
             <sub th:each="customPizza : ${order.customPizzaList}">
               <span th:text="${customPizza.quantity}+ 'x ' +${customPizza.pizzaName}"></span><br>
-              <span th:each="topping, iterstat : ${customPizza.toppings}">
-                 <span th:text="${topping.name}"></span><span th:unless="${iterstat.last}">, </span>
-              </span><br>
-              <hr>
+              <details>
+                <summary>
+                  Show toppings
+                </summary>
+                  <span th:each="topping, iterstat : ${customPizza.toppings}">
+                    <span th:text="${topping.name}"></span><span th:unless="${iterstat.last}">, </span>
+                  </span>
+              </details>
             </sub>
             <span th:if="${order.customPizzaList == null}" th:text="None"></span>
           </td>
           <!--fulfilled by-->
-          <!-- ingredients used
-              qtyx name @$cost-per <br>
-              $ingredient-total-cost -->
+          <td>
+            <span th:text="${order.employeeName}"></span>
+          </td>
+          <!-- ingredients used -->
+          <td>
+            <details>
+              <summary>Show ingredients used</summary>
+              <table>
+                <thead>
+                <tr>
+                  <th>
+                    <sub>Ingredient</sub>
+                  </th>
+                  <th>
+                    <sub>Qty</sub>
+                  </th>
+                  <th>
+                    <sub>Cost ea.</sub>
+                  </th>
+                  <th>
+                    <sub>Cost total</sub>
+                  </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="report : ${order.ingredientReport}">
+                  <td>
+                    <sub>
+                      <span th:text="${report.key}"></span><br>
+                    </sub>
+                  </td>
+                  <td>
+                    <sub>
+                      <span th:text="${report.value.get(0)}"></span>
+                    </sub>
+                  </td>
+                  <td>
+                    <sub>
+                      <span th:text="${#numbers.formatCurrency(report.value.get(1) / 100 + '.' + report.value.get(1) % 100)}"></span>
+                    </sub>
+                  </td>
+                  <td>
+                    <sub>
+                      <span th:text="${#numbers.formatCurrency(report.value.get(2) / 100 + '.' + report.value.get(2) % 100)}"></span>
+                    </sub>
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+            </details>
+          </td>
           <!--total cost-->
+          <td>
+            <sub>
+              <span th:text="${#numbers.formatCurrency(order.totalCost / 100.0)}"></span>
+            </sub>
+          </td>
           <!--total price-->
+          <td>
+            <sub>
+              <span th:text="${#numbers.formatCurrency(order.totalPrice / 100.0)}"></span>
+            </sub>
+          </td>
           <!--profit-->
+          <td>
+            <sub>
+              <span th:text="${#numbers.formatCurrency(order.totalProfit / 100.0)}"></span>
+            </sub>
+          </td>
         </tr>
       </tbody>
     </table>

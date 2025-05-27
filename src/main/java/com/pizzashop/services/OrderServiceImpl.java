@@ -297,22 +297,23 @@ public class OrderServiceImpl implements OrderService {
 
         for (Order order : orders) {
             OrderDTO orderDTO = this.convertOrderToDTO(order, false);
-            Map<String, Integer[]> ingredientCount = this.buildIngredientCount(orderDTO);
+            Map<String, List<Integer>> ingredientCount = this.buildIngredientCount(orderDTO);
             int totalCost = 0;
-            for (Integer[] count : ingredientCount.values()) {
-                System.out.println("value: " + Arrays.toString(count));
-                totalCost += count[2];
+            for (List<Integer> count : ingredientCount.values()) {
+                System.out.println("value: " + count.toString());
+                totalCost += count.get(2);
             }
             orderDTO.setTotalCost(totalCost);
             orderDTO.setIngredientReport(ingredientCount);
+
             orderDTOList.add(orderDTO);
         }
         return orderDTOList;
     }
 
-    private Map<String, Integer[]> buildIngredientCount(OrderDTO order) {
+    private Map<String, List<Integer>> buildIngredientCount(OrderDTO order) {
         Map<String, List<Integer>> extractedIds = this.extractItemIdsFromOrderDTO(order);
-        Map<String, Integer[]> ingredientCountMap = new HashMap<>();
+        Map<String, List<Integer>> ingredientCountMap = new HashMap<>();
 
         List<Integer> menuItemIdList = extractedIds.get("MenuItemIDs");
         List<MenuItem> menuItemsWithIngredients;
@@ -401,7 +402,7 @@ public class OrderServiceImpl implements OrderService {
         return itemIdMap;
     }
 
-    private Integer[] buildIngredientCount(Map<String, Integer[]> ingredientCountMap,
+    private List<Integer> buildIngredientCount(Map<String, List<Integer>> ingredientCountMap,
                                            MenuItemIngredient menuItemIngredient,
                                            CustomPizzaIngredient customPizzaIngredient, int quantity) {
 
@@ -419,19 +420,19 @@ public class OrderServiceImpl implements OrderService {
         int ingredientCost = ingredient.getCentsCostPer();
         int ingredientPrice = ingredient.getCentsPricePer();
         // [count, cost-per, total-cost]
-        Integer[] countArr;
+        List<Integer> countArr;
         if (ingredientCountMap.get(ingredient.getIngredientName()) == null) {
-            countArr = new Integer[3];
-            countArr[0] = qtyUsed * quantity;
-            countArr[1] = ingredientCost;
-            countArr[2] = (qtyUsed * ingredientCost) * quantity;
+            countArr = new ArrayList<>(3);
+            countArr.add(0, qtyUsed * quantity);
+            countArr.add(1, ingredientCost);
+            countArr.add(2, (qtyUsed * ingredientCost) * quantity);
             ingredientCountMap.put(ingredient.getIngredientName(), countArr);
         } else {
             countArr = ingredientCountMap.get(ingredient.getIngredientName());
-            countArr[0] += qtyUsed * quantity;
+            countArr.set(0, countArr.getFirst() + (qtyUsed * quantity));
             // countArr[1] = ingredientCost; -- initialized when new
             // countArr[2] = ingredientPrice; -- ^
-            countArr[2] += (qtyUsed * ingredientCost) * quantity;
+            countArr.set(2, countArr.getLast() + ((qtyUsed * ingredientCost) * quantity));
             ingredientCountMap.put(ingredient.getIngredientName(), countArr);
         }
         return countArr;

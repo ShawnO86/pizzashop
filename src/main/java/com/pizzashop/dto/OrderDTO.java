@@ -10,12 +10,13 @@ public class OrderDTO {
     private List<CustomPizzaDTO> customPizzaList;
     private int totalPrice;
     private int totalCost;
+    private int totalProfit;
     private Integer orderID;
     private LocalDateTime orderDateTime;
     private boolean inProgress;
     private String employeeName;
     private UserDetailDTO userDetail;
-    Map<String, Integer[]> ingredientReport;
+    Map<String, List<Integer>> ingredientReport;
 
     public OrderDTO() {}
 
@@ -42,6 +43,9 @@ public class OrderDTO {
     }
     public void setTotalCost(int totalCost) {
         this.totalCost = totalCost;
+    }
+    public int getTotalProfit() {
+        return this.totalPrice - this.totalCost;
     }
     public Integer getOrderID() {
         return orderID;
@@ -73,10 +77,10 @@ public class OrderDTO {
     public void setUserDetail(UserDetailDTO userDetail) {
         this.userDetail = userDetail;
     }
-    public Map<String, Integer[]> getIngredientReport() {
+    public Map<String, List<Integer>> getIngredientReport() {
         return ingredientReport;
     }
-    public void setIngredientReport(Map<String, Integer[]> ingredientReport) {
+    public void setIngredientReport(Map<String, List<Integer>> ingredientReport) {
         this.ingredientReport = ingredientReport;
     }
 

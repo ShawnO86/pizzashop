@@ -32,7 +32,6 @@ public class ManagementController {
     private final OrderDAO orderDAO;
     private final OrderService orderService;
 
-
     @Autowired
     public ManagementController(UserDAO userDAO, UserRegistrationService userService, OrderDAO orderDAO, OrderService orderService) {
         this.userDAO = userDAO;
@@ -197,7 +196,6 @@ public class ManagementController {
     @GetMapping("/showSalesReportForm")
     public String showSalesReportForm(Model model) {
         List<String> employees =  userDAO.findAllEmployeeUsernames();
-        System.out.println("employees usernames: " + employees);
 
         model.addAttribute("employees", employees);
         model.addAttribute("salesReportInfo", new SalesReportInfoDTO());
@@ -215,10 +213,7 @@ public class ManagementController {
         model.addAttribute("employees", employees);
         model.addAttribute("heading", "Sales Report");
 
-        System.out.println("salesReportInfo: " + salesReportInfo);
-
         if (bindingResult.hasErrors()) {
-            System.out.println("errors: " + bindingResult.getAllErrors());
             return "management/showSalesReport";
         }
 
@@ -239,13 +234,9 @@ public class ManagementController {
             orders = orderDAO.findAllFulfilledByIdInDateRange(startDate, endDate, employeeUsername);
         }
 
-        // todo: build template this OrderDTO list
         List<OrderDTO> orderDTOList = orderService.buildOrderDTOlist(orders);
 
-
-        System.out.println("result orderDTOList: " + orderDTOList);
         model.addAttribute("report", orderDTOList);
-
 
         return "management/showSalesReport";
     }
