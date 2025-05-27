@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Test Login Page</title>
+    <title>Login Page</title>
     <link rel="stylesheet" type="text/css" href="/styles/main.css">
 
 </head>
 <body>
+<header th:insert="~{header :: head}"></header>
+
 <div sec:authorize="isAuthenticated()">
     <h1>You are already logged in!</h1>
-    <a th:href="@{/}">Home</a>
 </div>
 
 <div class="form-container" sec:authorize="isAnonymous()">
-    <h2>Custom Login Page</h2>
     <form action="#" th:action="@{/authenticateUser}" method="POST">
 
         <!-- params are gathered on load from uri -->

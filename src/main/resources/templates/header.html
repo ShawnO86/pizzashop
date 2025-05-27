@@ -11,11 +11,11 @@
       <li>
         <a th:href="@{/}">Home</a>
       </li>
-      <li sec:authorize="hasRole('ROLE_CUSTOMER')">
+      <li>
         <a th:href="@{/order/showMenu}">Menu</a>
       </li>
       <li sec:authorize="hasRole('ROLE_EMPLOYEE')">
-        <a th:href="@{/employees/showOrders}">Show Orders</a>
+        <a th:href="@{/employees/showOrders}">Stream Orders</a>
       </li>
       <li sec:authorize="hasRole('ROLE_MANAGER')">
         <a th:href="@{/system}">Admin Portal</a>
@@ -26,7 +26,7 @@
         </form>
       </li>
       <li sec:authorize="isAnonymous()">
-        <a th:href="@{/login}">Login</a>
+        <a th:href="@{/login}">Log In</a>
       </li>
     </ul>
   </nav>

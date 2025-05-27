@@ -36,7 +36,7 @@ public class InventoryController {
     public String showInventory(Model model) {
         List<Ingredient> inventory = menuItemService.findAllIngredients();
         model.addAttribute("inventory", inventory);
-        model.addAttribute("header", "Inventory");
+        model.addAttribute("heading", "Inventory");
 
         return "management/showInventory";
     }
@@ -46,12 +46,12 @@ public class InventoryController {
     public String showAddInventoryForm(Model model, @RequestParam(value = "ingredientId", required = false) Integer ingredientId) {
         if (ingredientId == null) {
             model.addAttribute("inventoryItem", new IngredientDTO());
-            model.addAttribute("header", "Add Inventory");
+            model.addAttribute("heading", "Add Inventory");
         } else {
             Ingredient ingredient = menuItemService.findIngredientById(ingredientId);
             model.addAttribute("inventoryItem", ingredient);
             model.addAttribute("ingredientId", ingredientId);
-            model.addAttribute("header", "Update " + ingredient.getIngredientName());
+            model.addAttribute("heading", "Update " + ingredient.getIngredientName());
         }
 
         return "management/addInventory";
@@ -91,10 +91,15 @@ public class InventoryController {
             menuItemService.saveIngredient(ingredientDTO, ingredientId);
             return "redirect:/system/inventory/showInventory";
         } else {
+
             model.addAttribute("errorMessage", errorMessage);
             model.addAttribute("inventoryItem", ingredientDTO);
             if (ingredientId != null) {
+                Ingredient ingredient = menuItemService.findIngredientById(ingredientId);
                 model.addAttribute("ingredientId", ingredientId);
+                model.addAttribute("heading", "Update " + ingredient.getIngredientName());
+            } else {
+                model.addAttribute("heading", "Inventory");
             }
             return "management/addInventory";
         }

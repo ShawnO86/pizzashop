@@ -13,150 +13,154 @@
 <main>
 
   <section class="form-info">
-    <h3>Generate Sales Report:</h3>
-    <form method="POST" th:action="@{/system/showSalesReport}" th:object="${salesReportInfo}">
-      <label>Start Date:
-        <input th:field="*{startDate}" type="date"/>
-      </label>
-      <div th:if="${#fields.hasErrors('startDate')}" class="error">
-        <span th:errors="*{startDate}"></span>
-      </div>
-      <label>End Date:
-        <input th:field="*{endDate}" type="date"/>
-      </label>
-      <div th:if="${#fields.hasErrors('endDate')}" class="error">
-        <span th:errors="*{endDate}"></span>
-      </div>
-      <label>Fulfilled By:
-        <select th:field="*{employeeUsername}">
-          <option value="all">All Employees</option>
-          <option th:each="employee: ${employees}" th:value="${employee}" th:text="${employee}"></option>
-        </select>
-      </label>
-      <br>
-      <input type="submit" value="Submit">
-    </form>
+    <div>
+      <h2>Generate Sales Report:</h2>
+      <form method="POST" th:action="@{/system/showSalesReport}" th:object="${salesReportInfo}">
+        <label>Start Date:
+          <input th:field="*{startDate}" type="date"/>
+        </label>
+        <div th:if="${#fields.hasErrors('startDate')}" class="error">
+          <span th:errors="*{startDate}"></span>
+        </div>
+        <label>End Date:
+          <input th:field="*{endDate}" type="date"/>
+        </label>
+        <div th:if="${#fields.hasErrors('endDate')}" class="error">
+          <span th:errors="*{endDate}"></span>
+        </div>
+        <label>Fulfilled By:
+          <select th:field="*{employeeUsername}">
+            <option value="all">All Employees</option>
+            <option th:each="employee: ${employees}" th:value="${employee}" th:text="${employee}"></option>
+          </select>
+        </label>
+        <br>
+        <input type="submit" value="Submit">
+      </form>
+    </div>
   </section>
 
   <section th:if="${report}">
-    <table>
-      <thead>
-        <tr>
-          <th>Order ID</th>
-          <th>Order Date</th>
-          <th>Menu Items</th>
-          <th>Custom Pizzas</th>
-          <th>Fulfilled By</th>
-          <th>Ingredients Used</th>
-          <th>Total Cost</th>
-          <th>Total Price</th>
-          <th>Profit</th>
-        </tr>
-      </thead>
-      <tbody th:each="order : ${report}">
-        <tr>
-          <!--id-->
-          <td th:text="${order.orderID}"></td>
-          <!--date-->
-          <td>
-            <span th:text="${#temporals.format(order.orderDateTime, 'MM/dd/yyyy')}"></span>
-          </td>
-          <!--menu items-->
-          <td>
-            <sub th:each="menuItem : ${order.menuItemList}">
-              <span th:text="${menuItem.menuItemAmount} + 'x ' + ${menuItem.menuItemName}"></span><br>
-              <hr> <!-- todo: set border bottom instead -->
-            </sub>
-            <span th:if="${order.menuItemList == null}" th:text="None"></span>
-          </td>
-          <!--custom pizzas-->
-          <td>
-            <sub th:each="customPizza : ${order.customPizzaList}">
-              <span th:text="${customPizza.quantity}+ 'x ' +${customPizza.pizzaName}"></span><br>
+    <div>
+      <h3>Report</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Order Date</th>
+            <th>Menu Items</th>
+            <th>Custom Pizzas</th>
+            <th>Fulfilled By</th>
+            <th>Ingredients Used</th>
+            <th>Total Cost</th>
+            <th>Total Price</th>
+            <th>Profit</th>
+          </tr>
+        </thead>
+        <tbody th:each="order : ${report}">
+          <tr>
+            <!--id-->
+            <td th:text="${order.orderID}"></td>
+            <!--date-->
+            <td>
+              <span th:text="${#temporals.format(order.orderDateTime, 'MM/dd/yyyy')}"></span>
+            </td>
+            <!--menu items-->
+            <td>
+              <sub th:each="menuItem : ${order.menuItemList}" class="form-info">
+                <span th:text="${menuItem.menuItemAmount} + 'x ' + ${menuItem.menuItemName}"></span><br>
+              </sub>
+              <span th:if="${order.menuItemList == null}" th:text="None"></span>
+            </td>
+            <!--custom pizzas-->
+            <td>
+              <div th:each="customPizza : ${order.customPizzaList}">
+                <span th:text="${customPizza.quantity}+ 'x ' +${customPizza.pizzaName}"></span><br>
+                <details>
+                  <summary>
+                    Show toppings
+                  </summary>
+                    <span th:each="topping, iterstat : ${customPizza.toppings}">
+                      <span th:text="${topping.name}"></span><span th:unless="${iterstat.last}">, </span>
+                    </span>
+                </details>
+              </div>
+              <span th:if="${order.customPizzaList == null}" th:text="None"></span>
+            </td>
+            <!--fulfilled by-->
+            <td>
+              <span th:text="${order.employeeName}"></span>
+            </td>
+            <!-- ingredients used -->
+            <td>
               <details>
-                <summary>
-                  Show toppings
-                </summary>
-                  <span th:each="topping, iterstat : ${customPizza.toppings}">
-                    <span th:text="${topping.name}"></span><span th:unless="${iterstat.last}">, </span>
-                  </span>
+                <summary>Show ingredients used</summary>
+                <table>
+                  <thead>
+                  <tr>
+                    <th>
+                      <sub>Ingredient</sub>
+                    </th>
+                    <th>
+                      <sub>Qty</sub>
+                    </th>
+                    <th>
+                      <sub>Cost ea.</sub>
+                    </th>
+                    <th>
+                      <sub>Cost total</sub>
+                    </th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr th:each="report : ${order.ingredientReport}">
+                    <td>
+                      <sub>
+                        <span th:text="${report.key}"></span><br>
+                      </sub>
+                    </td>
+                    <td>
+                      <sub>
+                        <span th:text="${report.value.get(0)}"></span>
+                      </sub>
+                    </td>
+                    <td>
+                      <sub>
+                        <span th:text="${#numbers.formatCurrency(report.value.get(1) / 100 + '.' + report.value.get(1) % 100)}"></span>
+                      </sub>
+                    </td>
+                    <td>
+                      <sub>
+                        <span th:text="${#numbers.formatCurrency(report.value.get(2) / 100 + '.' + report.value.get(2) % 100)}"></span>
+                      </sub>
+                    </td>
+                  </tr>
+                  </tbody>
+                </table>
               </details>
-            </sub>
-            <span th:if="${order.customPizzaList == null}" th:text="None"></span>
-          </td>
-          <!--fulfilled by-->
-          <td>
-            <span th:text="${order.employeeName}"></span>
-          </td>
-          <!-- ingredients used -->
-          <td>
-            <details>
-              <summary>Show ingredients used</summary>
-              <table>
-                <thead>
-                <tr>
-                  <th>
-                    <sub>Ingredient</sub>
-                  </th>
-                  <th>
-                    <sub>Qty</sub>
-                  </th>
-                  <th>
-                    <sub>Cost ea.</sub>
-                  </th>
-                  <th>
-                    <sub>Cost total</sub>
-                  </th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="report : ${order.ingredientReport}">
-                  <td>
-                    <sub>
-                      <span th:text="${report.key}"></span><br>
-                    </sub>
-                  </td>
-                  <td>
-                    <sub>
-                      <span th:text="${report.value.get(0)}"></span>
-                    </sub>
-                  </td>
-                  <td>
-                    <sub>
-                      <span th:text="${#numbers.formatCurrency(report.value.get(1) / 100 + '.' + report.value.get(1) % 100)}"></span>
-                    </sub>
-                  </td>
-                  <td>
-                    <sub>
-                      <span th:text="${#numbers.formatCurrency(report.value.get(2) / 100 + '.' + report.value.get(2) % 100)}"></span>
-                    </sub>
-                  </td>
-                </tr>
-                </tbody>
-              </table>
-            </details>
-          </td>
-          <!--total cost-->
-          <td>
-            <sub>
-              <span th:text="${#numbers.formatCurrency(order.totalCost / 100.0)}"></span>
-            </sub>
-          </td>
-          <!--total price-->
-          <td>
-            <sub>
-              <span th:text="${#numbers.formatCurrency(order.totalPrice / 100.0)}"></span>
-            </sub>
-          </td>
-          <!--profit-->
-          <td>
-            <sub>
-              <span th:text="${#numbers.formatCurrency(order.totalProfit / 100.0)}"></span>
-            </sub>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+            </td>
+            <!--total cost-->
+            <td>
+              <sub>
+                <span th:text="${#numbers.formatCurrency(order.totalCost / 100.0)}"></span>
+              </sub>
+            </td>
+            <!--total price-->
+            <td>
+              <sub>
+                <span th:text="${#numbers.formatCurrency(order.totalPrice / 100.0)}"></span>
+              </sub>
+            </td>
+            <!--profit-->
+            <td>
+              <sub>
+                <span th:text="${#numbers.formatCurrency(order.totalProfit / 100.0)}"></span>
+              </sub>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </section>
 
 </main>

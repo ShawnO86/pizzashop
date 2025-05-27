@@ -300,7 +300,6 @@ public class OrderServiceImpl implements OrderService {
             Map<String, List<Integer>> ingredientCount = this.buildIngredientCount(orderDTO);
             int totalCost = 0;
             for (List<Integer> count : ingredientCount.values()) {
-                System.out.println("value: " + count.toString());
                 totalCost += count.get(2);
             }
             orderDTO.setTotalCost(totalCost);
@@ -418,7 +417,6 @@ public class OrderServiceImpl implements OrderService {
         }
 
         int ingredientCost = ingredient.getCentsCostPer();
-        int ingredientPrice = ingredient.getCentsPricePer();
         // [count, cost-per, total-cost]
         List<Integer> countArr;
         if (ingredientCountMap.get(ingredient.getIngredientName()) == null) {

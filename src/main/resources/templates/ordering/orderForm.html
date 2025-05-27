@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -149,9 +149,12 @@
 
         <h4 class="space-between"><span>Order Total:</span> <span id="order-total">0.00</span></h4>
         <input type="hidden" id="order-total-input" th:field="*{totalPrice}" th:name="*{totalPrice}" value="0"/>
-        <input type="button" id="cart-submit-btn" value="Submit Order"/>
+        <input type="button" id="cart-submit-btn" value="Submit Order" sec:authorize="hasRole('ROLE_CUSTOMER')"/>
       </form>
-
+      <p sec:authorize="isAnonymous()" class="error">
+        <span>Log in to place an order,</span><br>
+        <span>or call 123-456-7890</span>
+      </p>
     </div>
 
   </section>
