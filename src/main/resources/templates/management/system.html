@@ -1,19 +1,14 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Pizza Shop System</title>
-    <link rel="stylesheet" type="text/css" href="/styles/main.css">
-</head>
+<head th:replace="~{/common-head :: common_html_head(${pageTitle}, ${additionalStyles})}"></head>
 
 <body>
 
-<header th:insert="~{header :: head}"></header>
+<header th:insert="~{header :: head(${heading}, ${secondaryHeading})}"></header>
 
 <main>
     <section>
-        <ul>
+        <ul class="no-top-margin admin-nav">
             <li>
                 <a th:href="@{/system/inventory/showInventory}">Show/Modify Inventory</a>
             </li>

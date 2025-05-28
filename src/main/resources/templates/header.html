@@ -2,11 +2,25 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <body>
 
-<div th:fragment="head">
+<div th:fragment="head(heading, secondaryHeading)">
 
-  <h1 th:text="${heading}"></h1>
+  <div class="space-between vertical-center">
+    <div>
+      <h1 th:text="${heading}" class="heading"></h1>
+      <h2 th:if="${secondaryHeading != ''}" th:text="${secondaryHeading}" class="secondary-heading"></h2>
+    </div>
 
-  <nav>
+    <div th:if="${address}" class="address">
+      <p>ADDRESS:</p>
+      <strong>1234 st. City, State</strong>
+      <p>PHONE:</p>
+      <strong>(123)-456-7890</strong>
+    </div>
+  </div>
+
+  <div class="checker-pattern"></div>
+
+  <nav class="vertical-center">
     <ul>
       <li>
         <a th:href="@{/}">Home</a>

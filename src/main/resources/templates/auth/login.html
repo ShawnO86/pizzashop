@@ -1,21 +1,18 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login Page</title>
-    <link rel="stylesheet" type="text/css" href="/styles/main.css">
+<head th:replace="~{/common-head :: common_html_head(${pageTitle}, ${additionalStyles})}"></head>
 
-</head>
 <body>
-<header th:insert="~{header :: head}"></header>
+<header th:insert="~{header :: head(${heading}, ${secondaryHeading})}"></header>
 
+<main>
 <div sec:authorize="isAuthenticated()">
-    <h1>You are already logged in!</h1>
+    <h3>You are already logged in!</h3>
 </div>
 
 <div class="form-container" sec:authorize="isAnonymous()">
-    <form action="#" th:action="@{/authenticateUser}" method="POST">
+    <h3>Log In</h3>
+    <form action="#" th:action="@{/authenticateUser}" method="POST" class="form-body">
 
         <!-- params are gathered on load from uri -->
         <p th:if="${param.error}" class="form-info">
@@ -43,7 +40,7 @@
     <a th:href="@{/register/showRegistrationForm}">Register</a>
 </div>
 
-
+</main>
 
 </body>
 </html>

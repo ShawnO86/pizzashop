@@ -13,6 +13,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Optional;
 
 @Controller
@@ -38,8 +40,12 @@ public class RegistrationController {
     @GetMapping("/showRegistrationForm")
     public String showRegistrationPage(Model theModel) {
 
-        theModel.addAttribute("heading", "Registration Form");
+        theModel.addAttribute("heading", "Pizza & Pasta");
+        theModel.addAttribute("secondaryHeading", "RISTORANTE");
         theModel.addAttribute("webUser", new UserRegisterDTO());
+        theModel.addAttribute("pageTitle", "Pizza & Pasta - Registration");
+        theModel.addAttribute("additionalStyles", Arrays.asList("/styles/forms.css"));
+        theModel.addAttribute("address", true);
 
         return "auth/register";
     }
@@ -48,6 +54,12 @@ public class RegistrationController {
     public String processRegistrationForm(
             @Valid @ModelAttribute("webUser") UserRegisterDTO theWebUser,
             BindingResult theBindingResult, Model theModel) {
+
+        theModel.addAttribute("heading", "Pizza & Pasta");
+        theModel.addAttribute("secondaryHeading", "RISTORANTE");
+        theModel.addAttribute("additionalStyles", Arrays.asList("/styles/forms.css"));
+        theModel.addAttribute("pageTitle", "Pizza & Pasta - Registration");
+        theModel.addAttribute("address", true);
 
         if (theBindingResult.hasErrors()){
             theModel.addAttribute("registrationError", "You must correct the errors before proceeding");
@@ -61,7 +73,7 @@ public class RegistrationController {
             theWebUser.setUsername(null);
             theWebUser.setPassword(null);
             theModel.addAttribute("webUser", theWebUser);
-            theModel.addAttribute("registrationError", "Username already exists.");
+            theModel.addAttribute("registrationError", "Username: " + userName + " already exists.");
 
             return "auth/register";
         }

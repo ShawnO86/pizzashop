@@ -13,6 +13,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Controller
@@ -36,7 +38,10 @@ public class InventoryController {
     public String showInventory(Model model) {
         List<Ingredient> inventory = menuItemService.findAllIngredients();
         model.addAttribute("inventory", inventory);
-        model.addAttribute("heading", "Inventory");
+        model.addAttribute("heading", "Inventory Management");
+        model.addAttribute("secondaryHeading", "");
+        model.addAttribute("pageTitle", "Inventory Management");
+        model.addAttribute("additionalStyles", Arrays.asList("/styles/tables.css"));
 
         return "management/showInventory";
     }
@@ -44,14 +49,19 @@ public class InventoryController {
     //shows add/update inventory form depending on ingredientId
     @GetMapping("/addInventory")
     public String showAddInventoryForm(Model model, @RequestParam(value = "ingredientId", required = false) Integer ingredientId) {
+        model.addAttribute("additionalStyles", Arrays.asList("/styles/forms.css"));
+        model.addAttribute("heading", "Inventory Management");
+        model.addAttribute("secondaryHeading", "");
+        model.addAttribute("pageTitle", "Inventory Management");
+
         if (ingredientId == null) {
             model.addAttribute("inventoryItem", new IngredientDTO());
-            model.addAttribute("heading", "Add Inventory");
+            model.addAttribute("addType", "New Ingredient");
         } else {
             Ingredient ingredient = menuItemService.findIngredientById(ingredientId);
             model.addAttribute("inventoryItem", ingredient);
             model.addAttribute("ingredientId", ingredientId);
-            model.addAttribute("heading", "Update " + ingredient.getIngredientName());
+            model.addAttribute("addType", "Update " + ingredient.getIngredientName());
         }
 
         return "management/addInventory";
@@ -59,14 +69,12 @@ public class InventoryController {
 
     @GetMapping("/deleteInventory")
     public String deleteInventory(@RequestParam("ingredientId") int ingredientId, Model model) {
-        List<MenuItemIngredient> assocMenuItems = menuItemService.deleteIngredient(ingredientId);
-        int listSize = assocMenuItems.size();
+        int assocMenuItems = menuItemService.deleteIngredient(ingredientId);
 
-        if (listSize > 0) {
-            Ingredient ingredient = assocMenuItems.getFirst().getIngredient();
+        if (assocMenuItems > 0) {
             List<Ingredient> inventory = menuItemService.findAllIngredients();
             model.addAttribute("assocMenuItemsErr",
-                    "Cannot delete " + ingredient.getIngredientName() + " it is associated with " + listSize + " menu item(s)");
+                    "Cannot delete this ingredient, it is associated with " + assocMenuItems + " item(s)");
             model.addAttribute("inventory", inventory);
             return "management/showInventory";
         }
@@ -92,14 +100,16 @@ public class InventoryController {
             return "redirect:/system/inventory/showInventory";
         } else {
 
-            model.addAttribute("errorMessage", errorMessage);
-            model.addAttribute("inventoryItem", ingredientDTO);
+            model.addAttribute("additionalStyles", Arrays.asList("/styles/forms.css"));
+            model.addAttribute("heading", "Inventory Management");
+            model.addAttribute("secondaryHeading", "");
+            model.addAttribute("pageTitle", "Inventory Management");
             if (ingredientId != null) {
                 Ingredient ingredient = menuItemService.findIngredientById(ingredientId);
                 model.addAttribute("ingredientId", ingredientId);
-                model.addAttribute("heading", "Update " + ingredient.getIngredientName());
+                model.addAttribute("addType", "Update " + ingredient.getIngredientName());
             } else {
-                model.addAttribute("heading", "Inventory");
+                model.addAttribute("addType", "New Ingredient");
             }
             return "management/addInventory";
         }

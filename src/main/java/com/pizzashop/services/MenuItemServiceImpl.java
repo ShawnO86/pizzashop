@@ -1,9 +1,6 @@
 package com.pizzashop.services;
 
-import com.pizzashop.dao.IngredientDAO;
-import com.pizzashop.dao.MenuItemDAO;
-import com.pizzashop.dao.MenuItemIngredientDAO;
-import com.pizzashop.dao.OrderMenuItemDAO;
+import com.pizzashop.dao.*;
 import com.pizzashop.dto.IngredientDTO;
 import com.pizzashop.dto.MenuItemDTO;
 import com.pizzashop.entities.*;
@@ -20,14 +17,16 @@ public class MenuItemServiceImpl implements MenuItemService {
     private final IngredientDAO ingredientDAO;
     private final MenuItemIngredientDAO menuItemIngredientDAO;
     private final OrderMenuItemDAO orderMenuItemDAO;
+    private final CustomPizzaIngredientDAO customPizzaIngredientDAO;
 
     @Autowired
     public MenuItemServiceImpl(MenuItemDAO menuItemDAO, IngredientDAO ingredientDAO,
-                               MenuItemIngredientDAO menuItemIngredientDAO, OrderMenuItemDAO orderMenuItemDAO) {
+                               MenuItemIngredientDAO menuItemIngredientDAO, OrderMenuItemDAO orderMenuItemDAO, CustomPizzaIngredientDAO customPizzaIngredientDAO) {
         this.menuItemDAO = menuItemDAO;
         this.ingredientDAO = ingredientDAO;
         this.menuItemIngredientDAO = menuItemIngredientDAO;
         this.orderMenuItemDAO = orderMenuItemDAO;
+        this.customPizzaIngredientDAO = customPizzaIngredientDAO;
     }
 
     @Override
@@ -79,15 +78,21 @@ public class MenuItemServiceImpl implements MenuItemService {
         }
     }
 
-    // check if ingredient has associated menu items before deletion
+    // check if ingredient has associated menu / pizza item before deletion
     @Override
     @Transactional
-    public List<MenuItemIngredient> deleteIngredient(int ingredientId) {
+    public int deleteIngredient(int ingredientId) {
         List<MenuItemIngredient> assocMenuItems = menuItemIngredientDAO.findAllByIngredientId(ingredientId);
-        if (assocMenuItems.isEmpty()) {
+        List<CustomPizzaIngredient> assocPizzaItems = customPizzaIngredientDAO.findAllById(ingredientId);
+        int assocCount = 0;
+
+        if (assocMenuItems.isEmpty() && assocPizzaItems.isEmpty()) {
             ingredientDAO.deleteById(ingredientId);
+        } else {
+            assocCount = assocMenuItems.size() + assocPizzaItems.size();
         }
-        return assocMenuItems;
+
+        return assocCount;
     }
 
     @Override

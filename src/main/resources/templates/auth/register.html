@@ -1,22 +1,17 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Test Registration Page</title>
-  <link rel="stylesheet" type="text/css" href="/styles/main.css">
-</head>
+<head th:replace="~{/common-head :: common_html_head(${pageTitle}, ${additionalStyles})}"></head>
 
 <body>
 
-<header th:insert="~{header :: head}"></header>
+<header th:insert="~{header :: head(${heading}, ${secondaryHeading})}"></header>
 
 <main>
 
   <section>
     <div class="form-container">
-      <h2>Registration Page</h2>
-      <form action="#" th:action="@{/register/processRegistrationForm}" th:object="${webUser}" sec:authorize="isAnonymous()" method="POST">
+      <h2>User Registration</h2>
+      <form action="#" th:action="@{/register/processRegistrationForm}" th:object="${webUser}" sec:authorize="isAnonymous()" method="POST" class="form-body">
 
         <p th:if="${registrationError}" class="error form-info">
           <i class="error" th:text="${registrationError}"></i>
@@ -73,7 +68,7 @@
       </form>
 
 
-      <form action="#" th:action="@{/system/processManagementRegistrationForm}" th:object="${webUser}" sec:authorize="hasRole('ROLE_MANAGER')"  method="POST">
+      <form action="#" th:action="@{/system/processManagementRegistrationForm}" th:object="${webUser}" sec:authorize="hasRole('ROLE_MANAGER')"  method="POST" class="form-body">
 
         <p th:if="${registrationError}" class="error form-info">
           <i class="error" th:text="${registrationError}"></i>

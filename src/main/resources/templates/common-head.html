@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head th:fragment="common_html_head(pageTitle, additionalStyles)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle}">My Application</title>
+
+    <link rel="stylesheet" type="text/css" href="/styles/main.css">
+    <th:block th:if="${not #lists.isEmpty(additionalStyles)}">
+      <link th:each="style : ${additionalStyles}" rel="stylesheet" type="text/css" th:href="${style}">
+    </th:block>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Aclonica&family=Italiana&display=swap" rel="stylesheet">
+
+  </head>
+<body>
+</body>
+</html>
