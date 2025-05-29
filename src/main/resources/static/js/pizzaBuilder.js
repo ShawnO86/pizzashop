@@ -156,12 +156,10 @@ qtyInput.addEventListener("change", () => {
 export function handlePizzaBuilderEvents(event) {
     const target = event.target;
     let isPriceChanged = false;
-    console.log(target.id);
     if (target.matches('input[type="radio"], input[type="checkbox"], input[type="number"], button[type="submit"]')) {
         switch (target.type) {
             case "radio":
                 const pizzaSize = target.dataset.pizzaSize;
-
                 if (pizza["size-data"].size !== pizzaSize) {
                     handleRadioChange(pizzaSize);
 
@@ -268,12 +266,10 @@ export function createOrderItemAmountSelectorPizza(pizzaObject, container) {
     let extraToppingHTML = "";
 
     if (toppingJoinArr.length > 0) {
-        console.log("normal topping")
         toppingHTML = createOrderItemToppingHTML(pizzaIndex, pizzaObject.toppings, "normal");
     }
 
     if (extraToppingArr.length > 0) {
-        console.log("extra topping")
         extraToppingHTML = createOrderItemToppingHTML(pizzaIndex, pizzaObject["extra-toppings"], "extra");
     }
 

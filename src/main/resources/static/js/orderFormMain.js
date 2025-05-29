@@ -115,11 +115,9 @@ document.addEventListener('DOMContentLoaded', ()=> {
     }
 
     function parseThymeleafItems() {
-        console.log("parse thymeleaf: ", orderDTO);
         if (orderDTO.menuItems) {
             menuItems = {};
             for (const menuItem of orderDTO.menuItems) {
-                console.log("menuItem", menuItem, "\n", menuItem["menuItemID"])
                 menuItems[menuItem["menuItemID"]] = {
                     "maxQty": menuItem["maxQty"],
                     "name": menuItem["menuItemName"],
@@ -132,7 +130,6 @@ document.addEventListener('DOMContentLoaded', ()=> {
         if (orderDTO.pizzaItems) {
             customPizzas = {};
             for (const pizzaItem of orderDTO.pizzaItems) {
-                console.log("menuItem", pizzaItem)
                 customPizzas[pizzaItem["pizzaName"]] = {
                     "extra-toppings": {...pizzaItem["extraToppings"]},
                     "toppings": {...pizzaItem["toppings"]},
@@ -218,12 +215,11 @@ document.addEventListener('DOMContentLoaded', ()=> {
                 };
                 saveMenuObjectsToSession();
             }
-            console.log(menuItems);
 
         } else if (event.target.id === "open-pizza-builder-btn") {
-            console.log("open pizza builder..");
             populateBuilderForm();
             pizzaBuilderContainer.classList.remove("hide-area");
+            pizzaBuilderContainer.scrollIntoView({behavior: "smooth", block: "start"});
             disableEditBtns();
         }
     });
@@ -304,6 +300,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
 
                 pizzaBuilderContainer.classList.remove("hide-area");
                 populateBuilderForm(customPizzas[cartItemContainer.dataset.itemName]);
+                pizzaBuilderContainer.scrollIntoView({behavior: "smooth", block: "start"});
                 disableEditBtns();
                 delete customPizzas[cartItemContainer.dataset.itemName];
 

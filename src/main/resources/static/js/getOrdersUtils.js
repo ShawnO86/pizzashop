@@ -16,9 +16,7 @@ const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttrib
 export async function getCurrentOrders() {
     try {
         const response = await fetch(CURRENT_ORDERS_ENDPOINT);
-        const result = await response.json();
-        console.log("fetched current orders", result);
-        return result;
+        return await response.json();
     } catch (e) {
         console.error(e.message);
     }
@@ -91,9 +89,7 @@ export async function cancelOrderInProgress(orderId) {
 export async function getMenuItemRecipe(menuItemId) {
     try {
         const response = await fetch(MENU_ITEM_RECIPE_ENDPOINT + "?menuItemId=" + menuItemId);
-        const result = await response.json();
-        console.log("fetching menu item recipe...");
-        return result;
+        return await response.json();
     } catch (e) {
         console.error(e.message);
     }
@@ -102,9 +98,7 @@ export async function getMenuItemRecipe(menuItemId) {
 export async function getCustomPizzaRecipe(customPizzaId) {
     try {
         const response = await fetch(CUSTOM_PIZZA_RECIPE_ENDPOINT + "?customPizzaId=" + customPizzaId);
-        const result = await response.json();
-        console.log("fetching custom pizza recipe...");
-        return result;
+        return await response.json();
     } catch (e) {
         console.error(e.message);
     }
@@ -187,8 +181,6 @@ function buildUserDetailHTML(userdetail) {
 }
 
 export function buildRecipeDisplay(item, container) {
-    console.log("in build recipe display:", item);
-
     const ingredientsHTML = buildIngredientsHTML(item["Ingredients"]);
     let toppingsHTML = "";
     if (item["Toppings"]) {
