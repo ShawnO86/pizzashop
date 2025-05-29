@@ -37,7 +37,11 @@ public class MenuItemController {
     public String showMenuItems(Model model) {
         List<MenuItem> menuItems = menuItemService.findAllMenuItems();
         model.addAttribute("menuItems", menuItems);
-        model.addAttribute("heading", "All Menu Items");
+        model.addAttribute("heading", "Menu Item Management");
+        model.addAttribute("secondaryHeading", "");
+        model.addAttribute("pageTitle", "Menu Item Management");
+        model.addAttribute("additionalStyles", List.of("/styles/tables.css"));
+
         return "management/showMenuItems";
     }
 
@@ -49,6 +53,9 @@ public class MenuItemController {
         model.addAttribute("menuItemName", menuItemName);
         model.addAttribute("menuItemId", menuItemId);
         model.addAttribute("heading", menuItemName + " recipe");
+        model.addAttribute("secondaryHeading", "");
+        model.addAttribute("pageTitle", "Menu Item Management");
+        model.addAttribute("additionalStyles", List.of("/styles/tables.css"));
 
         return "management/showMenuItemRecipe";
     }
@@ -57,15 +64,19 @@ public class MenuItemController {
     public String showAddMenuItemForm(Model model, @RequestParam(value = "menuItemId", required = false) Integer menuItemId) {
         model.addAttribute("ingredients", menuItemService.findAllIngredients());
         model.addAttribute("categories", MenuCategoryEnum.values());
+        model.addAttribute("additionalStyles", List.of("/styles/forms.css"));
+        model.addAttribute("pageTitle", "Menu Item Management");
+        model.addAttribute("heading", "Menu Item Management");
+        model.addAttribute("secondaryHeading", "");
 
         if (menuItemId == null) {
-            model.addAttribute("heading", "Create A New Menu Item");
+            model.addAttribute("addType", "New Menu Item");
             model.addAttribute("menuItem", new MenuItemDTO());
             model.addAttribute("menuItemId", null);
             model.addAttribute("menuItemRecipe", null);
         } else {
             MenuItem menuItem = menuItemService.findMenuItemById(menuItemId);
-            model.addAttribute("heading", "Update " + menuItem.getDishName());
+            model.addAttribute("addType", "Update " + menuItem.getDishName());
             model.addAttribute("menuItem", menuItem);
             model.addAttribute("menuItemId", menuItemId);
             model.addAttribute("menuItemRecipe", menuItemService.buildRecipeByMenuItemId(menuItemId));
@@ -86,7 +97,10 @@ public class MenuItemController {
             model.addAttribute("assocMenuItemsErr",
                     "Cannot delete " + menuItem.getDishName() + " it is associated with " + listSize + " order(s)");
             model.addAttribute("menuItems", menuItems);
-            model.addAttribute("heading", "All Menu Items");
+            model.addAttribute("heading", "Menu Item Management");
+            model.addAttribute("secondaryHeading", "");
+            model.addAttribute("pageTitle", "Menu Item Management");
+            model.addAttribute("additionalStyles", List.of("/styles/tables.css"));
 
             return "management/showMenuItems";
         }

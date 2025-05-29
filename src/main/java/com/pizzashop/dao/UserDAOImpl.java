@@ -98,6 +98,14 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
+    public List<User> findAllByRole(RoleEnum role) {
+        TypedQuery<User> query = em.createQuery(
+                "SELECT u FROM User u JOIN u.roles r WHERE r.role = :role", User.class);
+        query.setParameter("role", role);
+        return query.getResultList();
+    }
+
+    @Override
     @Transactional
     public void save(User user) {
         em.persist(user);

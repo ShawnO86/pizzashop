@@ -12,9 +12,9 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -44,8 +44,10 @@ public class RegistrationController {
         theModel.addAttribute("secondaryHeading", "RISTORANTE");
         theModel.addAttribute("webUser", new UserRegisterDTO());
         theModel.addAttribute("pageTitle", "Pizza & Pasta - Registration");
-        theModel.addAttribute("additionalStyles", Arrays.asList("/styles/forms.css"));
+        theModel.addAttribute("additionalStyles", List.of("/styles/forms.css"));
         theModel.addAttribute("address", true);
+        theModel.addAttribute("addType", "New User Registration");
+        theModel.addAttribute("formAction", "/register/processRegistrationForm");
 
         return "auth/register";
     }
@@ -53,11 +55,11 @@ public class RegistrationController {
     @PostMapping("/processRegistrationForm")
     public String processRegistrationForm(
             @Valid @ModelAttribute("webUser") UserRegisterDTO theWebUser,
-            BindingResult theBindingResult, Model theModel) {
+            BindingResult theBindingResult, Model theModel, RedirectAttributes redirectAttributes) {
 
         theModel.addAttribute("heading", "Pizza & Pasta");
         theModel.addAttribute("secondaryHeading", "RISTORANTE");
-        theModel.addAttribute("additionalStyles", Arrays.asList("/styles/forms.css"));
+        theModel.addAttribute("additionalStyles", List.of("/styles/forms.css"));
         theModel.addAttribute("pageTitle", "Pizza & Pasta - Registration");
         theModel.addAttribute("address", true);
 
@@ -78,9 +80,10 @@ public class RegistrationController {
             return "auth/register";
         }
 
+        redirectAttributes.addFlashAttribute("registered", "Registration Confirmed, Please Log In");
         // Customer is default role
         userService.save(theWebUser, RoleEnum.ROLE_CUSTOMER.name());
 
-        return "auth/registration-confirmation";
+        return "redirect:/login";
     }
 }

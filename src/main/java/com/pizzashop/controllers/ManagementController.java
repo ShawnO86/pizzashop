@@ -17,12 +17,10 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Controller
 @RequestMapping("/system")
@@ -49,7 +47,12 @@ public class ManagementController {
 
     @GetMapping("/userData")
     public String showUserDataPage(Model model) {
-        model.addAttribute("heading", "User Data: All Users");
+        model.addAttribute("pageTitle", "User Management");
+        model.addAttribute("heading", "User Management");
+        model.addAttribute("secondaryHeading", "");
+        model.addAttribute("additionalStyles", List.of("/styles/tables.css", "/styles/forms.css"));
+        model.addAttribute("searchBy", "All Users");
+
         List<User> users = userDAO.findAllFetchUserDetailsRoles();
         model.addAttribute("users", users);
 
@@ -57,8 +60,19 @@ public class ManagementController {
     }
 
     @GetMapping("/userDataByLastname")
-    public String showUserDataByLastNamePage(@RequestParam("userLastName") String lastname, Model model) {
-        model.addAttribute("heading", "User Data: " + lastname);
+    public String showUserDataByLastNamePage(@RequestParam(value = "userLastName", required = false) String lastname,
+                                             Model model, RedirectAttributes redirectAttributes) {
+        if (lastname == null || lastname.isEmpty()) {
+            redirectAttributes.addFlashAttribute("noUsers", "Search field is empty!");
+            return "redirect:/system/userData";
+        }
+
+        model.addAttribute("heading", "User Management");
+        model.addAttribute("secondaryHeading", "");
+        model.addAttribute("pageTitle", "User Management");
+        model.addAttribute("additionalStyles", List.of("/styles/tables.css", "/styles/forms.css"));
+        model.addAttribute("searchBy", "Last Name: " + lastname);
+
         List<User> users = userDAO.findAllByLastName(lastname);
 
         if (!users.isEmpty()) {
@@ -70,19 +84,51 @@ public class ManagementController {
         return "management/showUserData";
     }
 
-    @GetMapping("/showRegistrationForm")
-    public String showRegistrationPage(Model model) {
-        model.addAttribute("heading", "Registration Form");
-        model.addAttribute("webUser", new UserRegisterDTO());
+    @GetMapping("/userDataByRole")
+    public String showUserDataByRolePage(@RequestParam(value = "userRole") RoleEnum role, Model model) {
+        model.addAttribute("heading", "User Management");
+        model.addAttribute("secondaryHeading", "");
+        model.addAttribute("pageTitle", "User Management");
+        model.addAttribute("additionalStyles", Arrays.asList("/styles/tables.css", "/styles/forms.css"));
+        model.addAttribute("searchBy", "Role: " + role);
 
+        List<User> users = userDAO.findAllByRole(role);
+
+        if (!users.isEmpty()) {
+            model.addAttribute("users", users);
+        } else {
+            model.addAttribute("noUsers", "No users found with role: " + role);
+        }
+
+        return "management/showUserData";
+    }
+
+    @GetMapping("/showRegistrationForm")
+    public String showRegistrationPage(Model theModel) {
+        theModel.addAttribute("heading", "User Management");
+        theModel.addAttribute("secondaryHeading", "");
+        theModel.addAttribute("pageTitle", "Pizza & Pasta - Registration");
+        theModel.addAttribute("additionalStyles", List.of("/styles/forms.css"));
+        theModel.addAttribute("addType", "Add User");
+        theModel.addAttribute("formAction", "/system/processManagementRegistrationForm");
+
+        theModel.addAttribute("webUser", new UserRegisterDTO());
         return "auth/register";
     }
 
     @GetMapping("/showUpdateUserForm")
-    public String showUpdateUserPage(@RequestParam("userId") int userId, Model model) {
+    public String showUpdateUserPage(@RequestParam("userId") int userId, Model model,
+                                     RedirectAttributes redirectAttributes) {
+
         User user = userDAO.findByIdJoinFetchUserDetailsRoles(userId);
 
         if (user != null) {
+            model.addAttribute("heading", "User Management");
+            model.addAttribute("secondaryHeading", "");
+            model.addAttribute("pageTitle", "User Management");
+            model.addAttribute("additionalStyles", List.of("/styles/forms.css"));
+            model.addAttribute("formAction", "/system/processUpdateUserForm");
+
             UserDetail userDetail = user.getUserDetail();
             UserRegisterDTO userDTO = new UserRegisterDTO(
                     user.getUsername(),
@@ -96,18 +142,15 @@ public class ManagementController {
             );
             userDTO.setPassword("");
             RoleEnum highestRole = this.getHighestRole(user.getRoles());
-
-            model.addAttribute("heading", "Update User Form");
+            model.addAttribute("addType", "Update User");
             model.addAttribute("webUser", userDTO);
             model.addAttribute("userId", userId);
             model.addAttribute("highestRole", highestRole);
 
-            return "management/updateUser";
-        } else {
-            model.addAttribute("heading", "Register New User");
-            model.addAttribute("webUser", new UserRegisterDTO());
-
             return "auth/register";
+        } else {
+            redirectAttributes.addFlashAttribute("noUsers", "User Not Found");
+            return "redirect:/system/userData";
         }
     }
 
@@ -155,7 +198,12 @@ public class ManagementController {
             return "redirect:/system/userData";
         } else {
             theWebUser.setPassword(null);
-            model.addAttribute("heading", "Register New User");
+            model.addAttribute("heading", "User Management");
+            model.addAttribute("secondaryHeading", "");
+            model.addAttribute("pageTitle", "User Management");
+            model.addAttribute("additionalStyles", List.of("/styles/forms.css"));
+            model.addAttribute("addType", "Add User");
+            model.addAttribute("formAction", "/system/processManagementRegistrationForm");
             model.addAttribute("webUser", theWebUser);
             model.addAttribute("registrationError", errMsg);
 
@@ -184,12 +232,17 @@ public class ManagementController {
             User user = userDAO.findById(userId);
             RoleEnum highestRole = this.getHighestRole(user.getRoles());
             model.addAttribute("registrationError", errMsg);
-            model.addAttribute("heading", "Update User Form");
             model.addAttribute("webUser", theWebUser);
             model.addAttribute("userId", userId);
             model.addAttribute("highestRole", highestRole);
+            model.addAttribute("heading", "User Management");
+            model.addAttribute("secondaryHeading", "");
+            model.addAttribute("pageTitle", "User Management");
+            model.addAttribute("additionalStyles", List.of("/styles/forms.css"));
+            model.addAttribute("addType", "Update User");
+            model.addAttribute("formAction", "/system/processUpdateUserForm");
 
-            return "management/updateUser";
+            return "auth/register";
         }
 
     }
@@ -200,11 +253,14 @@ public class ManagementController {
 
         model.addAttribute("employees", employees);
         model.addAttribute("salesReportInfo", new SalesReportInfoDTO());
-        model.addAttribute("heading", "Sales Report");
+        model.addAttribute("heading", "Sales Reporting");
+        model.addAttribute("secondaryHeading", "");
+        model.addAttribute("pageTitle", "Sales Reporting");
+        model.addAttribute("additionalStyles", List.of("/styles/tables.css", "/styles/forms.css"));
+
         return "management/showSalesReport";
     }
 
-    // todo: build page with orders made during specified timeframe and all ingredients used for each of those orders and total ingredients used
     @PostMapping("/showSalesReport")
     public String showSalesReport(@Valid @ModelAttribute("salesReportInfo") SalesReportInfoDTO salesReportInfo,
                                   BindingResult bindingResult,
@@ -212,7 +268,10 @@ public class ManagementController {
 
         List<String> employees =  userDAO.findAllEmployeeUsernames();
         model.addAttribute("employees", employees);
-        model.addAttribute("heading", "Sales Report");
+        model.addAttribute("heading", "Sales Reporting");
+        model.addAttribute("secondaryHeading", "");
+        model.addAttribute("pageTitle", "Sales Reporting");
+        model.addAttribute("additionalStyles", List.of("/styles/tables.css", "/styles/forms.css"));
 
         if (bindingResult.hasErrors()) {
             return "management/showSalesReport";
@@ -225,7 +284,6 @@ public class ManagementController {
             return "management/showSalesReport";
         }
 
-        //  todo : build list of orderDTOs and count ingredients total
         String employeeUsername = salesReportInfo.getEmployeeUsername();
         List<Order> orders;
 

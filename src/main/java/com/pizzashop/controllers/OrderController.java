@@ -42,7 +42,11 @@ public class OrderController {
         Map<String, List<MenuItem>> menuItemsByCategory = separateMenuItemsByCategory(menuItemDAO.findAllAvailable());
         List<Ingredient> pizzaToppings = ingredientDAO.findAllPizzaToppings();
 
-        model.addAttribute("heading", "Hungry? Create an order!");
+        model.addAttribute("heading", "Pizza & Pasta");
+        model.addAttribute("secondaryHeading", "RISTORANTE");
+        model.addAttribute("pageTitle", "Pizza & Pasta - Menu");
+        model.addAttribute("additionalStyles", List.of("/styles/forms.css"));
+        model.addAttribute("address", true);
         model.addAttribute("menuItemsByCategory", menuItemsByCategory);
         model.addAttribute("pizzaSizes", PizzaSizeEnum.values());
         model.addAttribute("pizzaToppings", pizzaToppings);
@@ -53,6 +57,8 @@ public class OrderController {
 
         return "ordering/orderForm";
     }
+
+    // todo : update processOrder, confirmOrder for new model requirements and set up CSS
 
     @PostMapping("/processOrder")
     public String processOrder(Model model, @ModelAttribute("order") OrderDTO orderDTO, RedirectAttributes redirectAttributes) {

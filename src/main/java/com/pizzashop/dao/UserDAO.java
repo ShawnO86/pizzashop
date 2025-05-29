@@ -1,5 +1,6 @@
 package com.pizzashop.dao;
 
+import com.pizzashop.entities.RoleEnum;
 import com.pizzashop.entities.User;
 
 import java.util.List;
@@ -20,6 +21,8 @@ public interface UserDAO {
     List<User> findAllFetchUserDetailsRoles();
 
     List<User> findAllByLastName(String lastName);
+
+    List<User> findAllByRole(RoleEnum role);
 
     void save(User user);
 

@@ -26,7 +26,7 @@
       <div class="form-body">
         <form th:action="@{/system/userDataByRole}" METHOD="GET">
           <label>Search by role:
-            <select type="text" th:name="userRole">
+            <select th:name="userRole">
                 <option th:each="role : ${T(com.pizzashop.entities.RoleEnum).values()}" th:value="${role}" th:text="${role}" ></option>
             </select>
           </label>

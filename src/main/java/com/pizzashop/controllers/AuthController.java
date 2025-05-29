@@ -4,8 +4,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 @Controller
 public class AuthController {
@@ -15,8 +15,9 @@ public class AuthController {
         model.addAttribute("heading", "Pizza & Pasta");
         model.addAttribute("secondaryHeading", "RISTORANTE");
         model.addAttribute("pageTitle", "Pizza & Pasta - Login");
-        model.addAttribute("additionalStyles", Arrays.asList("/styles/forms.css"));
+        model.addAttribute("additionalStyles", List.of("/styles/forms.css"));
         model.addAttribute("address", true);
+
         return "auth/login";
     }
 
@@ -27,6 +28,7 @@ public class AuthController {
         model.addAttribute("pageTitle", "Access denied");
         model.addAttribute("additionalStyles", Collections.emptyList());
         model.addAttribute("address", true);
+
         return "auth/access-denied";
     }
 }
