@@ -7,8 +7,10 @@
 
 <main>
 <div sec:authorize="isAuthenticated()">
-    <h3>You are already logged in!</h3>
+    <h3 class="no-top-margin">You are already logged in!</h3>
 </div>
+
+<h3 th:if="${registered}" th:text="${registered}" class="no-top-margin"></h3>
 
 <div class="form-container" sec:authorize="isAnonymous()">
     <h3>Log In</h3>

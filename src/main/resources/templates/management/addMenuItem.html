@@ -1,21 +1,18 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pizza Shop System</title>
-  <link rel="stylesheet" type="text/css" href="/styles/main.css">
-</head>
+<head th:replace="~{/common-head :: common_html_head(${pageTitle}, ${additionalStyles})}"></head>
 
 <body>
-<header th:insert="~{header :: head}"></header>
+<header th:insert="~{header :: head(${heading}, ${secondaryHeading})}"></header>
 
-<main class="inline">
+<main>
+  <section th:insert="~{systemNav :: systemNav}"></section>
+
   <section class="form-container">
-    <h3 th:if="${menuItemRecipe != null}">Update Menu Item</h3>
-    <h3 th:if="${menuItemRecipe == null}">Add Menu Item</h3>
+    <h3 th:if="${menuItemRecipe != null}" th:text="${addType}"></h3>
+    <h3 th:if="${menuItemRecipe == null}" th:text="${addType}"></h3>
 
-    <form method="POST" th:action="@{/system/changeMenu/saveMenuItem}" th:object="${menuItem}">
+    <form method="POST" th:action="@{/system/changeMenu/saveMenuItem}" th:object="${menuItem}" class="form-body">
 
       <p th:if="${menuItemError}" class="error form-info">
         <i th:text="${menuItemError}"></i>
@@ -82,7 +79,7 @@
             </label>
 
             <label>Amount:
-              <input type="number" name="ingredientIdAmountsValues" th:value="${ingredientArr[1]}" min="1" required/>
+              <input type="number" name="ingredientIdAmountsValues" th:value="${ingredientArr[1]}" min="1" max="9" required/>
             </label>
             <button type="button" class="remove-item">Remove</button>
           </div>
@@ -96,7 +93,7 @@
           </label>
 
           <label>Amount:
-            <input type="number" name="ingredientIdAmountsValues" min="1" required/>
+            <input type="number" name="ingredientIdAmountsValues" min="1" max="99" value="1" required/>
           </label>
 
           <button type="button" class="remove-item">Remove</button>

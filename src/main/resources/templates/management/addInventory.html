@@ -6,6 +6,8 @@
 <header th:insert="~{header :: head(${heading}, ${secondaryHeading})}"></header>
 
 <main>
+  <section th:insert="~{systemNav :: systemNav}"></section>
+
   <section class="form-container">
     <form method="POST" th:action="@{/system/inventory/saveInventory}" th:object="${inventoryItem}" class="form-body">
 

@@ -7,68 +7,14 @@
 <header th:insert="~{header :: head(${heading}, ${secondaryHeading})}"></header>
 
 <main>
+  <section sec:authorize="hasRole('ROLE_MANAGER')" th:insert="~{systemNav :: systemNav}"></section>
 
   <section>
     <div class="form-container">
-      <h2>User Registration</h2>
-      <form action="#" th:action="@{/register/processRegistrationForm}" th:object="${webUser}" sec:authorize="isAnonymous()" method="POST" class="form-body">
+      <h2 th:text="${addType}"></h2>
 
-        <p th:if="${registrationError}" class="error form-info">
-          <i class="error" th:text="${registrationError}"></i>
-        </p>
-
-        <label>
-          Username:
-          <input type="text" name="username" th:field="*{username}" required/>
-        </label>
-        <sub th:if="${#fields.hasErrors('username')}" th:errors="*{username}" class="error"></sub>
-        <label>
-          Password:
-          <input type="password" name="password" th:field="*{password}" required/>
-        </label>
-        <sub th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="error"></sub>
-        <label>
-          First Name:
-          <input type="text" name="firstname" th:field="*{firstName}" required/>
-        </label>
-        <sub th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}" class="error"></sub>
-        <label>
-          Last Name:
-          <input type="text" name="lastName" th:field="*{lastName}" required/>
-        </label>
-        <sub th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}" class="error"></sub>
-        <label>
-          Email:
-          <input type="text" name="email" th:field="*{email}" required/>
-        </label>
-        <sub th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error"></sub>
-        <label>
-          Phone Number:
-          <input type="text" name="phone" th:field="*{phone}" required/>
-        </label>
-        <sub th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}" class="error"></sub>
-        <label>
-          Street Address:
-          <input type="text" name="address" th:field="*{address}" required/>
-        </label>
-        <sub th:if="${#fields.hasErrors('address')}" th:errors="*{address}" class="error"></sub>
-        <label>
-          City:
-          <input type="text" name="city" th:field="*{city}" required/>
-        </label>
-        <sub th:if="${#fields.hasErrors('city')}" th:errors="*{city}" class="error"></sub>
-        <label>
-          State:
-          <input type="text" name="state" th:field="*{state}" required/>
-        </label>
-        <sub th:if="${#fields.hasErrors('state')}" th:errors="*{state}" class="error"></sub>
-
-        <br>
-        <input type="submit" />
-      </form>
-
-
-      <form action="#" th:action="@{/system/processManagementRegistrationForm}" th:object="${webUser}" sec:authorize="hasRole('ROLE_MANAGER')"  method="POST" class="form-body">
+      <form action="#" th:action="${formAction}"
+            th:object="${webUser}" method="POST" class="form-body">
 
         <p th:if="${registrationError}" class="error form-info">
           <i class="error" th:text="${registrationError}"></i>
@@ -120,12 +66,17 @@
         </label>
         <sub th:if="${#fields.hasErrors('state')}" th:errors="*{state}" class="error"></sub>
 
-        <label>
-        Role:
-          <select name="userRole">
-            <option th:each="role : ${T(com.pizzashop.entities.RoleEnum).values()}" th:value="${role.toString()}" th:text="${role.toString()}"></option>
-          </select>
-        </label>
+        <div sec:authorize="hasRole('ROLE_MANAGER')">
+          <input th:if="${addType == 'Update User'}" type="hidden" name="userId" th:value="${userId}" />
+
+          <label>
+            <span th:if="${highestRole}">Current Role: <span th:text="${highestRole}"></span><br></span>
+            Select New Role (if changing):
+            <select name="userRole">
+              <option th:each="role : ${T(com.pizzashop.entities.RoleEnum).values()}" th:value="${role}" th:text="${role}" ></option>
+            </select>
+          </label>
+        </div>
 
         <br>
         <input type="submit" />

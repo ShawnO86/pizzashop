@@ -1,62 +1,57 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pizza Shop System</title>
-  <link rel="stylesheet" type="text/css" href="/styles/main.css">
-</head>
+<head th:replace="~{/common-head :: common_html_head(${pageTitle}, ${additionalStyles})}"></head>
 
 <body>
+  <header th:insert="~{header :: head(${heading}, ${secondaryHeading})}"></header>
 
-<header th:insert="~{header :: head}"></header>
+  <main>
+    <section th:insert="~{systemNav :: systemNav}"></section>
 
-<main>
-  <section class="form-container">
+    <section class="horizontal-center">
+      <a th:href="@{/system/changeMenu/addMenuItem}">Add Item</a>
 
-    <p th:if="${assocMenuItemsErr}" class="error form-info">
-      <span th:text="${assocMenuItemsErr}"></span>
-    </p>
+      <p th:if="${assocMenuItemsErr}" class="error form-info">
+        <span th:text="${assocMenuItemsErr}"></span>
+      </p>
 
-    <a th:href="@{/system/changeMenu/addMenuItem}">Add Item</a>
+      <table>
+        <thead>
+        <tr>
+          <th>Dish Name</th>
+          <th>Description</th>
+          <th>Category</th>
+          <th>Available</th>
+          <th>Qty Available</th>
+          <th>Cost (cents)</th>
+          <th>Price (cents)</th>
+          <th>Action</th>
+        </tr>
+        </thead>
 
-    <table>
-      <thead>
-      <tr>
-        <th>Dish Name</th>
-        <th>Description</th>
-        <th>Category</th>
-        <th>Available</th>
-        <th>Qty Available</th>
-        <th>Cost (cents)</th>
-        <th>Price (cents)</th>
-        <th>Action</th>
-      </tr>
-      </thead>
+        <tbody>
+        <tr th:each="item : ${menuItems}">
+          <td th:text="${item.getDishName()}"></td>
+          <td th:text="${item.getDescription()}"></td>
+          <td th:text="${item.getMenuCategory()}"></td>
+          <td th:text="${item.getIsAvailable()}"></td>
+          <td th:text="${item.getAmountAvailable()}"></td>
+          <td th:text="${item.getCostCents()}"></td>
+          <td th:text="${item.getPriceCents()}"></td>
+          <td>
+            <a th:href="@{/system/changeMenu/showMenuItemRecipe(menuItemId=${item.getId()}, menuItemName=${item.getDishName()})}">Show Recipe</a> ||
+            <a th:href="@{/system/changeMenu/addMenuItem(menuItemId=${item.getId()})}">Update</a>
+            <a th:href="@{/system/changeMenu/deleteMenuItem(menuItemId=${item.getId()})}"
+               th:if="${item.dishName != T(com.pizzashop.entities.PizzaSizeEnum).SMALL.pizzaName &&
+                item.dishName != T(com.pizzashop.entities.PizzaSizeEnum).MEDIUM.pizzaName && item.dishName != T(com.pizzashop.entities.PizzaSizeEnum).LARGE.pizzaName}"
+               onclick="if (!(confirm('Are you sure you want to delete this record?'))) return false">|| Delete</a>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </section>
 
-      <tbody>
-      <tr th:each="item : ${menuItems}">
-        <td th:text="${item.getDishName()}"></td>
-        <td th:text="${item.getDescription()}"></td>
-        <td th:text="${item.getMenuCategory()}"></td>
-        <td th:text="${item.getIsAvailable()}"></td>
-        <td th:text="${item.getAmountAvailable()}"></td>
-        <td th:text="${item.getCostCents()}"></td>
-        <td th:text="${item.getPriceCents()}"></td>
-        <td>
-          <a th:href="@{/system/changeMenu/showMenuItemRecipe(menuItemId=${item.getId()}, menuItemName=${item.getDishName()})}">Show Recipe</a> ||
-          <a th:href="@{/system/changeMenu/addMenuItem(menuItemId=${item.getId()})}">Update</a>
-          <a th:href="@{/system/changeMenu/deleteMenuItem(menuItemId=${item.getId()})}"
-             th:if="${item.dishName != T(com.pizzashop.entities.PizzaSizeEnum).SMALL.pizzaName &&
-              item.dishName != T(com.pizzashop.entities.PizzaSizeEnum).MEDIUM.pizzaName && item.dishName != T(com.pizzashop.entities.PizzaSizeEnum).LARGE.pizzaName}"
-             onclick="if (!(confirm('Are you sure you want to delete this record?'))) return false">|| Delete</a>
-        </td>
-      </tr>
-      </tbody>
-    </table>
-  </section>
-
-</main>
+  </main>
 
 
 </body>

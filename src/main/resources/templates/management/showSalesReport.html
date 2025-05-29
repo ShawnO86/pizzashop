@@ -1,19 +1,16 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Title</title>
-  <link rel="stylesheet" type="text/css" href="/styles/main.css">
-</head>
-<body>
+<head th:replace="~{/common-head :: common_html_head(${pageTitle}, ${additionalStyles})}"></head>
 
-<header th:insert="~{header :: head}"></header>
+<body>
+<header th:insert="~{header :: head(${heading}, ${secondaryHeading})}"></header>
 
 <main>
+  <section th:insert="~{systemNav :: systemNav}"></section>
+
   <section class="form-info">
-    <h2>Generate Sales Report:</h2>
-    <form method="POST" th:action="@{/system/showSalesReport}" th:object="${salesReportInfo}">
+    <h2 class="no-top-margin">Generate Sales Report:</h2>
+    <form method="POST" th:action="@{/system/showSalesReport}" th:object="${salesReportInfo}" class="form-body">
       <label>Start Date:
         <input th:field="*{startDate}" type="date"/>
       </label>
@@ -37,8 +34,29 @@
     </form>
   </section>
 
-  <section th:if="${report}" class="space-between">
-    <div id="report">
+  <section th:if="${report}" class="horizontal-center">
+    <div id="inventory" class="horizontal-center">
+      <h3>Inventory Usage</h3>
+      <table>
+        <thead>
+        <tr>
+          <th>
+            Ingredient
+          </th>
+          <th>
+            Oz Used
+          </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="element : ${inventoryUsage}">
+          <td th:text="${element.key}"></td>
+          <td th:text="${element.value}"></td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+    <div id="report" class="horizontal-center">
       <h3>Orders Report</h3>
       <table>
         <thead>
@@ -158,29 +176,7 @@
         </tbody>
       </table>
     </div>
-    <div id="inventory">
-      <h3>Inventory Usage</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>
-              Ingredient
-            </th>
-            <th>
-              Used (in ounces)
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr th:each="element : ${inventoryUsage}">
-            <td th:text="${element.key}"></td>
-            <td th:text="${element.value}"></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
   </section>
-
 </main>
 
 </body>

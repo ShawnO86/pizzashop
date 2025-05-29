@@ -7,26 +7,9 @@
 <header th:insert="~{header :: head(${heading}, ${secondaryHeading})}"></header>
 
 <main>
-    <section>
-        <ul class="no-top-margin admin-nav">
-            <li>
-                <a th:href="@{/system/inventory/showInventory}">Show/Modify Inventory</a>
-            </li>
-            <li>
-                <a th:href="@{/system/changeMenu/showMenuItems}">Show/Modify Menu Items</a>
-            </li>
-            <li>
-                <a th:href="@{/system/userData}">Show/Modify Users</a>
-            </li>
-            <li>
-                <a th:href="@{/system/showSalesReportForm}">Generate Sales Reports</a>
-            </li>
-        </ul>
-        <div>
+    <section th:insert="~{systemNav :: systemNav}"></section>
 
-        </div>
 
-    </section>
 </main>
 
 </body>

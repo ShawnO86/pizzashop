@@ -1,35 +1,45 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pizza Shop System</title>
-  <link rel="stylesheet" type="text/css" href="/styles/main.css">
-</head>
+<head th:replace="~{/common-head :: common_html_head(${pageTitle}, ${additionalStyles})}"></head>
 
 <body>
 
-<header th:insert="~{header :: head}"></header>
+<header th:insert="~{header :: head(${heading}, ${secondaryHeading})}"></header>
 
 <main>
-  <section class="form-container">
+  <section th:insert="~{systemNav :: systemNav}"></section>
 
-    <p th:if="${registrationError}" class="error form-info">
-      <i class="error" th:text="${registrationError}"></i>
-    </p>
-
-    <a th:href="@{/system/showRegistrationForm}">Add User</a>
-
-    <form th:action="@{/system/userDataByLastname}" METHOD="GET">
-      <label>Search by lastname:
-      <input type="text" th:name="userLastName" placeholder="lastname"/>
-      </label>
-      <input type="submit">
-    </form>
+  <section class="horizontal-center">
+    <h3 class="no-top-margin" th:text="${searchBy}"></h3>
 
     <p th:if="${noUsers}" >
-      <span th:text="${noUsers}"></span>
+      <span th:text="${noUsers}" class="error"></span>
     </p>
+
+    <div class="space-between">
+      <div>
+        <a th:href="@{/system/showRegistrationForm}">Add User</a>
+        <span> || </span>
+        <a th:href="@{/system/userData}">Show All</a>
+      </div>
+
+      <div class="form-body">
+        <form th:action="@{/system/userDataByRole}" METHOD="GET">
+          <label>Search by role:
+            <select type="text" th:name="userRole">
+                <option th:each="role : ${T(com.pizzashop.entities.RoleEnum).values()}" th:value="${role}" th:text="${role}" ></option>
+            </select>
+          </label>
+          <input type="submit" value="Search">
+        </form>
+        <form th:action="@{/system/userDataByLastname}" METHOD="GET">
+          <label>Search by lastname:
+            <input type="text" th:name="userLastName" placeholder="lastname"/>
+          </label>
+          <input type="submit" value="Search">
+        </form>
+      </div>
+    </div>
 
     <table th:if="users">
       <thead>
@@ -41,7 +51,7 @@
           <th>Email</th>
           <th>Phone #</th>
           <th>Full Address</th>
-          <th>Active</th>
+          <th>Active?</th>
           <th>Action</th>
         </tr>
       </thead>

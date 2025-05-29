@@ -1,19 +1,14 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pizza Shop System</title>
-  <link rel="stylesheet" type="text/css" href="/styles/main.css">
-</head>
+<head th:replace="~{/common-head :: common_html_head(${pageTitle}, ${additionalStyles})}"></head>
 
 <body>
-<header th:insert="~{header :: head}"></header>
+<header th:insert="~{header :: head(${heading}, ${secondaryHeading})}"></header>
 
-<main class="inline">
+<main class="menu-layout">
 
   <section id="menuItems-container">
-    <button id="open-pizza-builder-btn">Build Your Own Pizza</button>
+    <button id="open-pizza-builder-btn">Build A Custom Pizza</button>
     <script th:inline="javascript">
       const pizzaPriceMap = {
         'SMALL': [],
@@ -58,10 +53,9 @@
     </div>
   </section>
 
-  <!-- todo: set to overlay menu with higher z-index -->
   <section class="form-container hide-area" id="pizza-builder-container">
     <div>
-      <h3>Build your custom pizza:</h3>
+      <h3>Build a custom pizza</h3>
       <label class="space-between"><strong>Name:</strong>
         <input type="text" placeholder="pizza name" id="pizza-name-input"/>
       </label>
@@ -71,14 +65,14 @@
       <h4>Size:</h4>
       <div th:each="size : ${pizzaSizes}" class="space-between">
         <div>
-          <input type="radio" name="pizzaSizeRadios" th:id="${size.name().toLowerCase() + '-radio'}" th:if="${size.name() == 'SMALL'}"
+          <input type="radio" name="pizzaSizeRadios" class="input-box" th:id="${size.name().toLowerCase() + '-radio'}" th:if="${size.name() == 'SMALL'}"
                  th:data-pizza-size="${size.name()}" th:data-ingredient-amount="${size.ingredientAmount}"
                  th:data-extra-ingredient-amount="${size.extraIngredientAmount}" checked />
-          <input type="radio" name="pizzaSizeRadios" th:id="${size.name().toLowerCase() + '-radio'}" th:if="${size.name() != 'SMALL'}"
+          <input type="radio" name="pizzaSizeRadios" class="input-box" th:id="${size.name().toLowerCase() + '-radio'}" th:if="${size.name() != 'SMALL'}"
                  th:data-pizza-size="${size.name()}" th:data-ingredient-amount="${size.ingredientAmount}"
                  th:data-extra-ingredient-amount="${size.extraIngredientAmount}" />
-          <label th:for="${size.name().toLowerCase() + '-radio'}">
-            <span th:text="${size.name().toLowerCase() + ' - (' + size.description + '):'}"></span>
+          <label th:for="${size.name().toLowerCase() + '-radio'}" class="input-box">
+            <span th:text="${#strings.capitalize(size.name().toLowerCase()) + ' - (' + size.description + '):'}"></span>
           </label>
         </div>
         <span th:class="${'pizza-size-price ' + size.name()}"></span>
@@ -89,9 +83,9 @@
       <h4>Toppings:</h4>
       <div th:each="topping : ${pizzaToppings}" class="space-between" th:if="${topping.ingredientName != 'Mozzarella'}">
         <div>
-          <input type="checkbox" name="toppingCheckboxes" th:id="${topping.ingredientName + '-chkbox'}" th:data-topping-id="${topping.id}"
+          <input type="checkbox" name="toppingCheckboxes" class="input-box" th:id="${topping.ingredientName + '-chkbox'}" th:data-topping-id="${topping.id}"
                  th:data-topping-name="${topping.ingredientName}" th:data-topping-price="${topping.getCentsPricePer()}" data-topping-type="regular">
-          <label th:text="${topping.ingredientName + ':'}" th:for="${topping.ingredientName + '-chkbox'}"></label>
+          <label th:text="${topping.ingredientName + ':'}" th:for="${topping.ingredientName + '-chkbox'}" class="input-box"></label>
         </div>
         <span class="ingredient-data" th:data-ingredient-price="${topping.getCentsPricePer()}"
               th:data-ingredient-name="${topping.ingredientName}">price</span>
@@ -103,9 +97,9 @@
 
       <div th:each="topping : ${pizzaToppings}" class="space-between">
         <div>
-          <input type="checkbox" name="extraToppingCheckboxes" th:id="${'extra-'+topping.ingredientName + '-chkbox'}" th:data-topping-id="${topping.id}"
+          <input type="checkbox" name="extraToppingCheckboxes" class="input-box" th:id="${'extra-'+topping.ingredientName + '-chkbox'}" th:data-topping-id="${topping.id}"
                  th:data-topping-name="${topping.ingredientName}" th:data-topping-price="${topping.getCentsPricePer()}" data-topping-type="extra">
-          <label th:text="${topping.ingredientName + ':'}" th:for="${'extra-' + topping.ingredientName + '-chkbox'}"></label>
+          <label th:text="${topping.ingredientName + ':'}" th:for="${'extra-' + topping.ingredientName + '-chkbox'}" class="input-box"></label>
         </div>
         <span class="extra-ingredient-data" th:data-ingredient-price="${topping.getCentsPricePer()}"
               th:data-ingredient-name="${topping.ingredientName}">price</span>
@@ -124,9 +118,9 @@
     <strong><sub class="space-between"><span id="pizza-qty-display"></span><span id="pizza-price-total"></span></sub></strong>
   </section>
 
-  <section class="stay-top" id="cart">
+  <section id="cart">
 
-    <div id="cart-container" class="form-container">
+    <div id="cart-container">
 
       <form id="menuAmount-container" th:action="@{/order/processOrder}" method="post" th:object="${order}">
         <div th:if="${cartError}" class="error" id="cart-errors" th:each="error : ${cartError}">
@@ -158,7 +152,6 @@
     </div>
 
   </section>
-
 </main>
 
 </body>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<body>
+
+  <ul class="no-top-margin admin-nav" th:fragment="systemNav">
+    <li>
+      <a th:href="@{/system/inventory/showInventory}">Show/Modify Inventory</a>
+    </li>
+    <li>
+      <a th:href="@{/system/changeMenu/showMenuItems}">Show/Modify Menu Items</a>
+    </li>
+    <li>
+      <a th:href="@{/system/userData}">Show/Modify Users</a>
+    </li>
+    <li>
+      <a th:href="@{/system/showSalesReportForm}">Generate Sales Reports</a>
+    </li>
+  </ul>
+
+</body>
+</html>

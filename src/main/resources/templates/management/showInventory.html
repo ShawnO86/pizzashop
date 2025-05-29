@@ -6,8 +6,9 @@
   <header th:insert="~{header :: head(${heading}, ${secondaryHeading})}"></header>
 
   <main>
+    <section th:insert="~{systemNav :: systemNav}"></section>
 
-    <section class="form-container">
+    <section class="form-container horizontal-center">
     <a th:href="@{/system/inventory/addInventory}">Add Item</a>
 
     <p th:if="${assocMenuItemsErr}" class="error form-info">
