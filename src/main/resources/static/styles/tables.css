@@ -1,0 +1,16 @@
+table {
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px dashed #c6d3e6;
+    text-align: center;
+    padding: 1rem;
+}
+
+.horizontal-center {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 1rem 0.25rem;
+}
