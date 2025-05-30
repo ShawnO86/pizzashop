@@ -53,6 +53,7 @@ nav ul a, #logout-btn {
     font-family: Aclonica, sans-serif;
     font-size: 1.5rem;
     text-decoration: underline var(--bg_3);
+    color: var(--dark-text);
 }
 
 summary {
