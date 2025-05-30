@@ -1,16 +1,21 @@
 :root {
-    --bg_1: #0A5847;
-    --bg_2: #FAF9E5;
+    --bg_1: #007337;
+    --bg_2: #faf9e7;
     --bg_3: #C63629;
     --bg_4: #F2982D;
     --dark-text: #333333;
     --light-text: #fcfcfc;
+    --dark-transparent: rgba(8, 58, 47, 0.55);
+    --dark-transparent2: rgba(8, 58, 47, 0.10);
+    --light-transparent: rgba(255, 255, 245, 0.65);
 }
 
 body {
     background: var(--bg_1);
     margin: 1rem 0.5rem;
     height: 100%;
+    overflow-y: scroll;
+    color: var(--dark-text);
 }
 
 header {
@@ -19,7 +24,7 @@ header {
 }
 
 main {
-    min-height: 65vh;
+    height: 100%;
     border-radius: 0 0 0.25rem 0.25rem;
     padding-bottom: 1rem;
 }
@@ -37,20 +42,29 @@ section {
 nav ul, .admin-nav {
     display: flex;
     justify-content: center;
+    align-items: center;
     list-style-type: none;
     padding: 1rem 1rem 1.5rem 1rem;
     margin: 0;
     gap: 1rem;
 }
 
-nav ul {
+nav ul a, #logout-btn {
     font-family: Aclonica, sans-serif;
     font-size: 1.5rem;
+    text-decoration: underline var(--bg_3);
 }
 
 summary {
     cursor: pointer;
-    text-decoration: underline blue;
+    text-decoration: underline var(--bg_3);
+}
+
+#logout-btn {
+    border: none;
+    background: none;
+    margin: 0;
+    padding: 0;
 }
 
 .heading {
@@ -83,9 +97,9 @@ summary {
 .checker-pattern {
     background-image: url('../images/checker.svg');
     background-repeat: repeat;
-    background-size: 40px, 80px;
+    background-size: 2.5rem, 5rem;
     width: 100%;
-    height: 80px;
+    height: 5rem;
     margin: 0.5rem 0;
 }
 
@@ -114,5 +128,6 @@ summary {
 }
 
 .space-between-dashed {
-    border-bottom: 1px dotted black;
+    border-bottom: 1px dotted var(--dark-text);
+    margin-bottom: 0.25rem;
 }

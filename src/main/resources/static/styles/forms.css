@@ -37,30 +37,32 @@ input[type=number] {
     padding: 0.25rem;
 }
 
-.cartItem-container {
-    border: 1px solid black;
-    width: 100%;
-}
-
 .thymeleaf-items {
     width: 100%;
 }
 
 .hide-area {
-    display: none;
+    visibility: hidden;
+    opacity: 0;
+    transition: background-color 50ms ease, opacity 1ms ease 40ms, visibility 1ms ease 40ms;
+    background: var(--dark-transparent2);
+}
+
+.show-area {
+    visibility: visible;
+    opacity: 1;
+    transition: background-color 200ms ease;
+    background: var(--dark-transparent);
 }
 
 #pizza-builder-container {
-    z-index: 2;
+    z-index: 3;
     position: absolute;
     top: 0;
-    left: 50%;
-    transform: translate(-50%, 50%);
-    background: var(--bg_1);
-    color: var(--light-text);
-    border-radius: 0.25rem;
-    padding: 1rem;
-    scroll-margin-top: 1rem;
+    width: 100%;
+    height: 100%;
+    padding: 3rem 0 0 0;
+    margin: 0;
 }
 
 #pizza-size-container .space-between,
@@ -70,17 +72,71 @@ input[type=number] {
     border-bottom: 1px dotted var(--dark-text);
 }
 
+.pizza-builder {
+    z-index: 3;
+    background: var(--bg_1);
+    color: var(--light-text);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    position: sticky;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, 0);
+    width: fit-content;
+}
+
 .menu-layout {
     display: flex;
     justify-content: space-between;
+    position: relative;
+    height: 100%;
+    gap: 4rem;
 }
+
+.category-heading {
+    font-family: Aclonica, sans-serif;
+    font-size: 1.25rem;
+    margin: 4rem 0 0 0;
+}
+
+#menuItems-container {
+    width: 100%;
+}
+
+#menuAmount-container {
+    display: flex;
+    flex-direction: column;
+}
+
+#menuItems-container hr, #menuAmount-container hr {
+    color: var(--light-text);
+    width: 100%;
+
+}
+
+#menuItems-container hr {
+    margin: 0 0 2rem 0;
+}
+
+#menuAmount-container hr {
+    margin: 1rem 0;
+}
+
 
 #cart {
     position: sticky;
     top: 1rem;
     align-self: flex-start;
     border: 1px solid var(--bg_1);
+    border-radius: 0.5rem;
     margin-right: 1rem;
+    padding: 1rem 2rem;
+    width: 100%;
+    background-color: var(--light-transparent);
+}
+
+.cartItem-container {
+    width: 100%;
 }
 
 .input-box {

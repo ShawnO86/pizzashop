@@ -40,14 +40,16 @@ export function createOrderItemAmountSelectorMenu(menuItemName, menuItemId, menu
     itemContainer.setAttribute("data-item-index", `menuItemList[${menuItemIndex}]`);
 
     itemContainer.innerHTML = `
-        <h5 class="space-between">
+        <h4 class="space-between-dashed">
             <span>${menuItemName}</span>
             <span class="cart-item-price">${orderInitQty} x ${displayAsCurrency(menuItemPrice, false)}</span>
-        </h5>
-        <label>Qty:
-            <input type="number" value="${orderInitQty}" min="1" max="${menuItemMaxQty}" name="menuItemList[${menuItemIndex}].menuItemAmount" required />
-        </label>
-        <button type="button" class="remove-item">Remove Item</button>
+        </h4>
+        <div class="space-between">
+            <label>Qty:
+                <input type="number" value="${orderInitQty}" min="1" max="${menuItemMaxQty}" name="menuItemList[${menuItemIndex}].menuItemAmount" required />
+            </label>
+            <button type="button" class="remove-item">Remove</button>
+        </div>
         <input type="hidden" name="menuItemList[${menuItemIndex}].menuItemID" value="${menuItemId}" />
         <input type="hidden" name="menuItemList[${menuItemIndex}].menuItemName" value="${menuItemName}" />
         <input type="hidden" name="menuItemList[${menuItemIndex}].maxQty" value="${menuItemMaxQty}" />

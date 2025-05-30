@@ -219,6 +219,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
         } else if (event.target.id === "open-pizza-builder-btn") {
             populateBuilderForm();
             pizzaBuilderContainer.classList.remove("hide-area");
+            pizzaBuilderContainer.classList.add("show-area");
             pizzaBuilderContainer.scrollIntoView({behavior: "smooth", block: "start"});
             disableEditBtns();
         }
@@ -228,6 +229,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
     pizzaBuilderContainer.addEventListener("click", (event) => {
         if (event.target.id === "pizza-cancel-btn") {
             pizzaBuilderContainer.classList.add("hide-area");
+            pizzaBuilderContainer.classList.remove("show-area");
             enableEditBtns();
             if (editingPizza.hasOwnProperty("toppings")) {
                 createOrderItemAmountSelectorPizza(editingPizza, customPizzasDisplay);
@@ -271,6 +273,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
             savePizzaObjectsToSession();
 
             pizzaBuilderContainer.classList.add("hide-area");
+            pizzaBuilderContainer.classList.remove("show-area");
             editingPizza = {};
             enableEditBtns();
         }

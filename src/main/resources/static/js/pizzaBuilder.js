@@ -286,21 +286,27 @@ export function createOrderItemAmountSelectorPizza(pizzaObject, container) {
     titleCasedSize = titleCasedSize.charAt(0).toUpperCase() + titleCasedSize.slice(1);
 
     itemContainer.innerHTML = `
-            <h5 class="space-between">
+            <h4 class="space-between-dashed">
                 <span>${pizzaObject["pizza-name"]}</span>
                 <span class="cart-item-price">${pizzaObject.quantity} x ${displayAsCurrency(pizzaObject["price-per"], false)}</span>
-            </h5>
-            <div>
-            <small><strong>${titleCasedSize} ${toppingAmount} Topping:</strong></small><br>
-            ${toppingJoinArr.length > 0 ? `<small><strong>Normal:</strong> ${toppingJoinArr.join(", \n")}</small><br>` : ""}
-            ${lightToppingJoinString.length > 0 ? `<small><strong>Light:</strong> ${lightToppingJoinString.join(", ")}</small><br>` : ""}
-            ${extraToppingJoinString.length > 0 ? `<small><strong>Extra:</strong> ${extraToppingJoinString.join(", ")}</small><br>` : ""}
+            </h4>
+            <div class="space-between">
+                <div>
+                    <small><strong>${titleCasedSize} ${toppingAmount} Topping:</strong></small><br>
+                    ${toppingJoinArr.length > 0 ? `<small><strong>Normal:</strong> ${toppingJoinArr.join(", \n")}</small><br>` : ""}
+                    ${lightToppingJoinString.length > 0 ? `<small><strong>Light:</strong> ${lightToppingJoinString.join(", ")}</small><br>` : ""}
+                    ${extraToppingJoinString.length > 0 ? `<small><strong>Extra:</strong> ${extraToppingJoinString.join(", ")}</small><br>` : ""}
+                </div>
+                <button type="button" class="edit-item">Edit</button>
             </div>
-            <button type="button" class="edit-item">Edit</button><br>
-            <label>Qty:
-                <input type="number" value="${pizzaObject.quantity}" min="1" max="${pizzaPriceMap[pizzaObject["size-data"].size].maxQty}" required/>
-            </label>
-            <button type="button" class="remove-item">Remove Item</button>
+            <br>
+            <div class="space-between">
+                <label>Qty:
+                    <input type="number" value="${pizzaObject.quantity}" min="1" max="${pizzaPriceMap[pizzaObject["size-data"].size].maxQty}" required/>
+                </label>
+                <button type="button" class="remove-item">Remove</button>
+            </div>
+
             <input type="hidden" name="customPizzaList[${pizzaIndex}].pizzaName" value="${pizzaObject["pizza-name"]}" />
             <input type="hidden" name="customPizzaList[${pizzaIndex}].pizzaSize.size" value="${pizzaObject["size-data"].size}" />
             <input type="hidden" name="customPizzaList[${pizzaIndex}].pizzaSize.price" value="${pizzaObject["size-data"].price}" />
