@@ -19,7 +19,10 @@ export function handleAddMenuItem(event, menuAmountContainer) {
 
 export function handleRemoveItem(event){
     event.preventDefault();
-    event.target.parentElement.remove();
+    const itemContainer = event.target.closest(".cartItem-container");
+    if (itemContainer) {
+        itemContainer.remove();
+    }
 }
 
 export function createOrderItemAmountSelectorMenu(menuItemName, menuItemId, menuItemPrice, orderInitQty, menuItemMaxQty, container) {

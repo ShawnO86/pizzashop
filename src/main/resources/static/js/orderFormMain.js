@@ -31,6 +31,10 @@ document.addEventListener('DOMContentLoaded', ()=> {
     let pizzaCount = 0;
     let cartTotal = 0;
 
+    if (openPizzaBuilder) {
+        openPizzaBuilderForm();
+    }
+
 // populate cart objects in session with orderDTO if returned with error,
 // cart objects will be overwritten with orderDTO if it's there.
     // todo: more robust error removal after setTime for each kind or not removing at all just format UI better?.
@@ -205,6 +209,14 @@ document.addEventListener('DOMContentLoaded', ()=> {
         container.querySelector(".cart-item-price").innerText = `${qty} x ${displayAsCurrency(price, false)}`;
     }
 
+    function openPizzaBuilderForm() {
+        populateBuilderForm();
+        pizzaBuilderContainer.classList.remove("hide-area");
+        pizzaBuilderContainer.classList.add("show-area");
+        pizzaBuilderContainer.scrollIntoView({behavior: "smooth", block: "start"});
+        disableEditBtns();
+    }
+
     // for adding cart items
     menuItemsContainer.addEventListener("click", (event) => {
         if (event.target.classList.contains("addMenuItem-btn")) {
@@ -217,11 +229,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
             }
 
         } else if (event.target.id === "open-pizza-builder-btn") {
-            populateBuilderForm();
-            pizzaBuilderContainer.classList.remove("hide-area");
-            pizzaBuilderContainer.classList.add("show-area");
-            pizzaBuilderContainer.scrollIntoView({behavior: "smooth", block: "start"});
-            disableEditBtns();
+            openPizzaBuilderForm();
         }
     });
 
@@ -302,10 +310,11 @@ document.addEventListener('DOMContentLoaded', ()=> {
                 handleRemoveItem(event);
 
                 pizzaBuilderContainer.classList.remove("hide-area");
-                populateBuilderForm(customPizzas[cartItemContainer.dataset.itemName]);
                 pizzaBuilderContainer.scrollIntoView({behavior: "smooth", block: "start"});
                 disableEditBtns();
                 delete customPizzas[cartItemContainer.dataset.itemName];
+                populateBuilderForm(customPizzas[cartItemContainer.dataset.itemName]);
+
 
             } else if (event.target.type === "number") {
                 updateCartItemTotal(type, cartItemContainer, event);
@@ -324,8 +333,11 @@ document.addEventListener('DOMContentLoaded', ()=> {
         }
     });
 
-    formSubmitBtn.addEventListener("click", () => {
-        menuAmountContainer.submit();
-    });
+    if (formSubmitBtn) {
+        formSubmitBtn.addEventListener("click", () => {
+            menuAmountContainer.submit();
+        });
+    }
+
 
 });
