@@ -38,7 +38,7 @@ public class OrderController {
     }
 
     @GetMapping("/showMenu")
-    public String showOrderForm(Model model) {
+    public String showOrderForm(Model model, @RequestParam(value = "openPizzaBuilder", required = false) boolean openPizzaBuilder) {
         Map<String, List<MenuItem>> menuItemsByCategory = separateMenuItemsByCategory(menuItemDAO.findAllAvailable());
         List<Ingredient> pizzaToppings = ingredientDAO.findAllPizzaToppings();
 
@@ -50,6 +50,10 @@ public class OrderController {
         model.addAttribute("menuItemsByCategory", menuItemsByCategory);
         model.addAttribute("pizzaSizes", PizzaSizeEnum.values());
         model.addAttribute("pizzaToppings", pizzaToppings);
+
+        if (openPizzaBuilder) {
+            model.addAttribute("openPizza", true);
+        }
 
         if (!model.containsAttribute("order")) {
             model.addAttribute("order", new OrderDTO());
@@ -73,11 +77,11 @@ public class OrderController {
         if (orderDTO.getCustomPizzaList() == null && orderDTO.getMenuItemList() == null) {
             model.addAttribute("cartError", "Nothing in cart!");
             model.addAttribute("order", orderDTO);
-            return showOrderForm(model);
+            return showOrderForm(model, false);
         } else if (existingOrder != null) {
             model.addAttribute("cartError", "Your current order is being processed!");
             model.addAttribute("order", new OrderDTO());
-            return showOrderForm(model);
+            return showOrderForm(model, false);
         } else {
             System.out.println("* validation *");
             validationResponse = orderService.submitOrderForValidation(orderDTO);
@@ -96,7 +100,7 @@ public class OrderController {
 
             model.addAttribute("order", orderDTO);
 
-            return showOrderForm(model);
+            return showOrderForm(model, false);
         }
 
         Order order = orderService.submitOrder(orderDTO, username);
@@ -104,8 +108,9 @@ public class OrderController {
         if (order == null) {
             model.addAttribute("cartError", "User not found!");
             model.addAttribute("order", orderDTO);
-            return showOrderForm(model);
+            return showOrderForm(model, false);
         }
+
 
         orderDTO.setOrderID(order.getId());
         orderNotificationController.notifyNewOrder(orderService.convertOrderToDTO(order, true));
@@ -116,12 +121,25 @@ public class OrderController {
 
     @GetMapping("/confirmOrder")
     public String showConfirmation(Model model, @RequestParam("orderId") int orderId) {
+
+        model.addAttribute("heading", "Pizza & Pasta");
+        model.addAttribute("secondaryHeading", "RISTORANTE");
+        model.addAttribute("pageTitle", "Pizza & Pasta - Menu");
+        model.addAttribute("additionalStyles", List.of("/styles/tables.css"));
+        model.addAttribute("address", true);
+
         if (!model.containsAttribute("order")) {
             Order confirmedOrder = orderDAO.findById(orderId);
+            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            String username = ((UserDetails) principal).getUsername();
+
             if (confirmedOrder != null) {
-                OrderDTO confirmedOrderDTO = orderService.convertOrderToDTO(confirmedOrder, false);
-                model.addAttribute("heading", "Your order is confirmed!");
-                model.addAttribute("order", confirmedOrderDTO);
+                if (!confirmedOrder.getUser().getUsername().equals(username)) {
+                    model.addAttribute("orderError", "This is not your order!");
+                } else {
+                    OrderDTO confirmedOrderDTO = orderService.convertOrderToDTO(confirmedOrder, true);
+                    model.addAttribute("order", confirmedOrderDTO);
+                }
             } else {
                 model.addAttribute("orderError", "Order not found!");
             }

@@ -6,13 +6,27 @@
 <header th:insert="~{header :: head(${heading}, ${secondaryHeading})}"></header>
 
 <main>
-  <section>
+  <section th:if="${orderError}">
+    <h2 class="no-top-margin" th:text="${orderError}"></h2>
+  </section>
+
+  <section class="receipt-container" th:if="${order}">
+    <h2 class="no-top-margin">Customer Info:</h2>
+    <div>
+      <p class="receipt-userdetail">
+        <span><strong>Name: </strong><span th:text="${order.userDetail.firstName}"></span> <span th:text="${order.userDetail.lastName}"></span></span>
+        <span><strong>Address: </strong><span th:text="${order.userDetail.address}"></span> <span th:text="${order.userDetail.city}"></span>, <span th:text="${order.userDetail.state}"></span></span>
+        <span><strong>Phone: </strong><span th:text="${order.userDetail.phone}"></span></span>
+        <span><strong>Email: </strong><span th:text="${order.userDetail.email}"></span></span>
+      </p>
+
+    </div>
     <h2>--  order receipt --</h2>
     <div th:if="${order.menuItemList != null}">
-      <p>From The Menu:</p>
+      <h3>From The Menu:</h3>
       <ul>
         <li th:each="menuItem : ${order.menuItemList}">
-          <p class="space-between">
+          <p class="space-between-dashed">
             <span th:text="${menuItem.menuItemName + ' x' + menuItem.menuItemAmount}"></span><span th:text="${'@' + #numbers.formatCurrency(menuItem.pricePerItem / 100 + '.' + menuItem.pricePerItem % 100) + 'ea.'}"></span>
           </p>
           <p th:text="${#numbers.formatCurrency((menuItem.pricePerItem * menuItem.menuItemAmount) / 100 + '.' + (menuItem.pricePerItem * menuItem.menuItemAmount) % 100)}"></p>
@@ -21,10 +35,10 @@
     </div>
 
     <div th:if="${order.customPizzaList != null}">
-      <p>Custom Made Pizzas:</p>
+      <h3>Custom Made Pizzas:</h3>
       <ul>
         <li th:each="pizza : ${order.customPizzaList}">
-          <p class="space-between">
+          <p class="space-between-dashed">
             <span th:text="${#strings.capitalize(#strings.toLowerCase(pizza.pizzaSize.size)) + ' ' + pizza.pizzaName + ' x' + pizza.quantity}"></span>
             <span th:text="${'@' + #numbers.formatCurrency(pizza.pricePerPizza / 100 + '.' + pizza.pricePerPizza % 100) + 'ea.'}"></span>
           </p>
@@ -42,12 +56,15 @@
         </li>
       </ul>
     </div>
-
-    <p th:text="${'Total: ' + #numbers.formatCurrency(order.totalPrice / 100 + '.' + order.totalPrice % 100)}"></p>
+    <br>
+    <p class="receipt-total">
+      <span><strong>Total: </strong></span>
+      <span th:text="${#numbers.formatCurrency(order.totalPrice / 100 + '.' + order.totalPrice % 100)}"></span>
+    </p>
 
   </section>
 </main>
 
 </body>
-<script src="/js/confirmationPage.js" defer></script>
+<script src="/js/confirmationPage.js"></script>
 </html>
