@@ -111,10 +111,10 @@ public class OrderController {
             return showOrderForm(model, false);
         }
 
+        OrderDTO convertedOrder = orderService.convertOrderToDTO(order, true);
 
-        orderDTO.setOrderID(order.getId());
-        orderNotificationController.notifyNewOrder(orderService.convertOrderToDTO(order, true));
-        redirectAttributes.addFlashAttribute("order", orderDTO);
+        orderNotificationController.notifyNewOrder(convertedOrder);
+        redirectAttributes.addFlashAttribute("order", convertedOrder);
 
         return "redirect:/order/confirmOrder?orderId=" + order.getId();
     }
