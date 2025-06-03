@@ -30,7 +30,7 @@ export function createOrderItemAmountSelectorMenu(menuItemName, menuItemId, menu
     const itemContainer = document.createElement("div");
 
     if (existingItem) {
-        alert(menuItemName + " is already in the cart. You can adjust the quantity there.");
+        alert(menuItemName + " is already in the cart. You can adjust the quantity there. (Click \"Show Cart\")");
         return;
     }
 

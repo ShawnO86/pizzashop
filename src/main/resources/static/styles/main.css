@@ -1,32 +1,34 @@
 :root {
-    --bg_1: #007337;
-    --bg_2: #faf9e7;
-    --bg_3: #C63629;
-    --bg_4: #F2982D;
+    --bg_1: #5F8D37;
+    --bg_2: #FFF1D7;
+    --bg_3: #BB3E00;
+    --bg_4: #F7AD45;
     --dark-text: #333333;
-    --light-text: #fcfcfc;
+    --light-text: #ffffff;
     --dark-transparent: rgba(8, 58, 47, 0.55);
     --dark-transparent2: rgba(8, 58, 47, 0.10);
-    --light-transparent: rgba(255, 255, 245, 0.65);
+    --light-transparent: rgba(255, 255, 255, 0.50);
+    --light-transparent2: rgba(255, 255, 255, 0.25);
+}
+
+html {
+    scroll-behavior: smooth;
 }
 
 body {
     background: var(--bg_1);
-    margin: 1rem 0.5rem;
-    height: 100%;
+    margin: 0;
+    padding: 1rem 2vw;
     overflow-y: scroll;
     color: var(--dark-text);
 }
 
 header {
-    border-radius: 0.25rem 0.25rem 0 0;
-    padding: 0;
+    border-radius: 0.5rem 0.5rem 0 0;
 }
 
 main {
-    height: 100%;
-    border-radius: 0 0 0.25rem 0.25rem;
-    padding-bottom: 1rem;
+    border-radius: 0 0 0.5rem 0.5rem;
 }
 
 header, main {
@@ -35,25 +37,29 @@ header, main {
     margin: 0 auto;
 }
 
-section {
-    padding: 0 1rem;
-}
-
 nav ul, .admin-nav {
     display: flex;
     justify-content: center;
     align-items: center;
     list-style-type: none;
-    padding: 1rem 1rem 1.5rem 1rem;
+    padding: 1.5rem 1rem 3rem 1rem;
     margin: 0;
-    gap: 1rem;
+    gap: 4vw;
 }
 
 nav ul a, #logout-btn {
     font-family: Aclonica, sans-serif;
     font-size: 1.5rem;
+    font-weight: bold;
     text-decoration: underline var(--bg_3);
     color: var(--dark-text);
+    cursor: pointer;
+    transition: color 200ms ease;
+}
+
+nav ul a:hover, #logout-btn:hover {
+    color: var(--bg_4);
+    transition: color 200ms ease;
 }
 
 summary {
@@ -68,18 +74,25 @@ summary {
     padding: 0;
 }
 
+.header-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
 .heading {
     font-family: Italiana, serif;
-    font-size: 3rem;
     margin: 0.5rem auto 0.5rem auto;
-    padding: 0 1rem;
 }
 
 .secondary-heading {
     font-family: Aclonica, sans-serif;
-    font-size: 3rem;
     margin: 0 auto 0.5rem auto;
-    padding: 0 1rem;
+}
+
+.heading, .secondary-heading {
+    padding: 0 2vw;
+    font-size: 3rem;
 }
 
 .welcome-heading p {
@@ -87,8 +100,10 @@ summary {
 }
 
 .address {
+    display: flex;
+    flex-direction: column;
     text-align: right;
-    padding: 0 1rem;
+    padding: 0 2vw;
 }
 
 .address p {
@@ -131,4 +146,26 @@ summary {
 .space-between-dashed {
     border-bottom: 1px dotted var(--dark-text);
     margin-bottom: 0.25rem;
+}
+
+@media screen and (max-width: 768px) {
+    body {
+        padding: 0;
+    }
+    header, main {
+        border-radius: 0;
+    }
+    .heading, .secondary-heading {
+        padding: 0;
+        text-align: center;
+        font-size: clamp(2rem, 10vw, 3rem);
+    }
+    .header-info {
+        flex-direction: column;
+    }
+    .address {
+        text-align: center;
+        flex-direction: row;
+        gap: 1rem;
+    }
 }

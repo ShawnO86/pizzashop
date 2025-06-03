@@ -1,6 +1,22 @@
-.form-body {
+hr, #cart, #pizza-builder-container,
+.form-info, #cart-submit-btn,
+    .pizza-builder-actions button {
+    width: 100%;
+}
+
+.form-body, .form-info, .menu-item-category,
+    #menuAmount-container,
+    .pizza-builder-actions, #cart {
     display: flex;
     flex-direction: column;
+    flex-wrap: wrap;
+}
+
+.cartItem-container, .menu-category-nav {
+    padding: 1rem 2vw;
+}
+
+.form-body {
     align-items: flex-end;
     gap: 0.5rem 0;
 }
@@ -14,21 +30,89 @@
 }
 
 .form-info {
-    width: 100%;
     text-align: center;
     border-top: 1px solid var(--dark-text);
     border-bottom: 1px solid var(--dark-text);
     padding: 0.5rem 0;
-    display: flex;
-    flex-direction: column;
     align-items: center;
 }
 
-input[type=submit], input[type=button], button {
-    padding: 0.25rem 1rem;
+#menuItems-container {
+    padding: 0 2vw 1rem 2vw;
+}
+
+.menu-category-nav {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 2vw;
+    position: sticky;
+    top: 0;
+    background-color: var(--bg_4);
+    color: var(--light-text);
+    padding: 0.25rem 2vw;
+}
+
+.menu-category-nav ul {
+    display: flex;
+    align-self: flex-end;
+    list-style-type: none;
+    margin: 1vw 0;
+    padding: 0;
+    gap: clamp(0.5rem, 2vw, 2rem);
+}
+
+.menu-category-nav ul a {
+    text-decoration: underline var(--bg_3);
+    color: var(--dark-text);
     cursor: pointer;
-    border-radius: 0.25rem;
+    font-family: Aclonica, sans-serif;
+    font-size: clamp(1rem, 4vw, 1.25rem);
+    transition: color 200ms ease;
+}
+
+.menu-category-nav ul a:hover {
+    color: var(--light-text);
+    transition: color 200ms ease;
+}
+
+.menu-item-category {
+    gap: 2vh;
+    scroll-margin-top: 2rem;
+}
+
+.menu-item {
+    background-color: var(--light-transparent2);
+    border-radius: 0.5rem;
+    border: 1px dashed var(--dark-transparent2);
+    padding: 0 1vw 1vw 1vw;
+}
+
+.category-heading {
+    font-family: Aclonica, sans-serif;
+    font-size: 1.25rem;
+    margin: 3rem 0 0 0;
+    scroll-margin-top: 10rem;
+}
+
+input, input[type=submit], input[type=button], button {
+    padding: clamp(0.25rem, 2vw, 0.75rem);
+    border-radius: 0.5rem;
     border: 1px solid var(--bg_1);
+}
+
+input[type=submit], input[type=button], button {
+    background-color: var(--light-transparent);
+    color: var(--dark-text);
+    cursor: pointer;
+    transition: background-color 200ms ease;
+    font-weight: bold;
+}
+
+input[type=submit]:hover, input[type=button]:hover, button:hover {
+    background-color: var(--bg_4);
+    color: var(--light-text);
+    transition: background-color 200ms ease;
 }
 
 input[type=number] {
@@ -37,106 +121,104 @@ input[type=number] {
     padding: 0.25rem;
 }
 
-.thymeleaf-items {
-    width: 100%;
+.menu-modal-btns {
+    display: flex;
+    gap: clamp(0.5rem, 2vw, 1rem);
 }
 
-.hide-area {
-    visibility: hidden;
-    opacity: 0;
-    transition: background-color 50ms ease, opacity 1ms ease 40ms, visibility 1ms ease 40ms;
-    background: var(--dark-transparent2);
+#open-pizza-builder-btn {
+    align-self: center;
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    height: clamp(2.5rem, 4vw, 4rem);
+    text-align: left;
 }
 
-.show-area {
-    visibility: visible;
-    opacity: 1;
-    transition: background-color 200ms ease;
-    background: var(--dark-transparent);
+#open-pizza-builder-btn svg, #show-cart-btn svg {
+    max-width: clamp(1rem, 2vw, 2rem);
 }
 
 #pizza-builder-container {
-    z-index: 3;
-    position: absolute;
-    top: 0;
-    width: 100%;
+    background-color: var(--dark-transparent);
     height: 100%;
-    padding: 3rem 0 0 0;
-    margin: 0;
+    width: 100%;
+    padding: 0;
+    margin: auto;
 }
 
 #pizza-size-container .space-between,
 #pizza-topping-container .space-between {
-    gap: 2rem;
+    gap: 2vw;
     margin-bottom: 0.5rem;
     border-bottom: 1px dotted var(--dark-text);
 }
 
 .pizza-builder {
-    z-index: 3;
-    background: var(--bg_1);
-    color: var(--light-text);
+    background: var(--bg_2);
+    color: var(--dark-text);
     border-radius: 0.5rem;
-    padding: 1rem;
-    position: sticky;
-    top: 0;
-    left: 50%;
-    transform: translate(-50%, 0);
-    width: fit-content;
+    border: 3px solid black;
+    margin: auto;
+    width: clamp(17.5rem, 25vw, 30rem);
+    min-width: 17.5rem;
+    box-shadow: 0 0.5rem 1rem 0 var(--dark-transparent), 0 0.25rem 1.5rem 0 var(--dark-transparent2);
+    padding: 2vh 2vw;
 }
 
-.menu-layout {
-    display: flex;
-    justify-content: space-between;
-    position: relative;
-    height: 100%;
-    gap: 4rem;
+.pizza-builder-actions {
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
 }
-
-.category-heading {
-    font-family: Aclonica, sans-serif;
-    font-size: 1.25rem;
-    margin: 4rem 0 0 0;
-}
-
-#menuItems-container {
-    width: 100%;
-}
-
-#menuAmount-container {
-    display: flex;
-    flex-direction: column;
-}
-
-#menuItems-container hr, #menuAmount-container hr {
-    color: var(--light-text);
-    width: 100%;
-
-}
-
-#menuItems-container hr {
-    margin: 0 0 2rem 0;
-}
-
-#menuAmount-container hr {
-    margin: 1rem 0;
-}
-
 
 #cart {
-    position: sticky;
-    top: 1rem;
-    align-self: flex-start;
-    border: 1px solid var(--bg_1);
+    height: fit-content;
+    text-align: right;
+}
+
+#show-cart-btn {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    gap: 1vw;
+    height: clamp(2.5rem, 4vw, 4rem);
+}
+
+#show-cart-btn:hover {
+    fill: var(--light-text);
+}
+
+#cart-container {
+    background: var(--bg_2);
+    color: var(--dark-text);
     border-radius: 0.5rem;
-    margin-right: 1rem;
-    padding: 1rem 2rem;
-    width: 100%;
-    background-color: var(--light-transparent);
+    width: clamp(17.5rem, 25vw, 30rem);
+    box-shadow: 0 0.5rem 1rem 0 var(--dark-transparent), 0 0.25rem 1.5rem 0 var(--dark-transparent2);
+    padding: 2vh 2vw;
 }
 
 .cartItem-container {
-    width: 100%;
+    background-color: var(--light-transparent2);
+    border-radius: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.cartItem-container h4 {
+    margin-bottom: 1.5rem;
+}
+
+#cart-submit-btn, #hide-cart-btn, #pizza-submit-btn, #pizza-cancel-btn {
+    background-color: var(--bg_1);
+    color: var(--light-text);
+    border: 1px solid var(--bg_1);
+    transition: background-color 200ms ease;
+    font-weight: bold;
+}
+
+#cart-submit-btn:hover, #hide-cart-btn:hover, #pizza-submit-btn:hover, #pizza-cancel-btn:hover {
+    background-color: var(--bg_4);
+    transition: background-color 200ms ease;
 }
 
 .input-box {
@@ -159,4 +241,24 @@ input[type=number] {
 
 #logout {
     color: green;
+}
+
+@media screen and (max-width: 768px) {
+    .menu-category-nav {
+        justify-content: center;
+    }
+    .menu-category-nav ul {
+        width: 100%;
+        justify-content: space-between;
+    }
+    .menu-modal-btns {
+        width: 100%;
+        justify-content: space-between;
+    }
+    #open-pizza-builder-btn {
+
+    }
+    #show-cart-btn {
+
+    }
 }

@@ -4,17 +4,21 @@
 
 <div th:fragment="head(heading, secondaryHeading)">
 
-  <div class="space-between vertical-center">
+  <div class="header-info">
     <div>
       <h1 th:text="${heading}" class="heading"></h1>
       <h2 th:if="${secondaryHeading != ''}" th:text="${secondaryHeading}" class="secondary-heading"></h2>
     </div>
 
     <div th:if="${address}" class="address">
-      <p>ADDRESS:</p>
-      <strong>1234 st. City, State</strong>
-      <p>PHONE:</p>
-      <strong>(123)-456-7890</strong>
+      <div>
+        <p>ADDRESS:</p>
+        <strong>1234 st. City, State</strong>
+      </div>
+      <div>
+        <p>PHONE:</p>
+        <strong>(123)-456-7890</strong>
+      </div>
     </div>
   </div>
 
@@ -40,7 +44,7 @@
         </form>
       </li>
       <li sec:authorize="isAnonymous()">
-        <a th:href="@{/login}">Log In</a>
+        <a th:href="@{/login}">Log-In</a>
       </li>
     </ul>
   </nav>

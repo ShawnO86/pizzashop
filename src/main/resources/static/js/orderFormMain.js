@@ -19,6 +19,9 @@ document.addEventListener('DOMContentLoaded', ()=> {
     const cartTotalElement = document.getElementById("order-total");
     const cartTotalInputElement = document.getElementById("order-total-input");
     const formSubmitBtn = document.getElementById("cart-submit-btn");
+    const builderBtn = document.getElementById("open-pizza-builder-btn");
+    const pizzaBuilder = document.querySelector(".pizza-builder");
+    const cartContainer = document.getElementById("cart-container");
 
     // todo : set check for all error elements.. ids = cart-errors, price-errors, availability-errors
     let cartErrorElement = document.getElementById("cart-errors");
@@ -32,7 +35,9 @@ document.addEventListener('DOMContentLoaded', ()=> {
     let cartTotal = 0;
 
     if (openPizzaBuilder) {
-        openPizzaBuilderForm();
+        setTimeout(() => {
+            openPizzaBuilderForm();
+        }, 150);
     }
 
 // populate cart objects in session with orderDTO if returned with error,
@@ -171,24 +176,6 @@ document.addEventListener('DOMContentLoaded', ()=> {
         }
     }
 
-    function disableEditBtns() {
-        const editBtns = menuAmountContainer.querySelectorAll(".edit-item");
-        const builderBtn = document.getElementById("open-pizza-builder-btn");
-        editBtns.forEach(el =>{
-            el.disabled = true;
-        })
-        builderBtn.disabled = true;
-    }
-
-    function enableEditBtns() {
-        const editBtns = menuAmountContainer.querySelectorAll(".edit-item");
-        const builderBtn = document.getElementById("open-pizza-builder-btn");
-        editBtns.forEach(el =>{
-            el.disabled = false;
-        })
-        builderBtn.disabled = false;
-    }
-
     function updateCartItemTotal(type, container, event) {
         let qty, price;
         if (type === "menu item") {
@@ -211,10 +198,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
 
     function openPizzaBuilderForm() {
         populateBuilderForm();
-        pizzaBuilderContainer.classList.remove("hide-area");
-        pizzaBuilderContainer.classList.add("show-area");
-        pizzaBuilderContainer.scrollIntoView({behavior: "smooth", block: "start"});
-        disableEditBtns();
+        pizzaBuilder.showModal();
     }
 
     // for adding cart items
@@ -226,19 +210,15 @@ document.addEventListener('DOMContentLoaded', ()=> {
                     "name": menuItem.menuItemName, "qty": menuItem.orderInitQty, "maxQty": menuItem.menuItemMaxQty, "price": menuItem.menuItemPrice
                 };
                 saveMenuObjectsToSession();
+                cartContainer.showModal();
             }
-
-        } else if (event.target.id === "open-pizza-builder-btn") {
-            openPizzaBuilderForm();
         }
     });
 
     // for adding new pizza items
     pizzaBuilderContainer.addEventListener("click", (event) => {
         if (event.target.id === "pizza-cancel-btn") {
-            pizzaBuilderContainer.classList.add("hide-area");
-            pizzaBuilderContainer.classList.remove("show-area");
-            enableEditBtns();
+            pizzaBuilder.close();
             if (editingPizza.hasOwnProperty("toppings")) {
                 createOrderItemAmountSelectorPizza(editingPizza, customPizzasDisplay);
                 customPizzas[editingPizza["pizza-name"]] = editingPizza;
@@ -280,16 +260,15 @@ document.addEventListener('DOMContentLoaded', ()=> {
             customPizzas[customPizza["pizza-name"]] = customPizza;
             savePizzaObjectsToSession();
 
-            pizzaBuilderContainer.classList.add("hide-area");
-            pizzaBuilderContainer.classList.remove("show-area");
+            pizzaBuilder.close();
             editingPizza = {};
-            enableEditBtns();
         }
     });
 
     // for removing, updating qty, or submitting added cart items
     menuAmountContainer.addEventListener("click", (event) => {
         const cartItemContainer = event.target.closest('.cartItem-container');
+        console.log(event.target)
         if (cartItemContainer) {
             const type = cartItemContainer.dataset.itemType;
 
@@ -308,13 +287,9 @@ document.addEventListener('DOMContentLoaded', ()=> {
             }  else if (event.target.classList.contains("edit-item")) {
                 editingPizza = customPizzas[cartItemContainer.dataset.itemName];
                 handleRemoveItem(event);
-
-                pizzaBuilderContainer.classList.remove("hide-area");
-                pizzaBuilderContainer.scrollIntoView({behavior: "smooth", block: "start"});
-                disableEditBtns();
-                delete customPizzas[cartItemContainer.dataset.itemName];
                 populateBuilderForm(customPizzas[cartItemContainer.dataset.itemName]);
-
+                pizzaBuilder.showModal();
+                delete customPizzas[cartItemContainer.dataset.itemName];
 
             } else if (event.target.type === "number") {
                 updateCartItemTotal(type, cartItemContainer, event);
@@ -338,6 +313,19 @@ document.addEventListener('DOMContentLoaded', ()=> {
             menuAmountContainer.submit();
         });
     }
+
+    builderBtn.addEventListener('click', () => {
+        openPizzaBuilderForm();
+    })
+
+    const showCartBtn = document.getElementById("show-cart-btn");
+    const hideCartBtn = document.getElementById("hide-cart-btn");
+    showCartBtn.addEventListener('click', () => {
+        cartContainer.showModal();
+    });
+    hideCartBtn.addEventListener('click', () => {
+        cartContainer.close();
+    })
 
 
 });
