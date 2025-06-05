@@ -83,6 +83,7 @@ function setToppingPriceDisplay(ingredientAmount, priceElements, isExtra) {
         }
         if (ingredientAmount > ingredientAmtAvailable) {
             el.innerText = "Unavailable"
+            checkBoxEl.checked = false;
             checkBoxEl.disabled = true;
         } else {
             el.innerText = displayAsCurrency(ingredientPrice, true);
