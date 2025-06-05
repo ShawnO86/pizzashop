@@ -62,8 +62,6 @@ public class OrderController {
         return "ordering/orderForm";
     }
 
-    // todo : update processOrder, confirmOrder for new model requirements and set up CSS
-
     @PostMapping("/processOrder")
     public String processOrder(Model model, @ModelAttribute("order") OrderDTO orderDTO, RedirectAttributes redirectAttributes) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -83,14 +81,12 @@ public class OrderController {
             model.addAttribute("order", new OrderDTO());
             return showOrderForm(model, false);
         } else {
-            System.out.println("* validation *");
             validationResponse = orderService.submitOrderForValidation(orderDTO);
         }
 
         if ((validationResponse.get("availabilityErrors") != null && !validationResponse.get("availabilityErrors").isEmpty()) ||
                 (validationResponse.get("priceErrors") != null && !validationResponse.get("priceErrors").isEmpty())) {
 
-            System.out.println("validationResponse.." + validationResponse.get("availabilityErrors") + "\n" + validationResponse.get("priceErrors"));
             if (!validationResponse.get("availabilityErrors").isEmpty()) {
                 model.addAttribute("availabilityErrors", validationResponse.get("availabilityErrors"));
             }

@@ -1,16 +1,100 @@
 table {
     border-collapse: collapse;
+    margin: auto;
+    scroll-margin-top: 1rem;
+}
+
+details {
+    margin-bottom: 0.5rem;
+}
+
+.table-scroll table thead tr th {
+    position: sticky;
+    top: 0;
+    background-color: var(--bg_1);
+    color: var(--light-text);
+    z-index: 1;
+    border: none;
 }
 
 th, td {
-    border: 1px dashed #c6d3e6;
+    border: 1px dashed var(--dark-text);
     text-align: center;
-    padding: 1rem;
+    padding: clamp(0px, 1vw, 1rem);
 }
 
-.horizontal-center {
+.table-scroll {
+    max-height: 95vh;
+    scroll-margin-top: 2rem;
+    overflow: auto;
+}
+
+.table-actions {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    padding: 1rem 0.25rem;
+    justify-content: flex-end;
+    gap: clamp(4px, 1vw, 8px);
+}
+
+.table-actions a {
+    background-color: var(--light-transparent);
+    border: 1px solid var(--dark-transparent2);
+    padding: clamp(1px, 2vw, 0.25rem);
+    border-radius: 0.5rem;
+}
+
+.table-actions a:hover {
+    background-color: var(--bg_4);
+    color: var(--light-text);
+}
+
+.menu-item-recipe-table th, .menu-item-recipe-table td {
+    font-size: clamp(14px, 4vw, 1rem);
+    padding: 0.5rem;
+}
+
+.receipt-container {
+    width: fit-content;
+    margin: auto;
+    background-color: var(--light-transparent);
+    border-radius: 0.5rem;
+    padding: clamp(0.5rem, 2vw, 1rem);
+    min-height: 50vh;
+}
+
+.receipt-container h2 {
+    text-align: center;
+}
+
+.receipt-total {
+    text-align: right;
+}
+
+.receipt-userdetail {
+    display: flex;
+    gap: clamp(0.5rem, 2vw, 1rem);
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.userdetail-item {
+    flex-basis: 49%;
+}
+
+@media screen and (max-width: 768px) {
+    table {
+        padding: 0;
+        margin: 0;
+    }
+    th, td {
+        padding: clamp(0.15rem, 2vw, 0.5rem);
+        font-size: clamp(0.85rem, 2vw, 1rem);
+        border-right: none;
+        border-left: none;
+        border-bottom: 1px dashed var(--dark-transparent);
+    }
+    .horizontal-center {
+
+        margin: inherit;
+    }
 }

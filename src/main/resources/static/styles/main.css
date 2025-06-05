@@ -13,6 +13,7 @@
 
 html {
     scroll-behavior: smooth;
+    box-sizing: border-box;
 }
 
 body {
@@ -29,6 +30,7 @@ header {
 
 main {
     border-radius: 0 0 0.5rem 0.5rem;
+    min-height: 60vh;
 }
 
 header, main {
@@ -41,6 +43,7 @@ nav ul, .admin-nav {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-wrap: wrap;
     list-style-type: none;
     padding: 1.5rem 1rem 3rem 1rem;
     margin: 0;
@@ -60,11 +63,6 @@ nav ul a, #logout-btn {
 nav ul a:hover, #logout-btn:hover {
     color: var(--bg_4);
     transition: color 200ms ease;
-}
-
-summary {
-    cursor: pointer;
-    text-decoration: underline var(--bg_3);
 }
 
 #logout-btn {
@@ -146,6 +144,10 @@ summary {
 .space-between-dashed {
     border-bottom: 1px dotted var(--dark-text);
     margin-bottom: 0.25rem;
+}
+
+summary {
+    cursor: pointer;
 }
 
 @media screen and (max-width: 768px) {

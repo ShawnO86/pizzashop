@@ -23,8 +23,9 @@ hr, #cart, #pizza-builder-container,
 
 .form-container {
     border: 1px solid var(--bg_1);
+    border-radius: 0.5rem;
     color: var(--dark-text);
-    padding: 0 1rem 1rem 1rem;
+    padding: clamp(0.25rem, 4vw, 1.25rem);
     width: fit-content;
     margin: auto;
 }
@@ -35,6 +36,24 @@ hr, #cart, #pizza-builder-container,
     border-bottom: 1px solid var(--dark-text);
     padding: 0.5rem 0;
     align-items: center;
+}
+
+#ingredientAmountsContainer {
+    background-color: var(--light-transparent);
+    padding: clamp(0.15rem, 2vw, 0.5rem);
+}
+
+.ingredient-amount {
+    display: flex;
+    justify-content: right;
+    align-items: flex-end;
+    width: 100%;
+    flex-wrap: wrap;
+    margin: 0.5rem 0;
+}
+
+.ingredient-amount div {
+    display: flex;
 }
 
 #menuItems-container {
@@ -81,6 +100,10 @@ hr, #cart, #pizza-builder-container,
     scroll-margin-top: 2rem;
 }
 
+.menu-item-category hr {
+    border-top: 2px solid var(--bg_3);
+}
+
 .menu-item {
     background-color: var(--light-transparent2);
     border-radius: 0.5rem;
@@ -95,10 +118,11 @@ hr, #cart, #pizza-builder-container,
     scroll-margin-top: 10rem;
 }
 
-input, input[type=submit], input[type=button], button {
-    padding: clamp(0.25rem, 2vw, 0.75rem);
+input, input[type=submit], input[type=button], input[type=number], button, select, textarea {
+    padding: clamp(0.25rem, 2vw, 0.5rem);
     border-radius: 0.5rem;
     border: 1px solid var(--bg_1);
+    max-height: 2.25rem;
 }
 
 input[type=submit], input[type=button], button {
@@ -116,9 +140,7 @@ input[type=submit]:hover, input[type=button]:hover, button:hover {
 }
 
 input[type=number] {
-    border-radius: 0.25rem;
-    border: 1px solid var(--bg_1);
-    padding: 0.25rem;
+    max-width: 3rem;
 }
 
 .menu-modal-btns {
@@ -133,6 +155,11 @@ input[type=number] {
     font-weight: bold;
     height: clamp(2.5rem, 4vw, 4rem);
     text-align: left;
+}
+
+#open-pizza-builder-btn[disabled] {
+    cursor: not-allowed;
+    background-color: var(--dark-transparent2);
 }
 
 #open-pizza-builder-btn svg, #show-cart-btn svg {
@@ -160,8 +187,7 @@ input[type=number] {
     border-radius: 0.5rem;
     border: 3px solid black;
     margin: auto;
-    width: clamp(17.5rem, 25vw, 30rem);
-    min-width: 17.5rem;
+    width: clamp(19rem, 25vw, 30rem);
     box-shadow: 0 0.5rem 1rem 0 var(--dark-transparent), 0 0.25rem 1.5rem 0 var(--dark-transparent2);
     padding: 2vh 2vw;
 }
@@ -180,6 +206,7 @@ input[type=number] {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    align-self: center;
     font-weight: bold;
     gap: 1vw;
     height: clamp(2.5rem, 4vw, 4rem);
@@ -225,22 +252,19 @@ input[type=number] {
     cursor: pointer;
 }
 
-#order-display {
-    margin: 2rem auto;
-    max-width: 80vw;
-}
-
-.order {
-    margin: 2rem auto;
-    min-width: 20rem;
-}
-
 .error {
-    color: red;
+    color: var(--bg_3);
+    font-weight: bold;
 }
 
 #logout {
     color: green;
+}
+
+@media screen and (max-width: 525px) {
+    label {
+        text-align: right;
+    }
 }
 
 @media screen and (max-width: 768px) {

@@ -56,7 +56,7 @@
         </tbody>
       </table>
     </div>
-    <div id="report" class="horizontal-center">
+    <div id="report" class="horizontal-center table-scroll">
       <h3>Orders Report</h3>
       <table>
         <thead>
@@ -89,7 +89,7 @@
             </td>
             <!--custom pizzas-->
             <td>
-              <div th:each="customPizza : ${order.customPizzaList}">
+              <div th:each="customPizza : ${order.customPizzaList}" class="space-between">
                 <span th:text="${customPizza.quantity}+ 'x ' +${customPizza.pizzaName}"></span><br>
                 <details>
                   <summary>
@@ -169,7 +169,7 @@
             <!--profit-->
             <td>
               <sub>
-                <span th:text="${#numbers.formatCurrency(order.totalProfit / 100.0)}"></span>
+                <span th:text="${#numbers.formatCurrency(order.getTotalProfit() / 100.0)}"></span>
               </sub>
             </td>
           </tr>

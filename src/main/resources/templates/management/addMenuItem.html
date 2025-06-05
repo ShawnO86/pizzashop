@@ -20,24 +20,22 @@
 
       <input type="hidden" name="menuItemId" th:if="${menuItemId}" th:value="${menuItemId}" />
 
-      <div th:if="${menuItem.dishName != T(com.pizzashop.entities.PizzaSizeEnum).SMALL.pizzaName &&
-       menuItem.dishName != T(com.pizzashop.entities.PizzaSizeEnum).MEDIUM.pizzaName && menuItem.dishName != T(com.pizzashop.entities.PizzaSizeEnum).LARGE.pizzaName}">
-        <label>Dish Name:
-          <input type="text" th:field="*{dishName}" placeholder="name">
-          <span th:if="${#fields.hasErrors('dishName')}" th:errors="*{dishName}" class="error"></span>
-        </label>
-      </div>
+      <label th:if="${menuItem.dishName != T(com.pizzashop.entities.PizzaSizeEnum).SMALL.pizzaName &&
+     menuItem.dishName != T(com.pizzashop.entities.PizzaSizeEnum).MEDIUM.pizzaName && menuItem.dishName != T(com.pizzashop.entities.PizzaSizeEnum).LARGE.pizzaName}">
+        Dish Name:
+        <input type="text" th:field="*{dishName}" placeholder="name" required>
+        <span th:if="${#fields.hasErrors('dishName')}" th:errors="*{dishName}" class="error"></span>
+      </label>
 
-      <div th:if="${menuItem.dishName == T(com.pizzashop.entities.PizzaSizeEnum).SMALL.pizzaName &&
-       menuItem.dishName == T(com.pizzashop.entities.PizzaSizeEnum).MEDIUM.pizzaName && menuItem.dishName == T(com.pizzashop.entities.PizzaSizeEnum).LARGE.pizzaName}">
-        <label><span th:text="${menuItem.dishName + '''s name cannot be modified, it is used in pizza builder.'}"></span>
-          <input type="hidden" th:field="*{dishName}" th:value="*{dishName}">
-          <span th:if="${#fields.hasErrors('dishName')}" th:errors="*{dishName}" class="error"></span>
-        </label>
-      </div>
+      <label th:if="${menuItem.dishName == T(com.pizzashop.entities.PizzaSizeEnum).SMALL.pizzaName &&
+      menuItem.dishName == T(com.pizzashop.entities.PizzaSizeEnum).MEDIUM.pizzaName && menuItem.dishName == T(com.pizzashop.entities.PizzaSizeEnum).LARGE.pizzaName}">
+        <span th:text="${menuItem.dishName + '''s name cannot be modified, it is used in pizza builder.'}"></span>
+        <input type="hidden" th:field="*{dishName}" th:value="*{dishName}">
+        <span th:if="${#fields.hasErrors('dishName')}" th:errors="*{dishName}" class="error"></span>
+      </label>
 
       <label>Description:
-        <textarea th:field="*{description}" placeholder="description"></textarea>
+        <textarea th:field="*{description}" placeholder="description" rows="5" cols="30" required></textarea>
         <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="error"></span>
       </label>
 
@@ -70,32 +68,35 @@
       <div id="ingredientAmountsContainer">
 
           <div class="ingredient-amount" th:if="${menuItemRecipe != null}" th:each="ingredientArr : ${menuItemRecipe}">
-            <label>Ingredient:
-              <select name="ingredientIdAmountsKeys">
-                <option th:each="ingredient : ${ingredients}" th:value="${ingredient.id}"
-                        th:text="${ingredient.ingredientName + ' (' + ingredient.unitOfMeasure + ')'}"
-                        th:selected="${ingredient.ingredientName == ingredientArr[0]}"></option>
-              </select>
-            </label>
+            <div>
+              <label>Ingredient:
+                <select name="ingredientIdAmountsKeys">
+                  <option th:each="ingredient : ${ingredients}" th:value="${ingredient.id}"
+                          th:text="${ingredient.ingredientName + ' (' + ingredient.unitOfMeasure + ')'}"
+                          th:selected="${ingredient.ingredientName == ingredientArr[0]}"></option>
+                </select>
+              </label>
 
-            <label>Amount:
-              <input type="number" name="ingredientIdAmountsValues" th:value="${ingredientArr[1]}" min="1" max="9" required/>
-            </label>
+              <label>Amount:
+                <input type="number" name="ingredientIdAmountsValues" th:value="${ingredientArr[1]}" min="1" max="9" required/>
+              </label>
+            </div>
             <button type="button" class="remove-item">Remove</button>
           </div>
 
         <div class="ingredient-amount" th:if="${menuItemRecipe == null}">
-          <label>Ingredient:
-            <select name="ingredientIdAmountsKeys">
-              <option th:each="ingredient : ${ingredients}" th:value="${ingredient.id}"
-                      th:text="${ingredient.ingredientName + ' (' + ingredient.unitOfMeasure + ')'}"></option>
-            </select>
-          </label>
+          <div>
+            <label>Ingredient:
+              <select name="ingredientIdAmountsKeys">
+                <option th:each="ingredient : ${ingredients}" th:value="${ingredient.id}"
+                        th:text="${ingredient.ingredientName + ' (' + ingredient.unitOfMeasure + ')'}"></option>
+              </select>
+            </label>
 
-          <label>Amount:
-            <input type="number" name="ingredientIdAmountsValues" min="1" max="99" value="1" required/>
-          </label>
-
+            <label>Amount:
+              <input type="number" name="ingredientIdAmountsValues" min="1" max="99" value="1" required/>
+            </label>
+          </div>
           <button type="button" class="remove-item">Remove</button>
         </div>
 

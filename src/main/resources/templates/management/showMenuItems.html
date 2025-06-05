@@ -15,40 +15,42 @@
         <span th:text="${assocMenuItemsErr}"></span>
       </p>
 
-      <table>
-        <thead>
-        <tr>
-          <th>Dish Name</th>
-          <th>Description</th>
-          <th>Category</th>
-          <th>Available</th>
-          <th>Qty Available</th>
-          <th>Cost (cents)</th>
-          <th>Price (cents)</th>
-          <th>Action</th>
-        </tr>
-        </thead>
+      <div class="table-scroll" id="table">
+        <table>
+          <thead>
+          <tr>
+            <th>Dish Name</th>
+            <th>Description</th>
+            <th>Category</th>
+            <th>Available</th>
+            <th>Qty Available</th>
+            <th>Cost (cents)</th>
+            <th>Price (cents)</th>
+            <th>Action</th>
+          </tr>
+          </thead>
 
-        <tbody>
-        <tr th:each="item : ${menuItems}">
-          <td th:text="${item.getDishName()}"></td>
-          <td th:text="${item.getDescription()}"></td>
-          <td th:text="${item.getMenuCategory()}"></td>
-          <td th:text="${item.getIsAvailable()}"></td>
-          <td th:text="${item.getAmountAvailable()}"></td>
-          <td th:text="${item.getCostCents()}"></td>
-          <td th:text="${item.getPriceCents()}"></td>
-          <td>
-            <a th:href="@{/system/changeMenu/showMenuItemRecipe(menuItemId=${item.getId()}, menuItemName=${item.getDishName()})}">Show Recipe</a> ||
-            <a th:href="@{/system/changeMenu/addMenuItem(menuItemId=${item.getId()})}">Update</a>
-            <a th:href="@{/system/changeMenu/deleteMenuItem(menuItemId=${item.getId()})}"
-               th:if="${item.dishName != T(com.pizzashop.entities.PizzaSizeEnum).SMALL.pizzaName &&
-                item.dishName != T(com.pizzashop.entities.PizzaSizeEnum).MEDIUM.pizzaName && item.dishName != T(com.pizzashop.entities.PizzaSizeEnum).LARGE.pizzaName}"
-               onclick="if (!(confirm('Are you sure you want to delete this record?'))) return false">|| Delete</a>
-          </td>
-        </tr>
-        </tbody>
-      </table>
+          <tbody>
+          <tr th:each="item : ${menuItems}">
+            <td th:text="${item.getDishName()}"></td>
+            <td th:text="${item.getDescription()}"></td>
+            <td th:text="${item.getMenuCategory()}"></td>
+            <td th:text="${item.getIsAvailable()}"></td>
+            <td th:text="${item.getAmountAvailable()}"></td>
+            <td th:text="${item.getCostCents()}"></td>
+            <td th:text="${item.getPriceCents()}"></td>
+            <td class="table-actions">
+              <a th:href="@{/system/changeMenu/showMenuItemRecipe(menuItemId=${item.getId()}, menuItemName=${item.getDishName()})}">Show Recipe</a>
+              <a th:href="@{/system/changeMenu/addMenuItem(menuItemId=${item.getId()})}">Update</a>
+              <a th:href="@{/system/changeMenu/deleteMenuItem(menuItemId=${item.getId()})}"
+                 th:if="${item.dishName != T(com.pizzashop.entities.PizzaSizeEnum).SMALL.pizzaName &&
+                  item.dishName != T(com.pizzashop.entities.PizzaSizeEnum).MEDIUM.pizzaName && item.dishName != T(com.pizzashop.entities.PizzaSizeEnum).LARGE.pizzaName}"
+                 onclick="if (!(confirm('Are you sure you want to delete this record?'))) return false">Delete</a>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
     </section>
 
   </main>

@@ -5,28 +5,39 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="_csrf" th:content="${_csrf.token}"/>
   <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
-  <title>Pizza Shop System</title>
+  <title>Order Fulfillment</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Aclonica&family=Italiana&display=swap" rel="stylesheet">
   <link rel="stylesheet" type="text/css" href="/styles/main.css">
+  <link rel="stylesheet" type="text/css" href="/styles/fulfillment.css">
 </head>
 
 <body>
-<header th:insert="~{header :: head(${heading})}"></header>
+<header th:insert="~{header :: head(${heading}, ${secondaryHeading})}"></header>
 
 <main>
 
-  <section>
+  <section class="space-between fulfillment-options">
     <h2>
       <span>Employee Name:</span>
       <span sec:authentication="principal.username" id="employee-name"></span>
     </h2>
-    <button id="connect-btn">Connect to order stream</button>
-    <button id="disconnect-btn">Disconnect</button>
+    <div>
+      <button id="connect-btn">Connect to order stream</button>
+      <button id="disconnect-btn">Disconnect</button>
+    </div>
   </section>
 
-  <section id="order-display" class="space-between">
-    <div id="orders-container"></div>
-
-    <div id="fulfilled-container"></div>
+  <section id="order-display">
+    <div class="order-waiting-container">
+      <h3>WAITING</h3>
+      <div id="orders-container"></div>
+    </div>
+    <div class="order-fulfilled-container">
+      <h3>BEING FULFILLED</h3>
+      <div id="fulfilled-container"></div>
+    </div>
   </section>
 
   <dialog id="recipe-dialog">

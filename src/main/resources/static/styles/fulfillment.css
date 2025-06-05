@@ -1,0 +1,139 @@
+.order, .fulfill-btn, details {
+    width: 100%;
+}
+
+#order-display {
+    margin: 0 2vw;
+    display: grid;
+    grid-template-areas:
+        "left left left . right right right"
+        "left left left . right right right"
+        "left left left . right right right";
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: auto;
+}
+
+.order-waiting-container, .order-fulfilled-container {
+    max-height: 85vh;
+    overflow-y: auto;
+    text-align: center;
+    border-bottom: 1px solid var(--dark-transparent);
+    margin-bottom: 2rem;
+}
+
+.order-waiting-container {
+    grid-area: left;
+}
+
+.order-fulfilled-container {
+    grid-area: right;
+}
+
+.fulfillment-options {
+    margin: 0 auto 2rem auto;
+    width: calc(100% - 4vw);
+    border-bottom: 1px solid var(--dark-transparent);
+    align-items: flex-end;
+}
+
+.fulfillment-options h2 {
+    margin: 0;
+}
+
+.order {
+    display: flex;
+    justify-content: center;
+    background-color: var(--light-transparent);
+    margin-bottom: 1rem;
+    border-radius: 0.5rem;
+}
+
+summary {
+    background-color: var(--bg_1);
+    color: var(--light-text);
+    font-weight: bold;
+    margin: 0;
+    border-radius: 0.5rem;
+    transition: background-color 200ms ease;
+    border: 1px solid var(--bg_1);
+}
+
+summary:hover, details[open] summary {
+    background-color: var(--bg_4);
+    transition: background-color 200ms ease;
+}
+
+summary span {
+    padding: 1vw;
+}
+
+details {
+    padding: 2vw;
+
+}
+
+#recipe-dialog {
+    background: var(--bg_2);
+    color: var(--dark-text);
+    border-radius: 0.5rem;
+    border: 3px solid black;
+}
+
+#close-recipe-dialog {
+    position: absolute;
+    top: 0;
+    right: 0;
+
+    border: none;
+    border-radius: 0;
+    font-weight: bold;
+    background-color: var(--bg_3);
+    color: var(--light-text);
+}
+
+#close-recipe-dialog:hover {
+    color: var(--bg_3);
+    background-color: var(--bg_2);
+}
+
+button {
+    background-color: var(--light-transparent);
+    color: var(--dark-text);
+    cursor: pointer;
+    transition: background-color 200ms ease;
+    font-weight: bold;
+    padding: clamp(0.25rem, 2vw, 0.5rem);
+    border-radius: 0.5rem;
+}
+
+button:hover {
+    background-color: var(--bg_4);
+    color: var(--light-text);
+    transition: background-color 200ms ease;
+}
+
+.fulfill-btn {
+    margin-top: 1rem;
+}
+
+
+@media screen and (max-width: 768px) {
+    #order-display {
+        grid-template-areas:
+        "left left left left left left left"
+        "right right right right right right right";
+    }
+
+    .order-waiting-container, .order-fulfilled-container {
+        max-height: none;
+        overflow-y: visible;
+    }
+
+    .order-waiting-container, .order-fulfilled-container {
+        text-align: center;
+    }
+
+    #orders-container, #fulfilled-container {
+        justify-self: center;
+    }
+}
