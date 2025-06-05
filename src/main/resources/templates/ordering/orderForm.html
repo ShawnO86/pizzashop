@@ -155,7 +155,7 @@
             <label th:text="${topping.ingredientName + ':'}" th:for="${topping.ingredientName + '-chkbox'}" class="input-box"></label>
           </div>
           <span class="ingredient-data" th:data-ingredient-price="${topping.getCentsPricePer()}"
-                th:data-ingredient-name="${topping.ingredientName}">price</span>
+                th:data-ingredient-name="${topping.ingredientName}" th:data-amount-available="${topping.getCurrentStock()}">price</span>
         </div>
 
         <h4>Extra Toppings:<br>
@@ -169,7 +169,7 @@
             <label th:text="${topping.ingredientName + ':'}" th:for="${'extra-' + topping.ingredientName + '-chkbox'}" class="input-box"></label>
           </div>
           <span class="extra-ingredient-data" th:data-ingredient-price="${topping.getCentsPricePer()}"
-                th:data-ingredient-name="${topping.ingredientName}">price</span>
+                th:data-ingredient-name="${topping.ingredientName}" th:data-amount-available="${topping.getCurrentStock()}">price</span>
         </div>
       </div>
 

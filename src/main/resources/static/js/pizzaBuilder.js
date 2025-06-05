@@ -70,15 +70,24 @@ function setSizePriceSelector() {
 }
 
 function setToppingPriceDisplay(ingredientAmount, priceElements, isExtra) {
-    let ingredientPricePer,ingredientPrice;
+    let ingredientPricePer,ingredientPrice,ingredientAmtAvailable;
+
     priceElements.forEach(el => {
         ingredientPricePer = el.dataset.ingredientPrice;
+        ingredientAmtAvailable = parseInt(el.dataset.amountAvailable);
+        const checkBoxEl = el.parentElement.querySelector('div').querySelector('input[type="checkbox"]')
         if (!isExtra) {
             ingredientPrice = ingredientPricePer * ingredientAmount;
         } else {
             ingredientPrice = ingredientPricePer * (ingredientAmount / 2);
         }
-        el.innerText = displayAsCurrency(ingredientPrice, true);
+        if (ingredientAmount > ingredientAmtAvailable) {
+            el.innerText = "Unavailable"
+            checkBoxEl.disabled = true;
+        } else {
+            el.innerText = displayAsCurrency(ingredientPrice, true);
+            checkBoxEl.disabled = false;
+        }
     });
 }
 
