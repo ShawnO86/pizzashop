@@ -220,7 +220,6 @@ public class MenuItemServiceImpl implements MenuItemService {
 
         for (MenuItemIngredient menuItemIngredient : menuItemIngredients) {
             MenuItem currentMenuItem = menuItemIngredient.getMenuItem();
-            System.out.println(currentMenuItem);
             currentMenuItem.setAmountAvailable(updateMenuItemAmountAvailable(currentMenuItem));
 
             menuItemDAO.update(currentMenuItem);

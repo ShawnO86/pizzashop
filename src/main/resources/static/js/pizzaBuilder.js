@@ -43,17 +43,24 @@ export function displayAsCurrency(amount, isTopping) {
 
 function setSizePriceSelector() {
     const pizzaSizeSelectors = pizzaSizeSelectionContainer.querySelectorAll('input[type="radio"][name="pizzaSizeRadios"]');
-    let sizePriceEl, sizeData;
+    let sizePriceEl, sizeData, amtUnavailable = 0;
     pizzaSizeSelectors.forEach(el => {
         const size = el.dataset.pizzaSize;
         pizzaPriceMap[size]["ingredientAmount"] = el.dataset.ingredientAmount;
         pizzaPriceMap[size]["extraIngredientAmount"] = el.dataset.extraIngredientAmount;
         sizePriceEl = pizzaSizeSelectionContainer.querySelector("." + size);
         sizeData = pizzaPriceMap[size];
-        if (sizeData) {
+        if (sizeData["price"]) {
             sizePriceEl.innerHTML = displayAsCurrency(sizeData.price, false);
         } else {
-            sizePriceEl.innerHTML = "No data";
+            sizePriceEl.innerHTML = "Not available";
+            el.disabled = true;
+            amtUnavailable += 1;
+        }
+        if (amtUnavailable === 3) {
+            const pizzaBuilderBtn = document.getElementById("open-pizza-builder-btn");
+            pizzaBuilderBtn.disabled = true;
+            pizzaBuilderBtn.innerText = "Custom pizza unavailable";
         }
     });
     // sets initial topping prices for small pizza

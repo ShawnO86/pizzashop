@@ -136,6 +136,8 @@ public class MenuItem {
         this.amountAvailable = amountAvailable;
         if (this.amountAvailable < 1) {
             this.isAvailable = false;
+        } else {
+            this.isAvailable = true;
         }
     }
 
