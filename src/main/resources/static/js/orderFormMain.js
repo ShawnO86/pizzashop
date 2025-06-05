@@ -262,6 +262,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
 
             pizzaBuilder.close();
             editingPizza = {};
+            cartContainer.showModal();
         }
     });
 

@@ -57,20 +57,14 @@ document.addEventListener('DOMContentLoaded', ()=> {
 
         eventSource.addEventListener('new-order', (event) => {
             const newOrderMsg = JSON.parse(event.data);
-            console.log('New Order Alert:', newOrderMsg);
-
             orders[newOrderMsg["orderID"]] = newOrderMsg;
             // Display the newOrderMessage to the employees
             appendOrderToUI(orders[newOrderMsg["orderID"]], orderContainer);
-
-            console.log("orders after update: ", orders);
         });
 
         eventSource.addEventListener('order-in-progress', (event) => {
             //remove received order by id key, put into pendingOrders object with completedBy
             const fulfilledOrderMsg = JSON.parse(event.data);
-
-            console.log("order in progress received: ", fulfilledOrderMsg);
             delete orders[fulfilledOrderMsg["orderID"]];
             fulfilled[fulfilledOrderMsg["orderID"]] = fulfilledOrderMsg;
 
@@ -89,8 +83,6 @@ document.addEventListener('DOMContentLoaded', ()=> {
 
         eventSource.addEventListener('cancel-in-progress', (event) => {
             const canceledOrderMsg = JSON.parse(event.data);
-            console.log("cancel in progress order received: ", canceledOrderMsg);
-
             delete fulfilled[canceledOrderMsg["orderID"]];
             orders[canceledOrderMsg["orderID"]] = canceledOrderMsg;
 
@@ -165,7 +157,6 @@ document.addEventListener('DOMContentLoaded', ()=> {
                 const menuItemRecipe = await getMenuItemRecipe(target.dataset.itemId);
                 buildRecipeDisplay(menuItemRecipe, recipeContainer);
                 recipeDialog.showModal();
-                console.log("menu item recipe finished:", menuItemRecipe);
             } catch (e) {
                 console.error("Error during getMenuItemRecipe:", e);
             }
@@ -174,7 +165,6 @@ document.addEventListener('DOMContentLoaded', ()=> {
                 const pizzaItemRecipe = await getCustomPizzaRecipe(target.dataset.itemId);
                 buildRecipeDisplay(pizzaItemRecipe, recipeContainer);
                 recipeDialog.showModal();
-                console.log("pizza item recipe finished:", pizzaItemRecipe);
             } catch (e) {
                 console.error("Error during getCustomPizzaRecipe:", e);
             }

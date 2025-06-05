@@ -118,7 +118,9 @@ export function appendOrderToUI(order, container) {
     userdetailHTML = buildUserDetailHTML(order["userDetail"]);
 
     const orderDateReceived = new Date(order['orderDateTime']);
-    const orderDateFormatted = [orderDateReceived.getMonth() + 1, orderDateReceived.getDate(), orderDateReceived.getHours(), orderDateReceived.getMinutes()]
+    const orderDateFormatted = [
+        orderDateReceived.getMonth() + 1, orderDateReceived.getDate(), orderDateReceived.getHours(), orderDateReceived.getMinutes()
+    ];
 
     orderTemplate.classList.add("order");
     orderTemplate.setAttribute("data-order-id", order['orderID']);
@@ -132,14 +134,13 @@ export function appendOrderToUI(order, container) {
             ${menuItemHTML ? menuItemHTML : ""}
             ${customPizzaHTML ? customPizzaHTML : ""}
             ${userdetailHTML}
-            <div>
-                ${order["employeeName"] === EMPLOYEE_NAME ? `
+            ${order["employeeName"] === EMPLOYEE_NAME ? `
+            <div class="space-between">
                     <button class="complete-btn" data-order-id="${order['orderID']}">Complete Order</button>
-                    <button class="cancel-fulfillment-btn" data-order-id="${order['orderID']}">Cancel In Progress</button>` : ''}
-                ${order["inProgress"] !== true ? `<button class="fulfill-btn" data-order-id="${order['orderID']}">Fulfill Order</button>` : `<p>Being fulfilled by: ${order["employeeName"]}</p>`}
-            </div>
+                    <button class="cancel-fulfillment-btn" data-order-id="${order['orderID']}">Cancel In Progress</button>
+            </div>` : ''}
+            ${order["inProgress"] !== true ? `<button class="fulfill-btn" data-order-id="${order['orderID']}">Fulfill Order</button>` : `<p>Being fulfilled by: ${order["employeeName"]}</p>`}
         </details>
-        <hr>
     `;
 
     container.appendChild(orderTemplate);
