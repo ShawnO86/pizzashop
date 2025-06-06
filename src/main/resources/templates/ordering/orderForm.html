@@ -92,14 +92,12 @@
           <p th:text="${menuItem.description}"></p>
           <p th:text="${#numbers.formatCurrency(menuItem.priceCents / 100.0)}"></p>
 
-
         <div class="space-between">
           <input type="number" placeholder="Qty" min="1" th:max="${menuItem.amountAvailable}" />
           <button class="addMenuItem-btn" th:data-item-name="${menuItem.dishName}"
                   th:data-item-id="${menuItem.id}" th:data-item-price="${menuItem.priceCents}"
                   th:data-item-max="${menuItem.amountAvailable}">Add To Order</button>
         </div>
-
 
         <div th:if="${category.key == 'PIZZA'}">
           <script th:inline="javascript">
@@ -185,8 +183,6 @@
       <strong><sub class="space-between"><span id="pizza-qty-display"></span><span id="pizza-price-total"></span></sub></strong>
     </dialog>
   </section>
-
-
 
 </main>
 

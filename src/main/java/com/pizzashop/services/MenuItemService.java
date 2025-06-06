@@ -22,6 +22,8 @@ public interface MenuItemService {
 
     List<MenuItem> findAllMenuItems();
 
+    List<MenuItem> findRandomMenuItems();
+
     MenuItem findMenuItemByName(String name);
 
     MenuItem findMenuItemById(int id);

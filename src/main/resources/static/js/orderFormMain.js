@@ -23,7 +23,6 @@ document.addEventListener('DOMContentLoaded', ()=> {
     const pizzaBuilder = document.querySelector(".pizza-builder");
     const cartContainer = document.getElementById("cart-container");
 
-    // todo : set check for all error elements.. ids = cart-errors, price-errors, availability-errors
     let cartErrorElement = document.getElementById("cart-errors");
     let availabilityErrorElement = document.getElementById("availability-errors");
     let priceErrorElement = document.getElementById("price-errors");
@@ -42,7 +41,6 @@ document.addEventListener('DOMContentLoaded', ()=> {
 
 // populate cart objects in session with orderDTO if returned with error,
 // cart objects will be overwritten with orderDTO if it's there.
-    // todo: more robust error removal after setTime for each kind or not removing at all just format UI better?.
     if (cartErrorElement || availabilityErrorElement || priceErrorElement) {
         if (cartErrorElement) {
             removeErrorElement(cartErrorElement, 8000);

@@ -4,11 +4,13 @@ import com.pizzashop.dao.*;
 import com.pizzashop.dto.IngredientDTO;
 import com.pizzashop.dto.MenuItemDTO;
 import com.pizzashop.entities.*;
+import com.pizzashop.entities.MenuItem;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.List;
 
 @Service
 public class MenuItemServiceImpl implements MenuItemService {
@@ -98,6 +100,26 @@ public class MenuItemServiceImpl implements MenuItemService {
     @Override
     public List<MenuItem> findAllMenuItems() {
         return menuItemDAO.findAll();
+    }
+
+    @Override
+    public List<MenuItem> findRandomMenuItems() {
+        List<MenuItem> availableMenuItems = menuItemDAO.findAllAvailable();
+        if (availableMenuItems.isEmpty()) {
+            return null;
+        }
+        int ITEM_AMOUNT = 3;
+        if (availableMenuItems.size() <= ITEM_AMOUNT) {
+            return availableMenuItems;
+        }
+
+        List<MenuItem> shuffledMenuItems = new ArrayList<>(availableMenuItems);
+        Collections.shuffle(shuffledMenuItems);
+
+        List<MenuItem> randomMenuItems = shuffledMenuItems.subList(0, ITEM_AMOUNT);
+
+        System.out.println(randomMenuItems);
+        return randomMenuItems;
     }
 
     @Override
