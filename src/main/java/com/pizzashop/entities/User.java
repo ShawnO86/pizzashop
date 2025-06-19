@@ -50,10 +50,6 @@ public class User {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public String getUsername() {
         return username;
     }
@@ -98,10 +94,6 @@ public class User {
         return orders;
     }
 
-    public void setOrders(List<Order> orders) {
-        this.orders = orders;
-    }
-
     public void addRole(Role role) {
         if (this.roles == null) {
             this.roles = new ArrayList<>();
@@ -109,14 +101,6 @@ public class User {
         if (!this.roles.contains(role)) {
             this.roles.add(role);
         }
-    }
-
-    public void addOrder(Order order) {
-        if (this.orders == null) {
-            this.orders = new ArrayList<>();
-        }
-        this.orders.add(order);
-        order.setUser(this);
     }
 
     @Override

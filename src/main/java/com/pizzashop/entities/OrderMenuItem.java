@@ -35,16 +35,8 @@ public class OrderMenuItem {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public Order getOrder() {
         return order;
-    }
-
-    public void setOrder(Order order) {
-        this.order = order;
     }
 
     public MenuItem getMenuItem() {

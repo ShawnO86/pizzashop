@@ -230,7 +230,6 @@ public class MenuItemServiceImpl implements MenuItemService {
         menuItem.setPriceCents(cost * menuItem.getMarkupMultiplier());
     }
 
-    @Override
     @Transactional
     public void updateAllMenuItemsAmountAvailableByIngredient(Ingredient ingredient) {
         List<MenuItemIngredient> menuItemIngredients = ingredient.getMenuItemIngredients();
@@ -268,7 +267,6 @@ public class MenuItemServiceImpl implements MenuItemService {
         return ingredientIdsQty;
     }
 
-    @Override
     public int updateMenuItemAmountAvailable(MenuItem menuItem) {
         int lowestInventoryAvailable = Integer.MAX_VALUE;
         List<MenuItemIngredient> menuItemIngredients = menuItem.getMenuItemIngredients();
@@ -288,7 +286,7 @@ public class MenuItemServiceImpl implements MenuItemService {
     }
 
     @Override
-    public int updateMenuItemAmountAvailableWithIngredients(MenuItem menuItem, List<MenuItemIngredient> ingredients) {
+    public int updateMenuItemAmountAvailableWithIngredients(List<MenuItemIngredient> ingredients) {
         int lowestInventoryAvailable = Integer.MAX_VALUE;
 
         for (MenuItemIngredient menuItemIngredient : ingredients) {

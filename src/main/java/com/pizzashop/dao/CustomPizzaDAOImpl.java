@@ -20,17 +20,6 @@ public class CustomPizzaDAOImpl implements CustomPizzaDAO {
     }
 
     @Override
-    public CustomPizza findById(int id) {
-        TypedQuery<CustomPizza> query = em.createQuery("FROM CustomPizza c WHERE c.id = :id", CustomPizza.class);
-        query.setParameter("id", id);
-        try {
-            return query.getSingleResult();
-        } catch (NoResultException e) {
-            return null;
-        }
-    }
-
-    @Override
     public CustomPizza findByIdJoinFetchIngredients(int id) {
         TypedQuery<CustomPizza> query = em.createQuery("FROM CustomPizza c " +
                 "JOIN FETCH c.customPizzaIngredients cpi JOIN FETCH cpi.ingredient " +

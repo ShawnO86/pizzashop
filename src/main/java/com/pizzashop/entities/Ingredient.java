@@ -50,10 +50,6 @@ public class Ingredient {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public String getIngredientName() {
         return ingredientName;
     }
@@ -104,18 +100,6 @@ public class Ingredient {
 
     public List<MenuItemIngredient> getMenuItemIngredients() {
         return menuItemIngredients;
-    }
-
-    public void setMenuItemIngredients(List<MenuItemIngredient> menuItemIngredients) {
-        this.menuItemIngredients = menuItemIngredients;
-    }
-
-    public List<CustomPizzaIngredient> getCustomPizzaIngredients() {
-        return customPizzaIngredients;
-    }
-
-    public void setCustomPizzaIngredients(List<CustomPizzaIngredient> customPizzaIngredients) {
-        this.customPizzaIngredients = customPizzaIngredients;
     }
 
 

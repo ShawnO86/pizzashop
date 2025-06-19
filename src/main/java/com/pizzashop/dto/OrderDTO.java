@@ -10,7 +10,6 @@ public class OrderDTO {
     private List<CustomPizzaDTO> customPizzaList;
     private int totalPrice;
     private int totalCost;
-    private int totalProfit;
     private Integer orderID;
     private LocalDateTime orderDateTime;
     private boolean inProgress;

@@ -33,32 +33,16 @@ public class MenuItemIngredient {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public MenuItem getMenuItem() {
         return menuItem;
-    }
-
-    public void setMenuItem(MenuItem menuItem) {
-        this.menuItem = menuItem;
     }
 
     public Ingredient getIngredient() {
         return ingredient;
     }
 
-    public void setIngredient(Ingredient ingredient) {
-        this.ingredient = ingredient;
-    }
-
     public int getQuantityUsed() {
         return quantityUsed;
-    }
-
-    public void setQuantityUsed(int quantityUsed) {
-        this.quantityUsed = quantityUsed;
     }
 
     @Override

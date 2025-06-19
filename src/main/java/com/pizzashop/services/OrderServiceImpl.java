@@ -176,11 +176,8 @@ public class OrderServiceImpl implements OrderService {
         List<Ingredient> ingredients = ingredientDAO.findAllInJoinFetchMenuItemIngredients(ingredientIDs);
         Set<MenuItem> affectedMenuItems = new HashSet<>();
         Map<Integer, List<MenuItemIngredient>> menuItemIngredientsByMenuItemId = new HashMap<>();
-        System.out.println("*** Ingredient ID Amounts: " + ingredientIdAmounts);
-        System.out.println("*** Affected Ingredients: " + ingredients);
         for (Ingredient ingredient : ingredients) {
             // set ingredient stock to reduced amount found in ingredientIdAmounts
-            System.out.println("reducing stock for: " + ingredient);
             ingredient.setCurrentStock(ingredientIdAmounts.get(ingredient.getId()));
             List<MenuItemIngredient> menuItemIngredients = ingredient.getMenuItemIngredients();
             for (MenuItemIngredient menuItemIngredient : menuItemIngredients) {
@@ -194,8 +191,7 @@ public class OrderServiceImpl implements OrderService {
 
         if (!affectedMenuItems.isEmpty()) {
             for (MenuItem menuItem : affectedMenuItems) {
-                System.out.println("updating amount available for: " + menuItem);
-                int newAmtAvailable = menuItemService.updateMenuItemAmountAvailableWithIngredients(menuItem, menuItemIngredientsByMenuItemId.get(menuItem.getId()));
+                int newAmtAvailable = menuItemService.updateMenuItemAmountAvailableWithIngredients(menuItemIngredientsByMenuItemId.get(menuItem.getId()));
                 if (newAmtAvailable != menuItem.getAmountAvailable()) {
                     menuItem.setAmountAvailable(newAmtAvailable);
                     menuItemDAO.update(menuItem);

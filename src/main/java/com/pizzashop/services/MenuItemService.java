@@ -34,13 +34,9 @@ public interface MenuItemService {
 
     List<OrderMenuItem> deleteMenuItem(int menuItemId);
 
-    void updateAllMenuItemsAmountAvailableByIngredient(Ingredient ingredient);
-
     List<String[]> buildRecipeByMenuItemId(int id);
 
     List<int[]> buildIngredientIdAmounts(Integer[] ingredientIdsAmountsKeys, Integer[] ingredientIdAmountValues);
 
-    int updateMenuItemAmountAvailable(MenuItem menuItem);
-
-    int updateMenuItemAmountAvailableWithIngredients(MenuItem menuItem, List<MenuItemIngredient> ingredients);
+    int updateMenuItemAmountAvailableWithIngredients(List<MenuItemIngredient> ingredients);
 }

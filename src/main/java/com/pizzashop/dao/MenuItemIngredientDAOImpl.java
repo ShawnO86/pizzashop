@@ -18,12 +18,6 @@ public class MenuItemIngredientDAOImpl implements MenuItemIngredientDAO {
     }
 
     @Override
-    public List<MenuItemIngredient> findAll() {
-        TypedQuery<MenuItemIngredient> query = em.createQuery("FROM MenuItemIngredient", MenuItemIngredient.class);
-        return query.getResultList();
-    }
-
-    @Override
     public List<MenuItemIngredient> findAllByIngredientId(Integer ingredientId) {
         TypedQuery<MenuItemIngredient> query = em.createQuery("FROM MenuItemIngredient m WHERE m.ingredient.id = :ingredientId", MenuItemIngredient.class);
         query.setParameter("ingredientId", ingredientId);
@@ -35,11 +29,6 @@ public class MenuItemIngredientDAOImpl implements MenuItemIngredientDAO {
         TypedQuery<MenuItemIngredient> query = em.createQuery("SELECT Mii FROM MenuItemIngredient Mii " +
                 "JOIN FETCH Mii.menuItem JOIN FETCH Mii.ingredient", MenuItemIngredient.class);
         return query.getResultList();
-    }
-
-    @Override
-    public MenuItemIngredient findById(Integer id) {
-        return em.find(MenuItemIngredient.class, id);
     }
 
     @Override

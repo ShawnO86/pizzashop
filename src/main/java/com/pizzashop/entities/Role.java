@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 public class Role {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int id;
 
@@ -22,10 +23,6 @@ public class Role {
 
     public int getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public RoleEnum getRole() {

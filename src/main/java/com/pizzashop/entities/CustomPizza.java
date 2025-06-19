@@ -38,10 +38,6 @@ public class CustomPizza {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public String getName() {
         return name;
     }
@@ -52,10 +48,6 @@ public class CustomPizza {
 
     public PizzaSizeEnum getSize() {
         return size;
-    }
-
-    public void setSize(PizzaSizeEnum size) {
-        this.size = size;
     }
 
     public int getPriceCents() {

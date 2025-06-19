@@ -60,10 +60,6 @@ public class MenuItem {
         return id;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
     public String getDishName() {
         return dishName;
     }
@@ -112,20 +108,8 @@ public class MenuItem {
         this.isAvailable = isAvailable;
     }
 
-    public List<OrderMenuItem> getOrderMenuItems() {
-        return orderMenuItems;
-    }
-
-    public void setOrderMenuItems(List<OrderMenuItem> orderMenuItems) {
-        this.orderMenuItems = orderMenuItems;
-    }
-
     public List<MenuItemIngredient> getMenuItemIngredients() {
         return menuItemIngredients;
-    }
-
-    public void setMenuItemIngredients(List<MenuItemIngredient> menuItemIngredients) {
-        this.menuItemIngredients = menuItemIngredients;
     }
 
     public int getAmountAvailable() {

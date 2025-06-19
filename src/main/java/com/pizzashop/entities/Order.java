@@ -3,7 +3,6 @@ package com.pizzashop.entities;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -56,10 +55,6 @@ public class Order {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public User getUser() {
         return user;
     }
@@ -70,10 +65,6 @@ public class Order {
 
     public LocalDateTime getOrder_date() {
         return order_date;
-    }
-
-    public void setOrder_date(LocalDateTime order_date) {
-        this.order_date = order_date;
     }
 
     public int getFinal_price_cents() {
@@ -116,12 +107,6 @@ public class Order {
         this.orderMenuItems = orderMenuItems;
     }
 
-    public void addMenuItem(OrderMenuItem orderMenuItem) {
-        if (orderMenuItems == null) {
-            orderMenuItems = new ArrayList<>();
-        }
-        this.orderMenuItems.add(orderMenuItem);
-    }
 
     @Override
     public String toString() {

@@ -32,44 +32,16 @@ public class CustomPizzaIngredient {
         this.isExtra = isExtra;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public CustomPizza getMenuItem() {
-        return customPizza;
-    }
-
-    public void setMenuItem(CustomPizza customPizza) {
-        this.customPizza = customPizza;
-    }
-
     public Ingredient getIngredient() {
         return ingredient;
-    }
-
-    public void setIngredient(Ingredient ingredient) {
-        this.ingredient = ingredient;
     }
 
     public int getQuantityUsed() {
         return quantityUsed;
     }
 
-    public void setQuantityUsed(int quantityUsed) {
-        this.quantityUsed = quantityUsed;
-    }
-
     public boolean getIsExtra() {
         return isExtra;
-    }
-
-    public void setIsExtra(boolean isExtra) {
-        this.isExtra = isExtra;
     }
 
     public void setQuantityUsedBySize(PizzaSizeEnum size) {
