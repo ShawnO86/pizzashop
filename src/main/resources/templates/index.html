@@ -1,20 +1,64 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns="http://www.w3.org/1999/html">
 <head th:replace="~{/common-head :: common_html_head(${pageTitle}, ${additionalStyles})}"></head>
 
 <body>
 
 <header th:insert="~{header :: head(${heading}, ${secondaryHeading})}"></header>
 
-<main>
-  <section sec:authorize="isAuthenticated()">
-    <h3 class="no-top-margin">Welcome
-    <span sec:authentication="principal.username"></span>!
-    </h3>
+<main id="home-page-layout">
+
+  <section id="specials-container">
+    <div id="specials-container-welcome">
+      <h1 class="no-top-margin" sec:authorize="isAuthenticated()">
+        Welcome, <span sec:authentication="principal.username"></span>
+      </h1>
+      <h1 class="no-top-margin" sec:authorize="isAnonymous()">Log-in to order online.</h1>
+
+      <div id="specials-image"></div>
+    </div>
+
+    <div id="specials-container-menu">
+      <h2 class="no-top-margin" id="specials-heading">
+        Your Special Selections
+      </h2>
+      <div id="specials-menu-items" >
+        <div>
+          <div th:if="${specials != null}" th:each="special : ${specials}">
+            <strong class="space-between-dashed strong-item">
+              <span th:text="${special.dishName}"></span><span th:text="${#numbers.formatCurrency(special.priceCents / 100.0)}"></span>
+            </strong>
+            <p th:text="${special.description}" class="no-top-margin"></p>
+          </div>
+          <div th:if="${specials == null}">
+            <p>No current specials</p>
+          </div>
+        </div>
+        <a th:href="@{/order/showMenu}" sec:authorize="isAuthenticated()" class="cta-btn">Order Online</a>
+        <a th:href="@{/order/showMenu}" sec:authorize="isAnonymous()" class="cta-btn">Full Menu</a>
+      </div>
+
+    </div>
+
   </section>
 
-  <section>
-    <a th:href="@{/order/showMenu(openPizzaBuilder=true)}">Pizza Builder</a>
+  <section id="custom-pizza-cta-container">
+    <div id="custom-pizza-cta">
+      <h3 class="no-top-margin">Customize Your Pizza</h3>
+      <p class="space-between-dashed strong-item"><span>Starting at</span> <span th:text="${#numbers.formatCurrency(smallPizzaPrice.priceCents / 100.0)}"></span></p>
+      <div id="pizza-builder-image"></div>
+      <a th:href="@{/order/showMenu(openPizzaBuilder=true)}" class="cta-btn" id="pizza-builder-cta-btn">Pizza Builder</a>
+    </div>
+    <div id="hours-info">
+      <p class="hours-heading">PHONE</p>
+      <p class="strong-item">(123)456-7890</p>
+      <p class="hours-heading">HOURS OF OPERATION</p>
+      <p class="strong-item">M-F: 11AM -- 9PM</p>
+      <p class="strong-item">SAT: 11AM -- 1AM</p>
+      <p class="strong-item">Closed Sunday</p>
+    </div>
+
   </section>
 
 </main>

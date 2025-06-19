@@ -1,0 +1,164 @@
+#home-page-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 2vw;
+}
+
+.cta-btn {
+    padding: clamp(0.25rem, 2vw, 0.5rem);
+    border-radius: 0.5rem;
+    border: 1px solid var(--light-transparent);
+    max-height: 2.25rem;
+    color: var(--bg_2);
+    background-color: var(--light-transparent2);
+    font-weight: bold;
+    text-decoration: none;
+    align-self: flex-end;
+    transition: background-color 200ms ease;
+}
+
+.cta-btn:hover {
+    border: 1px solid var(--bg_4);
+    background-color: var(--light-transparent);
+    color: var(--dark-text);
+    transition: background-color 200ms ease;
+}
+
+#specials-container, #custom-pizza-cta-container {
+    margin: 0 2vw;
+    border-radius: 0.5rem;
+    color: var(--light-text);
+}
+
+#specials-container {
+    background-color: var(--bg_3);
+    display: flex;
+    justify-content: space-between;
+    gap: 2vw;
+    padding: 2vw;
+    height: fit-content;
+}
+
+#specials-container-menu, #specials-container-welcome {
+    flex: 50%;
+    display: flex;
+    flex-direction: column;
+}
+
+#specials-container-welcome {
+    justify-content: flex-start;
+}
+
+#specials-heading, #specials-container-welcome h1 {
+    font-family: Aclonica, sans-serif;
+}
+
+#specials-heading {
+    text-align: right;
+}
+
+#specials-image {
+    background-image: url("../images/Pasta_1.jpg");
+}
+
+#pizza-builder-image {
+    background-image: url("../images/cheese_stretch_pizza.jpg");
+}
+
+#specials-image, #pizza-builder-image {
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    border-radius: 0.5rem;
+    flex: 1;
+}
+
+#specials-menu-items, #custom-pizza-cta-container {
+    display: flex;
+    justify-content: space-between;
+    border-radius: 0.5rem;
+    gap: 2vw;
+    height: 100%;
+}
+
+#specials-menu-items {
+    flex-direction: column;
+    padding: 2vw;
+}
+
+#specials-menu-items div {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.strong-item {
+    font-family: Aclonica, sans-serif;
+    padding-top: 0.5rem;
+    font-weight: 500;
+}
+
+#custom-pizza-cta-container {
+    margin-bottom: 2vw;
+}
+
+#custom-pizza-cta, #hours-info {
+    border-radius: 0.5rem;
+    flex: 50%;
+    padding: 2vw;
+}
+
+#custom-pizza-cta {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    background-color: var(--bg_1);
+}
+
+#pizza-builder-cta-btn {
+    margin-top: 1rem;
+}
+
+#custom-pizza-cta h3 {
+    font-family: Aclonica, sans-serif;
+}
+
+#hours-info {
+    background-color: var(--bg_4);
+    color: var(--dark-text);
+    text-align: center;
+}
+
+@media screen and (max-width: 768px) {
+    #specials-heading {
+        text-align: left;
+    }
+
+    #specials-container {
+        padding: 1vw;
+    }
+
+    #custom-pizza-cta-container {
+        padding: 0;
+    }
+
+    #specials-container, #custom-pizza-cta-container {
+        flex-direction: column;
+        margin: 0;
+        border-radius: 0;
+    }
+
+    #specials-menu-items {
+        padding: 0;
+        background-color: var(--bg_3);
+    }
+
+    #specials-image {
+        border-radius: 0;
+        min-height: 10rem;
+    }
+
+    #custom-pizza-cta, #hours-info {
+        border-radius: 0;
+    }
+}

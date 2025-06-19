@@ -63,8 +63,7 @@
           <input type="button" id="cart-submit-btn" value="Submit Order" sec:authorize="hasRole('ROLE_CUSTOMER')"/>
 
           <p sec:authorize="isAnonymous()" class="error">
-            <span>You may continue creating this order, to place it you must</span>
-            <span><a th:href="@{/login}">log-in</a> or call us at 123-456-7890.</span>
+            Please <a th:href="@{/login}">log in</a> or call us at (123)456-7890 to place this order.
           </p>
         </div>
       </form>
