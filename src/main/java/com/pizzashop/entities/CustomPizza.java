@@ -2,7 +2,6 @@ package com.pizzashop.entities;
 
 import jakarta.persistence.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -61,10 +60,6 @@ public class CustomPizza {
 
     public int getPriceCents() {
         return priceCents;
-    }
-
-    public void setPriceCents(int priceCents) {
-        this.priceCents = priceCents;
     }
 
     public List<CustomPizzaIngredient> getCustomPizzaIngredients() {

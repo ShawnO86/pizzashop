@@ -1,7 +1,6 @@
 package com.pizzashop.dao;
 
 import com.pizzashop.entities.CustomPizzaIngredient;
-import com.pizzashop.entities.MenuItemIngredient;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +10,7 @@ import java.util.List;
 
 @Repository
 public class CustomPizzaIngredientDAOImpl implements CustomPizzaIngredientDAO {
-    EntityManager em;
+    final EntityManager em;
 
     @Autowired
     public CustomPizzaIngredientDAOImpl(EntityManager em) {

@@ -20,7 +20,7 @@ import java.util.List;
 @RequestMapping("/system/changeMenu")
 public class MenuItemController {
 
-    MenuItemService menuItemService;
+    final MenuItemService menuItemService;
 
     @Autowired
     public MenuItemController(MenuItemService menuItemService) {

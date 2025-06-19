@@ -10,7 +10,7 @@ import java.util.List;
 
 @Repository
 public class OrderMenuItemDAOImpl implements OrderMenuItemDAO {
-    EntityManager em;
+    final EntityManager em;
 
     @Autowired
     public OrderMenuItemDAOImpl(EntityManager em) {

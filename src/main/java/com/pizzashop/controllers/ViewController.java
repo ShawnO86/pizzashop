@@ -13,7 +13,7 @@ import java.util.List;
 @Controller
 public class ViewController {
 
-    MenuItemService menuItemService;
+    final MenuItemService menuItemService;
 
     @Autowired
     public ViewController(MenuItemService menuItemService) {

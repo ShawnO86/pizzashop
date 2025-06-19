@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public class MenuItemIngredientDAOImpl implements MenuItemIngredientDAO {
 
-    EntityManager em;
+    final EntityManager em;
 
     public MenuItemIngredientDAOImpl(EntityManager em) {
         this.em = em;

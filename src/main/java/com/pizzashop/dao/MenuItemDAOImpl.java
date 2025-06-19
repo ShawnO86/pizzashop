@@ -13,7 +13,7 @@ import java.util.List;
 
 @Repository
 public class MenuItemDAOImpl implements MenuItemDAO {
-    EntityManager em;
+    final EntityManager em;
 
     @Autowired
     public MenuItemDAOImpl(EntityManager em) {

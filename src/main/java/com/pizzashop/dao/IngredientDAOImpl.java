@@ -13,7 +13,7 @@ import java.util.List;
 
 @Repository
 public class IngredientDAOImpl implements IngredientDAO {
-    EntityManager em;
+    final EntityManager em;
 
     @Autowired
     public IngredientDAOImpl(EntityManager em) {

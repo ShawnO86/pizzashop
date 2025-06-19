@@ -12,7 +12,7 @@ import java.util.List;
 
 @Repository
 public class CustomPizzaDAOImpl implements CustomPizzaDAO {
-    EntityManager em;
+    final EntityManager em;
 
     @Autowired
     public CustomPizzaDAOImpl(EntityManager em) {

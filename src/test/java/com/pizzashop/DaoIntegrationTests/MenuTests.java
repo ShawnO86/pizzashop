@@ -2,6 +2,8 @@ package com.pizzashop.DaoIntegrationTests;
 
 import com.pizzashop.config.SecConfig;
 import com.pizzashop.controllers.ManagementController;
+import com.pizzashop.controllers.OrderController;
+import com.pizzashop.controllers.OrderNotificationController;
 import com.pizzashop.controllers.RegistrationController;
 import com.pizzashop.dao.IngredientDAO;
 import com.pizzashop.dao.MenuItemDAO;
@@ -14,7 +16,6 @@ import com.pizzashop.services.MenuItemService;
 import com.pizzashop.services.OrderService;
 import com.pizzashop.services.UserRegistrationService;
 import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +43,9 @@ import static org.junit.jupiter.api.Assertions.*;
                 UserRegistrationService.class,
                 RegistrationController.class,
                 SecConfig.class,
-                ManagementController.class
+                ManagementController.class,
+                OrderController.class,
+                OrderNotificationController.class
         })
 )
 

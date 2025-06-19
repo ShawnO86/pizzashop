@@ -14,7 +14,7 @@ import java.util.List;
 
 @Repository
 public class OrderDAOImpl implements OrderDAO {
-    EntityManager em;
+    final EntityManager em;
 
     public OrderDAOImpl(EntityManager em) {
         this.em = em;

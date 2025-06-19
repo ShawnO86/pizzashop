@@ -2,7 +2,6 @@ package com.pizzashop.controllers;
 
 import com.pizzashop.dto.IngredientDTO;
 import com.pizzashop.entities.Ingredient;
-import com.pizzashop.entities.MenuItemIngredient;
 import com.pizzashop.services.MenuItemService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,15 +12,13 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 @Controller
 @RequestMapping("/system/inventory")
 public class InventoryController {
 
-    MenuItemService menuItemService;
+    final MenuItemService menuItemService;
 
     @Autowired
     public InventoryController(MenuItemService menuItemService) {
@@ -41,7 +38,7 @@ public class InventoryController {
         model.addAttribute("heading", "Inventory Management");
         model.addAttribute("secondaryHeading", "");
         model.addAttribute("pageTitle", "Inventory Management");
-        model.addAttribute("additionalStyles", Arrays.asList("/styles/tables.css"));
+        model.addAttribute("additionalStyles", List.of("/styles/tables.css"));
 
         return "management/showInventory";
     }
@@ -49,7 +46,7 @@ public class InventoryController {
     //shows add/update inventory form depending on ingredientId
     @GetMapping("/addInventory")
     public String showAddInventoryForm(Model model, @RequestParam(value = "ingredientId", required = false) Integer ingredientId) {
-        model.addAttribute("additionalStyles", Arrays.asList("/styles/forms.css"));
+        model.addAttribute("additionalStyles", List.of("/styles/forms.css"));
         model.addAttribute("heading", "Inventory Management");
         model.addAttribute("secondaryHeading", "");
         model.addAttribute("pageTitle", "Inventory Management");
@@ -100,7 +97,7 @@ public class InventoryController {
             return "redirect:/system/inventory/showInventory";
         } else {
 
-            model.addAttribute("additionalStyles", Arrays.asList("/styles/forms.css"));
+            model.addAttribute("additionalStyles", List.of("/styles/forms.css"));
             model.addAttribute("heading", "Inventory Management");
             model.addAttribute("secondaryHeading", "");
             model.addAttribute("pageTitle", "Inventory Management");

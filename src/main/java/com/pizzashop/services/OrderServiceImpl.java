@@ -578,7 +578,6 @@ public class OrderServiceImpl implements OrderService {
     private int validatePizzaDTOPrices(List<CustomPizzaDTO> customPizzaDTOs) {
         int totalPrice = 0;
         for (CustomPizzaDTO customPizzaDTO : customPizzaDTOs) {
-            int pizzaPrice = 0;
             List<ToppingDTO> toppings = customPizzaDTO.getToppings();
             List<Integer> toppingIds = new ArrayList<>();
             if (toppings != null && !toppings.isEmpty()) {
@@ -612,7 +611,7 @@ public class OrderServiceImpl implements OrderService {
                 return 0;
             }
 
-            pizzaPrice = basePizza.getPriceCents();
+            int pizzaPrice = basePizza.getPriceCents();
 
             for (Ingredient ingredient : toppingIngredients) {
                 pizzaPrice += ingredient.getCentsPricePer() * toppingAmount;
