@@ -116,10 +116,7 @@ public class MenuItemServiceImpl implements MenuItemService {
         List<MenuItem> shuffledMenuItems = new ArrayList<>(availableMenuItems);
         Collections.shuffle(shuffledMenuItems);
 
-        List<MenuItem> randomMenuItems = shuffledMenuItems.subList(0, ITEM_AMOUNT);
-
-        System.out.println(randomMenuItems);
-        return randomMenuItems;
+        return shuffledMenuItems.subList(0, ITEM_AMOUNT);
     }
 
     @Override
