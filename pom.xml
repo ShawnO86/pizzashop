@@ -5,12 +5,12 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.3</version>
+        <version>3.4.7</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.pizzashop</groupId>
     <artifactId>PizzaShop</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0</version>
     <name>PizzaShop</name>
     <description>PizzaShop</description>
     <url/>
@@ -75,6 +75,7 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
+
         </dependency>
         <dependency>
             <groupId>junit</groupId>
