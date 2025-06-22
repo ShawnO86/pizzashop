@@ -1,17 +1,21 @@
 package com.pizzashop.config;
 
+import com.pizzashop.dao.UserDAO;
 import com.pizzashop.dto.IngredientDTO;
 import com.pizzashop.dto.MenuItemDTO;
 import com.pizzashop.dto.UserRegisterDTO;
 import com.pizzashop.entities.MenuCategoryEnum;
 import com.pizzashop.entities.PizzaSizeEnum;
 import com.pizzashop.entities.RoleEnum;
+import com.pizzashop.entities.User;
 import com.pizzashop.services.MenuItemService;
 import com.pizzashop.services.UserRegistrationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -24,11 +28,18 @@ public class AppRunner implements CommandLineRunner {
 
     private final MenuItemService menuItemService;
     private final UserRegistrationService userRegistrationService;
+    private final UserDAO userDAO;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    @Value("${INITIAL_ADMIN_PASS}") private String initialPass;
 
     @Autowired
-    public AppRunner(MenuItemService menuItemService, UserRegistrationService userRegistrationService) {
+    public AppRunner(MenuItemService menuItemService, UserRegistrationService userRegistrationService, UserDAO userDAO,
+                     BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.menuItemService = menuItemService;
         this.userRegistrationService = userRegistrationService;
+        this.userDAO = userDAO;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
     @Override
@@ -39,16 +50,17 @@ public class AppRunner implements CommandLineRunner {
 
     private void initializeDatabase() {
         logger.info("Initializing database...");
+        User foundAdmin = userDAO.findByUsername("pizzashop");
 
-        if (userRegistrationService.findByUserName("pizzashop").isEmpty()) {
-            logger.info("Inserting initial admin user...");
-            UserRegisterDTO initialAdmin = new UserRegisterDTO(
-                    "pizzashop", "Shawn", "Osborne",
-                    "fakeEmail@gmail.com", "(123)456-7890",
-                    "123 Main St.", "PizzaTown", "ST"
-            );
-            initialAdmin.setPassword("admin123");
+        if (foundAdmin == null) {
+            logger.info("Admin not found! Inserting admin user pizzashop with default values...");
+            UserRegisterDTO initialAdmin = this.setInitialAdmin();
             userRegistrationService.save(initialAdmin, RoleEnum.ROLE_MANAGER.name());
+        } else if (!foundAdmin.isActive() || !bCryptPasswordEncoder.encode(initialPass).equals(foundAdmin.getPassword())) {
+            logger.info("Admin deactivated or password has changed! Activating admin user pizzashop with default values...");
+            UserRegisterDTO initialAdmin = this.setInitialAdmin();
+            userRegistrationService.update(initialAdmin, foundAdmin.getId(), RoleEnum.ROLE_MANAGER.name());
+            userDAO.activateUser(foundAdmin.getId());
         }
 
         if (menuItemService.findMenuItemByName(PizzaSizeEnum.SMALL.getPizzaName()) == null) {
@@ -121,5 +133,16 @@ public class AppRunner implements CommandLineRunner {
         }
 
         logger.info("Database initialization complete...");
+    }
+
+    private UserRegisterDTO setInitialAdmin() {
+        UserRegisterDTO initialAdmin = new UserRegisterDTO(
+                "pizzashop", "Shawn", "Osborne",
+                "fakeEmail@gmail.com", "(123)456-7890",
+                "123 Main St.", "PizzaTown", "ST"
+        );
+        initialAdmin.setPassword(initialPass);
+
+        return initialAdmin;
     }
 }
