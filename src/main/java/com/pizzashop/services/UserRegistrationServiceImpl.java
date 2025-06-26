@@ -122,7 +122,7 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
                 List<Role> roles = roleDAO.findAll();
                 user.setRoles(roles);
                 break;
-            default:
+            case "ROLE_CUSTOMER":
                 customer = roleDAO.findByRole(RoleEnum.ROLE_CUSTOMER);
                 user.addRole(customer);
                 break;
