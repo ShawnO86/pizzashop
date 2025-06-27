@@ -52,11 +52,13 @@ public class AppRunner implements CommandLineRunner {
         logger.info("Initializing database...");
         User foundAdmin = userDAO.findByUsername("pizzashop");
 
+
+
         if (foundAdmin == null) {
             logger.info("Admin not found! Inserting admin user pizzashop with default values...");
             UserRegisterDTO initialAdmin = this.setInitialAdmin();
             userRegistrationService.save(initialAdmin, RoleEnum.ROLE_MANAGER.name());
-        } else if (!foundAdmin.isActive() || !bCryptPasswordEncoder.encode(initialPass).equals(foundAdmin.getPassword())) {
+        } else if (!foundAdmin.isActive() || !bCryptPasswordEncoder.matches(initialPass, foundAdmin.getPassword())) {
             logger.info("Admin deactivated or password has changed! Activating admin user pizzashop with default values...");
             UserRegisterDTO initialAdmin = this.setInitialAdmin();
             userRegistrationService.update(initialAdmin, foundAdmin.getId(), RoleEnum.ROLE_MANAGER.name());
