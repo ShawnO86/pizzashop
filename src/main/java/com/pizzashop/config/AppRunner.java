@@ -1,15 +1,14 @@
 package com.pizzashop.config;
 
 import com.pizzashop.dao.UserDAO;
+import com.pizzashop.dao.RoleDAO;
 import com.pizzashop.dto.IngredientDTO;
 import com.pizzashop.dto.MenuItemDTO;
 import com.pizzashop.dto.UserRegisterDTO;
-import com.pizzashop.entities.MenuCategoryEnum;
-import com.pizzashop.entities.PizzaSizeEnum;
-import com.pizzashop.entities.RoleEnum;
-import com.pizzashop.entities.User;
+import com.pizzashop.entities.*;
 import com.pizzashop.services.MenuItemService;
 import com.pizzashop.services.UserRegistrationService;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,29 +28,52 @@ public class AppRunner implements CommandLineRunner {
     private final MenuItemService menuItemService;
     private final UserRegistrationService userRegistrationService;
     private final UserDAO userDAO;
+    private final RoleDAO roleDAO;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Value("${INITIAL_ADMIN_PASS}") private String initialPass;
 
     @Autowired
     public AppRunner(MenuItemService menuItemService, UserRegistrationService userRegistrationService, UserDAO userDAO,
-                     BCryptPasswordEncoder bCryptPasswordEncoder) {
+                     RoleDAO roleDAO, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.menuItemService = menuItemService;
         this.userRegistrationService = userRegistrationService;
         this.userDAO = userDAO;
+        this.roleDAO = roleDAO;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
     @Override
+    @Transactional
     public void run(String... args) {
         logger.info("Welcome to Pizza Shop!");
         this.initializeDatabase();
     }
 
-    private void initializeDatabase() {
+    @Transactional
+    protected void initializeDatabase() {
         logger.info("Initializing database...");
         User foundAdmin = userDAO.findByUsername("pizzashop");
+        List<Role> roles = roleDAO.findAll();
 
+        logger.info("Roles found: {}", roles);
+
+        if (roles.size() != 3) {
+            logger.info("Adding roles to database...");
+            roleDAO.deleteAll();
+
+            Role customerRole = new Role();
+            customerRole.setRole(RoleEnum.ROLE_CUSTOMER);
+            roleDAO.save(customerRole);
+
+            Role employeeRole = new Role();
+            employeeRole.setRole(RoleEnum.ROLE_EMPLOYEE);
+            roleDAO.save(employeeRole);
+
+            Role adminRole = new Role();
+            adminRole.setRole(RoleEnum.ROLE_MANAGER);
+            roleDAO.save(adminRole);
+        }
 
 
         if (foundAdmin == null) {

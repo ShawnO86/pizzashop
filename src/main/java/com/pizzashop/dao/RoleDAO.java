@@ -6,7 +6,12 @@ import com.pizzashop.entities.RoleEnum;
 import java.util.List;
 
 public interface RoleDAO {
+
     Role findByRole(RoleEnum role);
 
     List<Role> findAll();
+
+    void save(Role role);
+
+    void deleteAll();
 }
