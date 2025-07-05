@@ -48,6 +48,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
             // if not manually closed, close stream and attempt to reconnect.
             if (!isClosed) {
                 eventSource.close();
+                connectionStatus.innerText = "Disconnected";
                 console.error(error, "Attempting reconnect in 3 seconds...");
                 setTimeout(connect, 3000);
             } else {

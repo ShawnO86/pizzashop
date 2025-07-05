@@ -119,7 +119,6 @@ export function appendOrderToUI(order, container) {
 
     const orderDateReceived = new Date(order['orderDateTime']);
     const orderDateFormatted = orderDateReceived.toLocaleString("en-US", {
-        timeZone: "UTC",
         day: "2-digit",
         month: "2-digit",
         hour: "numeric",
