@@ -145,17 +145,13 @@ public class OrderNotificationController {
 
     @PostMapping("/setInProgress")
     public ResponseEntity<String> setPendingOrder(@RequestParam("orderId") int orderId, @RequestParam("employeeName") String employeeName) {
-        //System.out.println("request received, orderId: " + orderId + ", employeeName: " + employeeName);
         Order order = orderDAO.findByIdJoinFetchUserDetails(orderId);
         if (order == null) {
-            System.out.println("Order not found");
             return new ResponseEntity<>("Order not found", HttpStatus.NOT_FOUND);
         } else if (order.getIn_progress()) {
-            System.out.println("Order already in progress");
             notifyOrderInProgress(orderService.convertOrderToDTO(order, true));
             return new ResponseEntity<>("Order already in progress", HttpStatus.CONFLICT);
         } else if (order.getIs_complete()) {
-            System.out.println("Order already completed");
             notifyOrderComplete(orderId);
             return new ResponseEntity<>("Order already completed", HttpStatus.CONFLICT);
         }
@@ -174,7 +170,6 @@ public class OrderNotificationController {
         if (order == null) {
             return new ResponseEntity<>("Order not found", HttpStatus.NOT_FOUND);
         } else if (order.getIs_complete()) {
-            System.out.println("Order already complete");
             notifyOrderComplete(orderId);
             return new ResponseEntity<>("Order already complete", HttpStatus.CONFLICT);
         }
@@ -191,10 +186,8 @@ public class OrderNotificationController {
     public ResponseEntity<String> cancelInProgress(@RequestParam("orderId") int orderId) {
         Order order = orderDAO.findByIdJoinFetchUserDetails(orderId);
         if (order == null) {
-            System.out.println("Order not found");
             return new ResponseEntity<>("Order not found", HttpStatus.NOT_FOUND);
         } else if (order.getIs_complete()) {
-            System.out.println("Order already completed");
             notifyOrderComplete(orderId);
             return new ResponseEntity<>("Order already completed", HttpStatus.CONFLICT);
         }
