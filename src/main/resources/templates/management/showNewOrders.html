@@ -20,8 +20,11 @@
 
   <section class="space-between fulfillment-options">
     <h2>
-      <span>Employee Name:</span>
+      <span>Employee Name --</span>
       <span sec:authentication="principal.username" id="employee-name"></span>
+      <br>
+      <span>Connection Status --</span>
+      <span id="connection-status">Disconnected</span>
     </h2>
     <div>
       <button id="connect-btn">Connect to order stream</button>

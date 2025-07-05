@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
     const recipeDialog = document.getElementById("recipe-dialog");
     const recipeContainer = document.getElementById("recipe-container");
     const closeRecipeBtn = document.getElementById("close-recipe-dialog");
+    const connectionStatus = document.getElementById("connection-status");
 
     let eventSource;
     let orders = {};
@@ -38,6 +39,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
 
         eventSource.onopen = () => {
             isClosed = false;
+            connectionStatus.innerText = "Connected";
         };
         eventSource.onmessage = (event) => {
             console.log(event.data);
@@ -107,6 +109,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
             eventSource.close();
             isClosed = true;
             alert('Order notification stream closed.');
+            connectionStatus.innerText = "Disconnected";
         } else {
             alert("Notification stream is already closed.");
         }

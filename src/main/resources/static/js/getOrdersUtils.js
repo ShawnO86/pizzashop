@@ -118,9 +118,13 @@ export function appendOrderToUI(order, container) {
     userdetailHTML = buildUserDetailHTML(order["userDetail"]);
 
     const orderDateReceived = new Date(order['orderDateTime']);
-    const orderDateFormatted = [
-        orderDateReceived.getMonth() + 1, orderDateReceived.getDate(), orderDateReceived.getHours(), orderDateReceived.getMinutes()
-    ];
+    const orderDateFormatted = orderDateReceived.toLocaleString("en-US", {
+        timeZone: "UTC",
+        day: "2-digit",
+        month: "2-digit",
+        hour: "numeric",
+        minute: "numeric"
+    })
 
     orderTemplate.classList.add("order");
     orderTemplate.setAttribute("data-order-id", order['orderID']);
@@ -129,7 +133,7 @@ export function appendOrderToUI(order, container) {
         <details>
             <summary class="space-between">
                 <span>Order ID: ${order['orderID']}</span>
-                <span>Received on: ${orderDateFormatted[0]}/${orderDateFormatted[1]} @ ${orderDateFormatted[2]}:${orderDateFormatted[3]}</span>
+                <span>Received on: ${orderDateFormatted}</span>
             </summary>
             ${menuItemHTML ? menuItemHTML : ""}
             ${customPizzaHTML ? customPizzaHTML : ""}
