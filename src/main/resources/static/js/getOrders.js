@@ -37,7 +37,6 @@ document.addEventListener('DOMContentLoaded', ()=> {
         populateInitialUI();
 
         eventSource.onopen = () => {
-            console.log("Notification stream open.")
             isClosed = false;
         };
         eventSource.onmessage = (event) => {
@@ -47,8 +46,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
             // if not manually closed, close stream and attempt to reconnect.
             if (!isClosed) {
                 eventSource.close();
-                console.error(error);
-                console.log("Attempting reconnect in 3 seconds...");
+                console.error(error, "Attempting reconnect in 3 seconds...");
                 setTimeout(connect, 3000);
             } else {
                 console.log("Auto reconnect disabled, stream was closed intentionally.")
@@ -57,19 +55,21 @@ document.addEventListener('DOMContentLoaded', ()=> {
 
         eventSource.addEventListener('new-order', (event) => {
             const newOrderMsg = JSON.parse(event.data);
-            orders[newOrderMsg["orderID"]] = newOrderMsg;
+            const orderId = newOrderMsg["orderID"];
+            orders[orderId] = newOrderMsg;
             // Display the newOrderMessage to the employees
-            appendOrderToUI(orders[newOrderMsg["orderID"]], orderContainer);
+            appendOrderToUI(orders[orderId], orderContainer);
         });
 
         eventSource.addEventListener('order-in-progress', (event) => {
             //remove received order by id key, put into pendingOrders object with completedBy
             const fulfilledOrderMsg = JSON.parse(event.data);
-            delete orders[fulfilledOrderMsg["orderID"]];
-            fulfilled[fulfilledOrderMsg["orderID"]] = fulfilledOrderMsg;
+            const orderId = fulfilledOrderMsg["orderID"]
+            delete orders[orderId];
+            fulfilled[orderId] = fulfilledOrderMsg;
 
-            appendOrderToUI(fulfilled[fulfilledOrderMsg["orderID"]], fulfilledContainer);
-            const removeEl = orderContainer.querySelector(`[data-order-id="${fulfilledOrderMsg["orderID"]}"]`)
+            appendOrderToUI(fulfilled[orderId], fulfilledContainer);
+            const removeEl = orderContainer.querySelector(`[data-order-id="${orderId}"]`)
             removeEl.remove();
         });
 
@@ -83,10 +83,11 @@ document.addEventListener('DOMContentLoaded', ()=> {
 
         eventSource.addEventListener('cancel-in-progress', (event) => {
             const canceledOrderMsg = JSON.parse(event.data);
-            delete fulfilled[canceledOrderMsg["orderID"]];
-            orders[canceledOrderMsg["orderID"]] = canceledOrderMsg;
+            const orderId = canceledOrderMsg["orderID"];
+            delete fulfilled[orderId];
+            orders[orderId] = canceledOrderMsg;
 
-            const removeEl = fulfilledContainer.querySelector(`[data-order-id="${canceledOrderMsg["orderID"]}"]`)
+            const removeEl = fulfilledContainer.querySelector(`[data-order-id="${orderId}"]`)
             removeEl.remove();
             populateInitialUI()
         });
@@ -95,7 +96,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
     function manualConnect() {
         if (isClosed) {
             connect()
-                .then(() => console.log('order notification stream connected.'));
+                .then(() => alert('order notification stream connected.'));
         } else {
             alert("Notification stream is already active.");
         }
@@ -105,7 +106,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
         if (eventSource && eventSource.readyState !== EventSource.CLOSED) {
             eventSource.close();
             isClosed = true;
-            console.log('Order notification stream closed.');
+            alert('Order notification stream closed.');
         } else {
             alert("Notification stream is already closed.");
         }
@@ -170,12 +171,4 @@ document.addEventListener('DOMContentLoaded', ()=> {
             }
         }
     });
-
 });
-
-
-
-
-
-
-
