@@ -138,6 +138,9 @@ public class MenuItemController {
             model.addAttribute("ingredients", menuItemService.findAllIngredients());
             model.addAttribute("categories", MenuCategoryEnum.values());
             model.addAttribute("menuItem", menuItemDTO);
+            model.addAttribute("secondaryHeading", "");
+            model.addAttribute("pageTitle", "Menu Item Management");
+            model.addAttribute("additionalStyles", List.of("/styles/tables.css"));
 
             if (menuItemId == null) {
                 model.addAttribute("heading", "Create A New Menu Item");

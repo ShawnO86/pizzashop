@@ -27,8 +27,8 @@
         <span th:if="${#fields.hasErrors('dishName')}" th:errors="*{dishName}" class="error"></span>
       </label>
 
-      <label th:if="${menuItem.dishName == T(com.pizzashop.entities.PizzaSizeEnum).SMALL.pizzaName &&
-      menuItem.dishName == T(com.pizzashop.entities.PizzaSizeEnum).MEDIUM.pizzaName && menuItem.dishName == T(com.pizzashop.entities.PizzaSizeEnum).LARGE.pizzaName}">
+      <label th:if="${menuItem.dishName == T(com.pizzashop.entities.PizzaSizeEnum).SMALL.pizzaName ||
+      menuItem.dishName == T(com.pizzashop.entities.PizzaSizeEnum).MEDIUM.pizzaName || menuItem.dishName == T(com.pizzashop.entities.PizzaSizeEnum).LARGE.pizzaName}">
         <span th:text="${menuItem.dishName + '''s name cannot be modified, it is used in pizza builder.'}"></span>
         <input type="hidden" th:field="*{dishName}" th:value="*{dishName}">
         <span th:if="${#fields.hasErrors('dishName')}" th:errors="*{dishName}" class="error"></span>
@@ -49,8 +49,8 @@
         </label>
       </div>
 
-      <div th:if="${menuItem.dishName == T(com.pizzashop.entities.PizzaSizeEnum).SMALL.pizzaName &&
-       menuItem.dishName == T(com.pizzashop.entities.PizzaSizeEnum).MEDIUM.pizzaName && menuItem.dishName == T(com.pizzashop.entities.PizzaSizeEnum).LARGE.pizzaName}">
+      <div th:if="${menuItem.dishName == T(com.pizzashop.entities.PizzaSizeEnum).SMALL.pizzaName ||
+       menuItem.dishName == T(com.pizzashop.entities.PizzaSizeEnum).MEDIUM.pizzaName || menuItem.dishName == T(com.pizzashop.entities.PizzaSizeEnum).LARGE.pizzaName}">
         <label><span th:text="${menuItem.dishName + '''s category cannot be modified.'}"></span>
           <input type="hidden" th:field="*{menuCategory}" th:value="*{menuCategory}">
           <span th:if="${#fields.hasErrors('menuCategory')}" th:errors="*{menuCategory}" class="error"></span>

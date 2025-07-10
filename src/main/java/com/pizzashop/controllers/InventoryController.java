@@ -73,6 +73,11 @@ public class InventoryController {
             model.addAttribute("assocMenuItemsErr",
                     "Cannot delete this ingredient, it is associated with " + assocMenuItems + " item(s)");
             model.addAttribute("inventory", inventory);
+            model.addAttribute("heading", "Inventory Management");
+            model.addAttribute("secondaryHeading", "");
+            model.addAttribute("pageTitle", "Inventory Management");
+            model.addAttribute("additionalStyles", List.of("/styles/tables.css"));
+
             return "management/showInventory";
         }
 
