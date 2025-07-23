@@ -23,6 +23,7 @@ public class OrderServiceImpl implements OrderService {
 
     private final MenuItemService menuItemService;
 
+    // todo: move these lists to method scope and pass as params for other methods.
     private List<String> availabilityErrors;
     private List<String> priceErrors;
 

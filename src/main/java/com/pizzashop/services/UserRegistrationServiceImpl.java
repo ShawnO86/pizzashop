@@ -58,7 +58,7 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
 
         userDAO.save(user);
     }
-
+//todo : dont allow pizzashop user to be changed at all.
     @Override
     public void update(UserRegisterDTO userRegisterDTO, int userId, String role) {
         User user = userDAO.findByIdJoinFetchUserDetailsRoles(userId);
