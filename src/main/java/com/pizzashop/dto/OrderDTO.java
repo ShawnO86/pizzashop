@@ -1,6 +1,8 @@
 package com.pizzashop.dto;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +14,7 @@ public class OrderDTO {
     private int totalCost;
     private Integer orderID;
     private LocalDateTime orderDateTime;
+    private String convertedOrderDateTime;
     private boolean inProgress;
     private String employeeName;
     private UserDetailDTO userDetail;
@@ -57,6 +60,11 @@ public class OrderDTO {
     }
     public void setOrderDateTime(LocalDateTime orderDateTime) {
         this.orderDateTime = orderDateTime;
+        Instant utcInstant = orderDateTime.atZone(ZoneId.systemDefault()).toInstant();
+        this.convertedOrderDateTime = utcInstant.toString();
+    }
+    public String getConvertedOrderDateTime() {
+        return convertedOrderDateTime;
     }
     public boolean getInProgress() {
         return inProgress;

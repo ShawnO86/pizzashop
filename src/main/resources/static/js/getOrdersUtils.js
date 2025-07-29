@@ -117,7 +117,7 @@ export function appendOrderToUI(order, container) {
 
     userdetailHTML = buildUserDetailHTML(order["userDetail"]);
 
-    const orderDateReceived = new Date(order['orderDateTime']);
+    const orderDateReceived = new Date(order['convertedOrderDateTime']);
     const orderDateFormatted = orderDateReceived.toLocaleString("en-US", {
         day: "2-digit",
         month: "2-digit",
