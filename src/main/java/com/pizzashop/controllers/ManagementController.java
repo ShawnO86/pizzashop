@@ -220,30 +220,31 @@ public class ManagementController {
             errMsg = "You must correct the errors before proceeding";
         }
 
-
         if (errMsg.isEmpty()) {
-            userService.update(theWebUser, userId, userRole);
-
-            return "redirect:/system/userData";
-
-        } else {
-            theWebUser.setPassword(null);
-
-            User user = userDAO.findById(userId);
-            RoleEnum highestRole = this.getHighestRole(user.getRoles());
-            model.addAttribute("registrationError", errMsg);
-            model.addAttribute("webUser", theWebUser);
-            model.addAttribute("userId", userId);
-            model.addAttribute("highestRole", highestRole);
-            model.addAttribute("heading", "User Management");
-            model.addAttribute("secondaryHeading", "");
-            model.addAttribute("pageTitle", "User Management");
-            model.addAttribute("additionalStyles", List.of("/styles/forms.css"));
-            model.addAttribute("addType", "Update User");
-            model.addAttribute("formAction", "/system/processUpdateUserForm");
-
-            return "auth/register";
+            try {
+                userService.update(theWebUser, userId, userRole);
+                return "redirect:/system/userData";
+            } catch (RuntimeException e) {
+                errMsg = e.getMessage();
+            }
         }
+
+        theWebUser.setPassword(null);
+
+        User user = userDAO.findById(userId);
+        RoleEnum highestRole = this.getHighestRole(user.getRoles());
+        model.addAttribute("registrationError", errMsg);
+        model.addAttribute("webUser", theWebUser);
+        model.addAttribute("userId", userId);
+        model.addAttribute("highestRole", highestRole);
+        model.addAttribute("heading", "User Management");
+        model.addAttribute("secondaryHeading", "");
+        model.addAttribute("pageTitle", "User Management");
+        model.addAttribute("additionalStyles", List.of("/styles/forms.css"));
+        model.addAttribute("addType", "Update User");
+        model.addAttribute("formAction", "/system/processUpdateUserForm");
+
+        return "auth/register";
 
     }
 

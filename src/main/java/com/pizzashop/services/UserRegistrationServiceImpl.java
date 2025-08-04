@@ -58,10 +58,15 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
 
         userDAO.save(user);
     }
-//todo : dont allow pizzashop user to be changed at all.
+
     @Override
     public void update(UserRegisterDTO userRegisterDTO, int userId, String role) {
         User user = userDAO.findByIdJoinFetchUserDetailsRoles(userId);
+
+        if (Objects.equals(user.getUsername(), "pizzashop")) {
+            throw new RuntimeException("This is the default admin account, it cannot be updated in this way.");
+        }
+
         user.setUsername(userRegisterDTO.getUsername());
         user.setPassword(bCryptPasswordEncoder.encode(userRegisterDTO.getPassword()));
 
