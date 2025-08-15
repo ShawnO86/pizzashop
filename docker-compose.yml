@@ -1,0 +1,36 @@
+services:
+  spring-app:
+    image: pizza_shop:latest #build using Dockerfile
+    container_name: pizza_shop_container
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/pizzainventory #db name same as MYSQL_DATABASE
+      MYSQL_USERNAME: username #same as MYSQL_USER
+      MYSQL_PASSWORD: password #same as MYSQL_PASSWORD
+      INITIAL_ADMIN_PASS: application_admin_password #initial application login: user will be pizzashop (or change in config.AppRunner.setInitialAdmin())
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+
+  mysql-db:
+    image: mysql:8.0
+    container_name: mysql-database-container
+    environment:
+      #substitute username, password, db name for your own. Must match application container's env variables!
+      MYSQL_DATABASE: pizzainventory
+      MYSQL_USER: username
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: mysql_root_password
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      #for password, use -p then the password (no spaces)
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "username", "-ppassword"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  mysql-data:
