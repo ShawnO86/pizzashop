@@ -1,6 +1,6 @@
 services:
   spring-app:
-    image: pizza_shop:latest #build using Dockerfile
+    image: pizza_shop:latest #build using Dockerfile in base dir: (docker build -t pizza_shop .)
     container_name: pizza_shop_container
     ports:
       - "8080:8080"
