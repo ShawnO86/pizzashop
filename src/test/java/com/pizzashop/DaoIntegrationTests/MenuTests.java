@@ -1,5 +1,6 @@
 package com.pizzashop.DaoIntegrationTests;
 
+import com.pizzashop.config.AppRunner;
 import com.pizzashop.config.SecConfig;
 import com.pizzashop.controllers.ManagementController;
 import com.pizzashop.controllers.OrderController;
@@ -45,7 +46,8 @@ import static org.junit.jupiter.api.Assertions.*;
                 SecConfig.class,
                 ManagementController.class,
                 OrderController.class,
-                OrderNotificationController.class
+                OrderNotificationController.class,
+                AppRunner.class
         })
 )
 

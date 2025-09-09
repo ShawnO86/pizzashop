@@ -82,13 +82,17 @@ public class UserTests {
         User fetchedUser = userDAO.findByUsername(user.getUsername());
         UserDetail fetchedUserDetail = fetchedUser.getUserDetail();
         System.out.println("Fetched user:\n" + fetchedUser);
+        System.out.println("Fetched userdetail:\n" + fetchedUserDetail);
 
         fetchedUserDetail.setFirstName("TestFirstName_changed");
         fetchedUser.setUserDetail(fetchedUserDetail);
 
-        User changedUser = userDAO.findByUsername(user.getUsername());
+        userDAO.save(fetchedUser);
+
+        User changedUser = userDAO.findByUsername(fetchedUser.getUsername());
 
         System.out.println("Updated user:\n" + changedUser);
+        System.out.println("Updated userdetail:\n" + changedUser.getUserDetail());
         // ensure same identifier
         assertEquals(changedUser.getId(), fetchedUser.getId());
         assertEquals(changedUser.getUserDetail().getFirstName(), user.getUserDetail().getFirstName());
